@@ -1,0 +1,28 @@
+preciso que analise a estrutura do meu projeto atual da fb bombas, princiopalmente da pagina inicial onde
+   temos todas as sessoes do site sem ser a pagina de produtos. a pagina de produtos precisa ser refeita
+  por completo. verifique no backup do projeto como estava anteriormente essa pagina dos produtos, preciso
+  que baseado nela agora voce pegue todos os dados corretos dos produtos atuais da empresa e o design e
+  layout da pagina inicial e refaça essa pagina dos produtos por completo para ficar muito mais bem
+  cosntruido e padronizado com as sessoes de clientes, proque escolher a fb bombas, nossa historia, etc.
+  nessa pagina de produtos devemos ter a mesma estrutura que tinhamos no backup onde teremos 2 tipos de
+  produtos e o cliente com facilidade poderá ver todos as infos e achar o tamanho ou modelo que quer. para
+  isso voce deve refazer o visual completo e estrutura dos dados dos produtos para ficar com os novos dados
+   que ja temos na nova pagina dos produtos mas com os dados corretos, modelos e tamanhos corretos e tudo
+  highend e otimizado seguindo tudo que eu solicitei. divisões das bombas >> bombas de engrenagem (serie
+  fbe) bombas centrifugas (serie fbcn e fbot) >> bombas de engrenagem: As que tem variações, vamo colocar o
+   diâmetro como principal dai quando clica naquele diâmetro entra em outra página com todos os modelos com
+   aquele diâmetro >> Por exemplo:
+
+  1/8" -> só um modelo
+  1/4" -> só um modelo
+  3/8" -> só um modelo
+  1/2" -> só um modelo
+  3/4" -> só um modelo
+  1" -> 4 modelos, sendo: 1", 1" A, 1" D e 1" DA
+  2" -> 2 modelos, sendo 2" e 2" A
+  3" -> 2 modelos, sendo 3" e 3" M9
+  4" -> 3 modelos, sendo 4" M6, 4" M8 e 4" M12 >> As que só tem um modelo vai direto pras especificações da
+   bomba, as que tem mais de um modelo abre a página com as variações >> bombas centrifugas: apenas dados
+  basicos que ja temos no backup, mas sem os 4 cards de info da versao do backup (visual padronizado tambem
+   com a pagina inicial do site atualmente!) . COMECE AGORA E ANALISE MINHA SOLICITACAO EM CADA DETALHE,
+  ANALISE O PROJETO E OS DADOS DOS PRODUTOS QUE JA COLOQUEI NELE PARA ESSA NOVA PAGINA DOS PRODUTOS.

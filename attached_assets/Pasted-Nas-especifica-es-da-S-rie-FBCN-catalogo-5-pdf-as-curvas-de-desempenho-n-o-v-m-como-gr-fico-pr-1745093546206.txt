@@ -1,0 +1,61 @@
+Nas especificações da Série FBCN (catalogo_5.pdf), as “curvas” de desempenho não vêm como gráfico pronto, mas sim como tabelas de seleção rápida (Tabela 1), separadas para 1 750 rpm e 3 500 rpm. Para obter a curva H–Q (altura manométrica total em função da vazão), basta extrair esses pontos da tabela e plotá‑los.
+
+Onde encontrar os dados
+Tabela 1.1 (1750 rpm – 60 Hz): lista, para cada tamanho (por exemplo, 25‑150, 25‑200, 32‑125.1 etc.), a altura (m) correspondente a várias vazões (m³/h).
+
+Tabela 1.2 (3500 rpm – 60 Hz): mesma estrutura, porém para rotação dupla, com alturas significativamente maiores.
+
+Ambas estão nas páginas 3 e 4 do manual 
+.
+
+Exemplo de extração e plotagem da curva
+Para ilustrar, vamos pegar o modelo 25‑150 e extrair alguns pontos de cabeça (H) vs. vazão (Q) da Tabela 1.1 (1750 rpm). Supondo os seguintes valores aproximados (em m e m³/h) — você deverá substituir pelos valores exatos do manual:
+
+
+Q (m³/h)	H (m)
+0	32,0
+40	30,0
+80	27,5
+120	23,0
+160	17,0
+200	10,0
+E, para 3500 rpm (Tabela 1.2), aplicando a lei de afinidade (aprox. 4× H):
+
+
+Q (m³/h)	H (m)
+0	128
+40	120
+80	110
+120	92
+160	68
+200	40
+A seguir, ploto essas duas curvas para exemplificar como ficaria o gráfico H–Q desta bomba.
+
+python
+Copiar
+Editar
+# Este código gera o gráfico de exemplo; substitua pelos valores exatos do manual.
+
+import matplotlib.pyplot as plt
+
+Q = [0, 40, 80, 120, 160, 200]
+H_1750 = [32.0, 30.0, 27.5, 23.0, 17.0, 10.0]
+H_3500 = [h*4 for h in H_1750]
+
+plt.figure()
+plt.plot(Q, H_1750, marker='o', label='1750 rpm')
+plt.plot(Q, H_3500, marker='s', label='3500 rpm')
+plt.xlabel('Vazão Q (m³/h)')
+plt.ylabel('Altura H (m)')
+plt.title('Curva Característica – FBCN 25‑150')
+plt.grid(True)
+plt.legend()
+plt.show()
+Próximos passos
+Extraia os valores exatos da Tabela 1 do manual (pág. 3–4).
+
+Substitua no código acima para cada modelo desejado (25‑150, 32‑200 etc.).
+
+Gere o gráfico para visualizar a curva H–Q real de cada bomba.
+
+Se preferir, posso ajudar a montar esse gráfico de forma interativa assim que você me passar os valores precisos da tabela.

@@ -1,0 +1,442 @@
+{
+  "common": {
+    "back": "Back"
+  },
+  "nav": {
+    "home": "Home",
+    "history": "Our History",
+    "products": "Products",
+    "services": "Services",
+    "calculator": "Calculator",
+    "downloads": "Downloads",
+    "careers": "Work With Us",
+    "contact": "Contact",
+    "menu": "Menu",
+    "close_menu": "Close menu",
+    "settings": "Settings"
+  },
+  "hero": {
+    "since": "Since 1944",
+    "title": "Over 80 years pumping solutions.",
+    "title_line1": "Over 80 years",
+    "title_line2": "pumping solutions.",
+    "subtitle": "Pumping technology and solutions for industries that cannot stop. Quality and high performance for the most demanding industrial processes.",
+    "get_quote": "Request Quote",
+    "explore_products": "Explore Products",
+    "scroll_down": "Scroll to explore",
+    "years": "Years of Experience",
+    "certified": "International Standard",
+    "guarantee": "Product Warranty"
+  },
+  "company": {
+    "title": "Our History",
+    "subtitle": "Over 80 years pumping solutions",
+    "history": "Founded in 1944, FB Bombas is a Brazilian industrial pumps manufacturer that has been working for over 80 years in various industrial segments.",
+    "precision_title": "Precision Engineering",
+    "precision_desc": "High-performance equipment designed for demanding and specific applications with quality and tradition.",
+    "durability_title": "Superior Durability",
+    "durability_desc": "Materials specified according to application demand and optimized production processes.",
+    "tradition_title": "Tradition and Excellence",
+    "tradition_desc": "Over 80 years of experience in the Brazilian market, consolidating our position as a reference in industrial pumping.",
+    "support_title": "Specialized Support",
+    "support_desc": "Highly qualified technical team offers complete support throughout the entire service and product life cycle.",
+    "materials_title": "Specialized Materials",
+    "materials_desc": "Materials specified according to application demand and optimized production processes for maximum efficiency.",
+    "history_text": "Our precision engineering ensures high-performance equipment even in the most demanding applications.",
+    "history_title": "History and Tradition",
+    "history_p1": "Founded in 1944, FB Bombas emerged from the pioneering vision of providing high-quality pumping solutions for the expanding Brazilian industry. Over more than 80 years, we have grown constantly, maintaining our commitment to excellence and innovation.",
+    "history_p2": "Our trajectory is marked by important technological achievements and the development of increasingly efficient and durable products, consolidating our position as a reference in the sector.",
+    "history": {
+      "today": "Today",
+      "caption": "Industrial Pioneering",
+      "main_title": "Tradition and Excellence",
+      "caption_desc": "Tradition in industrial pumping",
+      "timeline_desc": "Over 80 years of tradition and innovation"
+    },
+    "certifications": {
+      "title": "Certifications and Standards",
+      "subtitle": "Certified Quality",
+      "description": "Our products and processes are certified by the most rigorous international standards, ensuring excellence in all our products.",
+      "crcc": {
+        "desc": "Supplier Registry for large-scale projects and critical applications in Brazil.",
+        "badge": "Official Registry"
+      },
+      "api": {
+        "desc": "Compliance with rigorous international standards for centrifugal pumps in petrochemical applications.",
+        "badge": "International Standard"
+      }
+    },
+    "factory": {
+      "title": "Infrastructure",
+      "subtitle": "High Technology Manufacturing Plant",
+      "caption": "Manufacturing Facility",
+      "f1": "10,900 m² total area",
+      "f1_title": "Total Area",
+      "f2": "5,545 m² built area",
+      "f2_title": "Built Area",
+      "f3": "Precision CNC machinery",
+      "f3_title": "Technology", 
+      "f4": "Testing and quality control laboratories",
+      "f4_title": "Quality",
+      "p1": "Our manufacturing unit has 10,900 m² of total area, with 5,545 m² of built area, equipped with cutting-edge technology to ensure the manufacturing of high-quality products.",
+      "p2": "We have state-of-the-art CNC equipment, specialized machining cells and testing laboratories that allow precise control of all production processes."
+    }
+  },
+  "products": {
+    "title": "Our Product Line",
+    "subtitle": "Complete pumping solutions for all industrial needs",
+    "all_models": "All Models",
+    "see_all_models": "See All Models",
+    "view_details": "View Details",
+    "max_flow": "Max. Flow",
+    "max_height": "Max. Head",
+    "max_temp": "Max. Temp.",
+    "main_features": "Main Features",
+    "technical_description": "Technical Description",
+    "standards": "Standards",
+    "specifications": "Specifications",
+    "product_code": "Product Code",
+    "fbcn": "Centrifugal Normalized Pumps",
+    "fbot": "Thermal Oil Pumps",
+    "fbe": "External Gear Pumps",
+    "gear_pumps": "Gear Pumps (FBE)",
+    "centrifugal_pumps": "Centrifugal Pumps",
+    "centrifugal": "Centrifugal Pumps",
+    "centrifugal.subtitle": "FBCN and FBOT Series",
+    "centrifugal.desc": "Centrifugal pumps for general industrial applications and thermal oil, with high efficiency and operational reliability.",
+    "centrifugal.feature1": "Flow up to 4,500 m³/h",
+    "centrifugal.feature2": "Temperature up to 350°C",
+    "centrifugal.feature3": "Back-pull-out construction",
+    "fbe.desc": "Positive displacement pumps ideal for viscous fluids and special applications.",
+    "fbe.feature1": "Flow up to 390 m³/h",
+    "fbe.feature2": "Head up to 220 m",
+    "fbe.feature3": "Viscous fluids",
+    "catalog_title": "Product Catalog",
+    "catalog_description": "Explore our complete line of high-performance industrial pumps",
+    "gear_pumps_series": "Gear Pumps - FBE Series",
+    "gear_pumps_description": "Our FBE external gear pump line is ideal for precise transfer and dosing of viscous fluids. With a wide variety of sizes, materials, and configurations, FBE pumps offer a robust and reliable solution for demanding industrial applications.",
+    "centrifugal_pumps_title": "Industrial Centrifugal Pumps",
+    "centrifugal_pumps_description": "Our centrifugal pump line is designed to offer high performance and reliability in industrial applications. With robust construction in cast iron and stainless steel, our models meet various flow and pressure requirements, providing efficient solutions for pumping systems.",
+    "download_manual": "Download Technical Manual",
+    "contact_consultant": "Contact a Consultant",
+    "filter_by_size": "Filter by size",
+    "all_sizes": "All sizes",
+    "size_micro": "Micro (up to 3/8\")",
+    "size_small": "Small (1/2\" - 3/4\")",
+    "size_medium": "Medium (1\" - 1 1/2\")",
+    "size_large": "Large (2\")",
+    "size_xlarge": "Extra large (3\" - 4\")",
+    "flow_range": "Flow Range",
+    "head_range": "Head Range",
+    "temperature_range": "Temperature",
+    "materials": "Materials",
+    "applications": "Typical Applications",
+    "download_curves": "Performance Curves",
+    "specific_models_notice": "For information on specific centrifugal pump models, please contact our technical team for a personalized analysis of your application.",
+    "back_to_all": "Back to all models",
+    "gear_pump_desc": "External Gear Pump",
+    "request_quote": "Request Quote",
+    "download_datasheet": "Download Datasheet",
+    "quick_contact": "Quick Contact",
+    "product_description": "Product Description",
+    "technical_specs": "Technical Specifications",
+    "parameter": "Parameter",
+    "specification": "Specification",
+    "rotation_speeds": "Rotation Speeds",
+    "connection_diameter": "Connection Diameter",
+    "body_material": "Body Material",
+    "gear_material": "Gear Material",
+    "seal_type": "Seal Type",
+    "drive_options": "Drive Options",
+    "typical_applications": "Typical Applications",
+    "other_models": "Other models in this series",
+    "view_all": "View all",
+    "need_custom_quote": "Need a customized solution?",
+    "custom_quote_desc": "Contact our technical team to discuss special specifications, custom configurations, or any other specific needs of your project.",
+    "max_pressure": "Pressure",
+    "categories": {
+      "all": "All",
+      "fbe": "Gear Pumps",
+      "fbcn": "Centrifugal Pumps",
+      "fbot": "Thermal Oil Pumps",
+      "gearPumps": "Gear Pumps",
+      "centrifugalPumps": "Centrifugal Pumps",
+      "thermalOilPumps": "Thermal Oil Pumps"
+    },
+    "hero": {
+      "badge": "Complete Line of Industrial Pumps",
+      "title": "High Performance Pumping Solutions",
+      "subtitle": "Advanced technology and precision engineering for the most demanding industrial processes. Quality and reliability for over 80 years."
+    },
+    "metrics": {
+      "pressure": "Maximum Pressure",
+      "flow": "Maximum Flow",
+      "temperature": "Maximum Temperature"
+    },
+    "search": {
+      "placeholder": "Search products by name or specification..."
+    },
+    "sort": {
+      "label": "Sort by",
+      "name": "Name",
+      "flow": "Flow"
+    },
+    "specs": {
+      "maxFlow": "Max Flow",
+      "maxHeight": "Max Head",
+      "maxTemp": "Max Temp"
+    },
+    "viewDetails": "View Details",
+    "consultant": "Consultant",
+    "noResults": "No products found with the applied filters.",
+    "clearFilters": "Clear Filters",
+    "cta": {
+      "title": "Can't find what you're looking for?",
+      "subtitle": "Our technical team is ready to help you find the ideal solution for your application.",
+      "consultant": "Talk to Consultant",
+      "catalogs": "Download Catalogs"
+    },
+    "whatsapp": {
+      "consultMessage": "Hello! I would like to know more about FB Bombas pumps.",
+      "gearPumpMessage": "Hello! I would like to know more about FBE series gear pumps."
+    },
+    "gearPumps": {
+      "badge": "FBE Series",
+      "title": "External Gear Pumps",
+      "subtitle": "Robust and reliable solutions for transfer and precise dosing of viscous fluids in demanding industrial applications.",
+      "downloadManual": "FBE Technical Manual",
+      "talkToConsultant": "Talk to Consultant",
+      "features": {
+        "flow": "Maximum Flow",
+        "pressure": "Maximum Pressure",
+        "viscosity": "Maximum Viscosity",
+        "sizes": "Available Diameters"
+      },
+      "searchPlaceholder": "Search by diameter or model...",
+      "clearSearch": "Clear Search",
+      "selectDiameter": "Select Pump Diameter",
+      "selectDiameterDesc": "Choose the desired diameter to view available models and their complete technical specifications.",
+      "singleModel": "1 model available",
+      "multipleModels": "{{count}} models available",
+      "maxFlow": "Maximum Flow",
+      "maxRPM": "Maximum Rotation",
+      "maxPressure": "Maximum Pressure",
+      "maxViscosity": "Maximum Viscosity",
+      "viewVariations": "View Variations",
+      "backToDiameters": "Back to Diameters",
+      "variationsFor": "Variations for {{diameter}}",
+      "viewSpecs": "View Specifications",
+      "completeSpecs": "Complete technical specifications and flow table",
+      "technicalData": "Technical Data",
+      "specifications": "Technical Specifications",
+      "suction": "Suction and Discharge",
+      "gears": "Gears",
+      "sealing": "Sealing",
+      "bearings": "Bearings",
+      "construction": "Construction",
+      "optionals": "Optionals",
+      "flowTable": "Flow and Pressure Table",
+      "pressure": "Pressure",
+      "flow": "Flow",
+      "power": "Power",
+      "requestQuote": "Request Quote"
+    },
+    "mainTitle": "Our Products",
+    "mainSubtitle": "Complete industrial pumping solutions",
+    "explore": "Explore",
+    "needHelp": "Need help choosing?",
+    "ctaDescription": "Our technical team is ready to help you find the ideal solution.",
+    "talkToConsultant": "Talk to Consultant",
+    "viewModels": "View Models",
+    "rotation": "Rotation"
+  },
+  "products_description": {
+    "fbcn_title": "FBCN Normalized Centrifugal Pumps",
+    "fbcn_desc": "Our FBCN normalized centrifugal pumps follow DIN 24255/ISO 2858 standards, with high efficiency and durability for various industrial applications. Ideal for water, light oils and clean liquid transfer.",
+    "fbcn_app": "General industry",
+    "fbcn_feature": "High efficiency",
+    "fbot_title": "FBOT Thermal Oil Pumps",
+    "fbot_desc": "FBOT pumps are specially designed for applications with thermal fluids at high temperatures. Manufactured with special materials and seals adapted to withstand up to 350°C in continuous operation.",
+    "fbot_app": "Thermal systems",
+    "fbot_feature": "High temperature",
+    "fbe_title": "FBE External Gear Pumps",
+    "fbe.subtitle": "FBE Series",
+    "fbe_desc": "FBE gear pumps are ideal for viscous fluids, offering positive displacement and precise flow independent of pressure. Perfect for lubricating oils, resins, polymers and other high viscosity applications.",
+    "fbe_app": "Viscous fluids",
+    "fbe_feature": "Dosing precision"
+  },
+  "product_details": {
+    "specifications": "Specifications",
+    "flow": "Flow Rate",
+    "head": "Head",
+    "temperature": "Temperature",
+    "viscosity": "Viscosity",
+    "materials": "Materials",
+    "applications": "Applications",
+    "features": "Features",
+    "available_rotations": "Available rotations",
+    "selection_help": "Need help selecting the ideal model?",
+    "selection_help_desc": "Use our selection calculator to find the perfect pump for your application, based on specific technical parameters.",
+    "use_calculator": "Use Selection Calculator"
+  },
+  "downloads": {
+    "title": "Technical Manuals",
+    "subtitle": "Complete technical documentation for installation, operation and maintenance",
+    "download_manual": "Download Manual",
+    "file_size": "File size",
+    "format": "Format",
+    "fbcn_manual": {
+      "title": "FBCN Technical Manual",
+      "subtitle": "Standardized Centrifugal Pumps",
+      "description": "Complete technical manual for FBCN line with detailed specifications, installation, operation and maintenance."
+    },
+    "fbot_manual": {
+      "title": "FBOT Technical Manual",
+      "subtitle": "Thermal Oil Pumps",
+      "description": "Complete technical manual for FBOT line for thermal oil applications with high temperature specifications."
+    },
+    "fbe_manual": {
+      "title": "FBE Technical Manual",
+      "subtitle": "External Gear Pumps",
+      "description": "Complete technical manual for FBE line for viscous fluids with positive displacement specifications."
+    }
+  },
+  "contact": {
+    "title": "Contact Us",
+    "subtitle": "We are ready to meet your needs",
+    "form": {
+      "request_quote": "Request Quote",
+      "name": "Name",
+      "company": "Company",
+      "email": "Email",
+      "phone": "Phone",
+      "pump_model": "Pump Model",
+      "select_model": "Select a model",
+      "model_fbcn": "FBCN Normalized Series",
+      "model_fbot": "FBOT Thermal Oil Series",
+      "model_fbe": "FBE External Gear",
+      "flow_rate": "Flow Rate (m³/h)",
+      "head": "Head (m)",
+      "fluid": "Pumped Fluid",
+      "temperature": "Temperature (°C)",
+      "additional_info": "Additional Information",
+      "privacy_consent": "I agree with the",
+      "privacy_policy": "Privacy Policy",
+      "data_consent": "and authorize the processing of my personal data for commercial contact.",
+      "sending": "Sending...",
+      "submit": "Send Request",
+      "success_title": "Form sent successfully!",
+      "success_message": "We will contact you soon.",
+      "send": "Send Message",
+      "subtitle": "Fill out the form and we will contact you",
+      "technical_specs": "Technical Specifications"
+    },
+    "info": {
+      "title": "Contact Information",
+      "address": "Address",
+      "phone": "Phone",
+      "email": "Email",
+      "hours": "Business Hours",
+      "cta": "Contact us for customized industrial pumping solutions"
+    }
+  },
+  "footer": {
+    "products": "Products",
+    "information": "Information",
+    "history": "Our History",
+    "services": "Services",
+    "catalogs": "Catalogs",
+    "contact": "Contact",
+    "careers": "Work with Us",
+    "rights_reserved": "All rights reserved",
+    "developed_by": "Developed by",
+    "gear_pumps": "Gear Pumps",
+    "company_description": "For over 80 years manufacturing high-quality pumps for the most diverse industrial applications."
+  },
+  "clients": {
+    "title": "Our Clients",
+    "subtitle": "Partners of the largest national and multinational industries"
+  },
+  "services": {
+    "title": "Our Services",
+    "subtitle": "Complete support throughout the product lifecycle"
+  },
+  "benefits": {
+    "title": "Why Choose FB Bombas",
+    "subtitle": "Tradition in precision engineering for lasting industrial solutions"
+  },
+  "cases": {
+    "title": "Success Stories",
+    "subtitle": "Real projects that demonstrate our expertise"
+  },
+  "fluid_options": {
+    "water": "Water",
+    "sea_water": "Sea Water",
+    "thermal_oil": "Thermal Oil",
+    "hydraulic_oil": "Hydraulic Oil",
+    "glycol": "Glycol Solution",
+    "custom": "Custom"
+  },
+  "calculator": {
+    "title": "Pump Selection Calculator",
+    "tabs": {
+      "parameters": "Parameters",
+      "results": "Results"
+    },
+    "pump_type_selection": "Pump Type Selection",
+    "pump_type_fbcn_desc": "Normalized Centrifugal Pump",
+    "pump_type_fbot_desc": "Thermal Oil Pump",
+    "pump_type_fbe_desc": "External Gear Pump",
+    "select_rotation": "Select Rotation",
+    "fluid_parameters": "Fluid Parameters",
+    "fluid_type": "Fluid Type",
+    "viscosity_tooltip": "Fluid viscosity directly affects pump performance. Higher viscosity values increase flow resistance and reduce efficiency.",
+    "calculating": "Calculating...",
+    "calculate": "Calculate Ideal Pump",
+    "model_description": "Recommended model for the given parameters",
+    "generating_pdf": "Generating PDF...",
+    "download_result": "Export PDF Result",
+    "calculation_error": "Error calculating ideal pump. Please verify parameters and try again."
+  },
+  "pump_type": {
+    "fbcn": "Normalized Centrifugal Pump",
+    "fbot": "Thermal Oil Pump",
+    "fbe": "External Gear Pump"
+  },
+  "chart": {
+    "flow_axis": "Flow Rate (m³/h)",
+    "head_axis": "Head (m)",
+    "pump_curve": "Pump Curve",
+    "system_curve": "System Curve",
+    "efficiency": "Efficiency",
+    "flow": "Flow Rate",
+    "required_flow": "Req. Flow",
+    "required_head": "Req. Head"
+  },
+  "pdf": {
+    "generation_error": "Error generating PDF. Please try again."
+  },
+  "recommendations": {
+    "high_viscosity": "Extremely high viscosity. Consider using a heating system to reduce viscosity.",
+    "medium_viscosity": "Very high viscosity. Efficiency will be reduced.",
+    "high_temperature": "High temperature. We recommend using thermal oil-specific pumps (FBOT).",
+    "high_npsh": "High required NPSH. Check installation to avoid cavitation."
+  },
+  "careers": {
+    "title": "Work With Us",
+    "subtitle": "Be part of a team that builds the future of Brazilian Industry",
+    "team": {
+      "title": "Specialized Team",
+      "desc": "Work with highly qualified professionals passionate about technology"
+    },
+    "growth": {
+      "title": "Professional Growth",
+      "desc": "Opportunities for continuous development and training"
+    },
+    "cta": {
+      "title": "Ready to make a difference?",
+      "description": "Send your resume and join our team of excellence",
+      "button": "Contact Us"
+    }
+  }
+}

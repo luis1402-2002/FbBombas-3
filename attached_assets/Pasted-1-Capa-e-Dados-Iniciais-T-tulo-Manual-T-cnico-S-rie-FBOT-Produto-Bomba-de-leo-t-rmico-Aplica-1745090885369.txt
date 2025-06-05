@@ -1,0 +1,171 @@
+1. Capa e Dados Iniciais
+Título: Manual Técnico – Série FBOT
+
+Produto: Bomba de óleo térmico
+
+Aplicação: Desenvolvida para bombear óleos térmicos orgânicos em indústrias farmacêutica, química, alimentícia, têxtil, plástica etc. O fluido não deve conter partículas abrasivas ou substâncias que ataquem quimicamente os componentes da bomba ​
+.
+
+Descrição Geral: Construção “back-pull-out”, que permite retirar o conjunto mancal/carcaça sem desconectar tubulações, facilitando montagem, desmontagem e manutenção. Vedação do mancal com selo mecânico imerso em óleo e gaxetas de grafite ​
+.
+
+Denominação / Dados de Operação:
+
+Tamanhos nominais: DN 25 até DN 300 (mm)
+
+Vazões: até 2 200 m³/h
+
+Altura manométrica: até 135 m
+
+Temperatura de operação: até 350 °C
+
+Rotações: até 3 500 rpm ​
+.
+
+2. Índice Geral
+Curva Característica – Seleção Rápida (pág. 3)
+
+Características Gerais da Bomba (pág. 4)
+
+Reserva de Potência (pág. 5)
+
+Acessórios (pág. 6)
+
+Velocidade Periférica (pág. 6)
+
+Desenho em Corte (pág. 7)
+
+Lista de Peças (pág. 8)
+
+Conexões Auxiliares (pág. 9)
+
+Dimensional (pág. 9–10) ​
+.
+
+3. Curvas Característica
+1750 rpm, 60 Hz: Gráfico de vazão vs. altura (Seleção rápida).
+
+3500 rpm, 60 Hz: Curva adicional para rotações mais altas (Figura 1) ​
+.
+
+4. Características Gerais da Bomba
+Tabela 1 – Informações Técnicas ​
+
+
+Dado Construtivo	Unidade	Especificação
+Ø Máximo do Rotor	mm	152 / 317
+Largura do Rotor	mm	5 / 23
+Tipo de Rotor	–	Fechado
+Rotação Máxima	rpm	3500
+Pressão Máx. de Sucção	bar	10
+Pressão Máx. de Recalque × Temp.	bar	Vide Figura 1
+Pressão de Teste Hidrostático	bar	1,5 × pressão de operação
+Temperatura Máxima	°C	350
+Sentido de Rotação	–	Horário (visto do acionamento)
+Flanges	–	ANSI B16.42 150 lbs / DIN PN16
+Mancal 3 / 4 (rolamentos)	–	6306 C4 / 6306 ZZ C4 WT
+6308 C4 / 6308 ZZ C4 WT
+Lubrificação dos Mancais	–	Óleo
+Gaxeta de fibra de grafite	mm	5,5
+Selo mecânico simples	mm	Ø 32 / Ø 42
+Peso	kg	28 / 320
+2.1 Corpo da Bomba: Espiral, fundido em peça única, sem pés.
+2.2 Rotor: Radial fechado, sucção simples.
+2.3 Eixo: Duplo estágio de vedação (gaxetas de grafite + selo mecânico em óleo).
+2.4 Mancal: Dois rolamentos – um submerso em óleo e outro lubrificado a graxa. ​
+
+5. Reserva de Potência
+Tabela 2 – Reserva de Potência ​
+
+
+Bomba (cv)	Potência Requerida (cv)	Reserva de Potência no Motor
+até 2	mínimo 1,5	aprox. 20%
+até 20	–	aprox. 15%
+acima de 20	–	aprox. 10%
+6. Acessórios
+Flanges: ANSI B16.42 e DIN EN 1092‑2 PN16 (opcional).
+
+Acionamento: Motor elétrico.
+
+Acoplamento: Flexível, com/sem espaçador padrão FB ou similar.
+
+Protetor de Acoplamento: Aço carbono ou anti-centelhante.
+
+Base: Chapa “U” em aço. ​
+
+7. Velocidade Periférica
+Limites conforme material do rotor ​
+:
+
+Ferro Fundido: até 40 m/s
+
+Ferro Nodular: até 60 m/s
+
+Aço Carbono: até 60 m/s
+
+Aços Inoxidáveis: até 80 m/s
+
+8. Desenho em Corte
+Figura 2: Corte longitudinal da bomba, com dimensões principais indicadas. ​
+
+9. Lista de Peças
+Tabela 3 – Lista de Peças ​
+
+
+Nº Peça	Descrição	Qtd
+102	Carcaça – Corpo Espiral	1
+163	Tampa de Pressão	1
+183	Pé de Apoio	1
+210	Eixo	1
+230	Rotor	1
+321.01	Rolamento Radial de Esferas	1
+321.02	Rolamento Radial de Esferas Blindado à graxa	1
+330	Suporte de Mancal	1
+360	Tampa de Mancal	1
+400.01	Junta Plana – carcaça / tampa de pressão	1
+400.03	Junta Plana – tampa de mancal / suporte	1
+411	Arruela de vedação – conexões FF, V e D1	3
+433	Selo Mecânico	1
+461	Gaxetas de grafite	3
+502	Anel de Desgaste do Corpo	1
+503	Anel de Desgaste do Rotor	1
+550	Tampa de apoio	1
+551.01	Arruela distanciadora – gaxeta	1
+551.04	Arruela distanciadora – rolamento	2
+710	Tubo	1
+901.01	Parafuso Cab. Sextavada – tampa/carcaça	6
+901.03	Parafuso Cab. Sextavada – suporte/carcaça	4
+901.13	Parafuso Cab. Sextavada – pé/suporte	1
+903	Bujão – conexões FF, V e D1	3
+914	Parafuso Allen – tampa do mancal	4
+922	Porca do Rotor	1
+932.01	Anel de Segurança – gaxeta	1
+932.04	Anel de Segurança – rolamentos	2
+936	Arruela de pressão	1
+940.1	Chaveta – rotor	1
+940.2	Chaveta – acoplamento	1
+970	Placa de Identificação	1
+10. Conexões Auxiliares
+Figura 3: Indicação das conexões D1, D2, FF e V na carcaça.
+
+Tabela 4 – Diâmetros das Roscas ​
+
+
+Conexão	Denominação	Dimensões
+D1	Dreno do suporte	¼” BSP
+D2	Indicador de vazamento no selo mecânico	¼” BSP
+FF	Alimentação de óleo	¼” BSP
+V	Respiro	¼” BSP
+11. Dimensional
+Figura 4: Desenho dimensional com todas as cotas principais.
+
+Tabela 5 – Dimensões (mm): Lista completa de todas as medidas em milímetros para cada tamanho nominal (DN 25 a DN 300), conforme disposição da Figura 4. (Para consulta dos valores detalhados, ver Tabela 5 no PDF) ​
+.
+
+12. Dados da Fabricante
+FABRICADORA DE BOMBAS IND. E COM. LTDA.
+Av. Pedro Celestino Leite Penteado, 305 – Cajamar, SP, Brasil.
+CEP 07760‑000 | Tel.: +55 (11) 4898‑9200 | Fax: +55 (11) 4898‑9215
+Outubro 2010 ​
+
+Observação: Este relatório reúne integralmente todo o texto, tabelas e referências gráficas presentes no PDF da Bomba de Óleo Térmico FBOT. Caso necessite dos valores numéricos específicos da Tabela 5, recomenda‑se consultar diretamente a página da Tabela no PDF.

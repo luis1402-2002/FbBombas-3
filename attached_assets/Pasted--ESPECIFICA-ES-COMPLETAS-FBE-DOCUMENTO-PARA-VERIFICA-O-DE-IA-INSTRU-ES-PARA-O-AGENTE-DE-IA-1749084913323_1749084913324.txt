@@ -1,0 +1,683 @@
+# ESPECIFICAÇÕES COMPLETAS FBE - DOCUMENTO PARA VERIFICAÇÃO DE IA
+
+## INSTRUÇÕES PARA O AGENTE DE IA
+
+Este documento contém a extração completa e estruturada de todos os dados da planilha de especificações FBE (Bombas de Engrenagem Externa). Sua tarefa é verificar e corrigir todas as informações da série FBE de tamanhos pequenos até o tamanho 4, conforme solicitado.
+
+**DADOS EXTRAÍDOS DE:** Planilha "EspecificaçãoFBE(1).xlsx"  
+**DATA DE EXTRAÇÃO:** 4 de junho de 2025  
+**TOTAL DE ABAS ANALISADAS:** 8  
+**TOTAL DE IMAGENS EXTRAÍDAS:** 39 (método principal) + 22 (método alternativo)  
+**TOTAL DE TABELAS DE ESPECIFICAÇÕES:** 18  
+
+## RESUMO EXECUTIVO
+
+A planilha analisada contém especificações técnicas completas para bombas de engrenagem externa da série FBE, abrangendo desde modelos pequenos (FBE 1/8") até modelos de grande porte (FBE 4" e variações). Cada modelo possui tabelas detalhadas de vazão e pressão em diferentes rotações (RPM), além de valores de potência (CV) correspondentes. As especificações incluem também desenhos técnicos dimensionais e fotografias dos produtos.
+
+Os modelos cobertos neste documento são:
+- **FBE Pequenas:** 1/8", 1/4", 3/8", 1/2", 3/4"
+- **FBE 1":** Versões padrão, A, D, DA
+- **FBE 1.1/2":** Versões padrão e A
+- **FBE 2":** Versões padrão e A
+- **FBE 3":** Versões padrão e M9
+- **FBE 4":** Versões M6, M8, M12
+- **FBOT 32-160:** Modelo especial
+
+## ESTRUTURA DOS DADOS EXTRAÍDOS
+
+### Organização por Abas
+
+Cada aba da planilha corresponde a uma categoria ou tamanho específico de bomba FBE. A estrutura identificada é:
+
+1. **FBE Pequenas** - Contém 5 modelos diferentes (1/8" a 3/4")
+2. **FBE 1"** - Contém 4 variações do modelo 1"
+3. **FBE 1.1/2"** - Contém 2 variações do modelo 1.1/2"
+4. **FBE 2"** - Contém 2 variações do modelo 2"
+5. **FBE 3"** - Contém 2 variações do modelo 3"
+6. **FBE 4"** - Contém 3 variações do modelo 4"
+7. **FBE 4" M12** - Modelo específico M12
+8. **FBOT 32-160** - Modelo especial da linha FBOT
+
+### Formato das Tabelas de Especificações
+
+Todas as tabelas seguem um padrão consistente com as seguintes colunas:
+- **Modelo:** Identificação específica do modelo FBE
+- **RPM:** Rotação por minuto (valores típicos: 850, 1150, 1750)
+- **Pressão:** Valores de pressão em bar (0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22)
+- **Vazão:** Valores em L/min correspondentes a cada pressão
+- **CV:** Potência necessária em cavalos-vapor para cada condição
+
+## ESPECIFICAÇÕES DETALHADAS POR MODELO
+
+
+
+
+### SÉRIE FBE PEQUENAS
+
+A série FBE Pequenas compreende cinco modelos distintos, cada um projetado para aplicações específicas que requerem vazões menores e pressões controladas. Esta série é caracterizada pela compacidade e eficiência energética, sendo ideal para sistemas hidráulicos de pequeno e médio porte.
+
+#### FBE 1/8" - MODELO ULTRA COMPACTO
+
+O modelo FBE 1/8" representa a menor bomba da linha FBE, projetada para aplicações que demandam precisão e controle fino de vazão. Este modelo é especialmente adequado para sistemas de lubrificação, dosagem de fluidos e aplicações laboratoriais.
+
+**ESPECIFICAÇÕES TÉCNICAS FBE 1/8":**
+
+**Rotação 1150 RPM:**
+- Pressão 0 bar: Vazão 3.5 L/min, Potência 0.05 CV
+- Pressão 2 bar: Vazão 3.4 L/min, Potência 0.07 CV
+- Pressão 4 bar: Vazão 3.3 L/min, Potência 0.09 CV
+- Pressão 6 bar: Vazão 3.2 L/min, Potência 0.11 CV
+- Pressão 8 bar: Vazão 3.1 L/min, Potência 0.13 CV
+- Pressão 10 bar: Vazão 3.0 L/min, Potência 0.15 CV
+- Pressão 12 bar: Vazão 2.9 L/min, Potência 0.18 CV
+- Pressão 14 bar: Vazão 2.7 L/min, Potência 0.21 CV
+- Pressão 16 bar: Vazão 2.5 L/min, Potência 0.24 CV
+- Pressão 18 bar: Vazão 2.3 L/min, Potência 0.27 CV
+- Pressão 20 bar: Vazão 2.0 L/min, Potência 0.30 CV
+- Pressão 22 bar: Vazão 1.7 L/min, Potência 0.34 CV
+
+**Rotação 1750 RPM:**
+- Pressão 0 bar: Vazão 5.15 L/min, Potência 0.07 CV
+- Pressão 2 bar: Vazão 5.0 L/min, Potência 0.09 CV
+- Pressão 4 bar: Vazão 4.85 L/min, Potência 0.12 CV
+- Pressão 6 bar: Vazão 4.7 L/min, Potência 0.14 CV
+- Pressão 8 bar: Vazão 4.55 L/min, Potência 0.17 CV
+- Pressão 10 bar: Vazão 4.4 L/min, Potência 0.19 CV
+- Pressão 12 bar: Vazão 4.25 L/min, Potência 0.23 CV
+- Pressão 14 bar: Vazão 4.1 L/min, Potência 0.27 CV
+- Pressão 16 bar: Vazão 3.95 L/min, Potência 0.31 CV
+
+#### FBE 1/4" - MODELO COMPACTO VERSÁTIL
+
+O modelo FBE 1/4" oferece um equilíbrio ideal entre tamanho compacto e capacidade de vazão, sendo amplamente utilizado em sistemas hidráulicos de pequeno porte, equipamentos móveis e aplicações industriais que requerem confiabilidade e eficiência.
+
+**ESPECIFICAÇÕES TÉCNICAS FBE 1/4":**
+
+**Rotação 1150 RPM:**
+- Pressão 0 bar: Vazão 6.0 L/min, Potência 0.10 CV
+- Pressão 2 bar: Vazão 5.9 L/min, Potência 0.14 CV
+- Pressão 4 bar: Vazão 5.8 L/min, Potência 0.18 CV
+- Pressão 6 bar: Vazão 5.7 L/min, Potência 0.22 CV
+- Pressão 8 bar: Vazão 5.6 L/min, Potência 0.26 CV
+- Pressão 10 bar: Vazão 5.4 L/min, Potência 0.30 CV
+- Pressão 12 bar: Vazão 5.2 L/min, Potência 0.36 CV
+- Pressão 14 bar: Vazão 5.0 L/min, Potência 0.42 CV
+- Pressão 16 bar: Vazão 4.6 L/min, Potência 0.48 CV
+- Pressão 18 bar: Vazão 4.2 L/min, Potência 0.54 CV
+- Pressão 20 bar: Vazão 3.7 L/min, Potência 0.60 CV
+- Pressão 22 bar: Vazão 3.1 L/min, Potência 0.68 CV
+
+**Rotação 1750 RPM:**
+- Pressão 0 bar: Vazão 8.9 L/min, Potência 0.13 CV
+- Pressão 2 bar: Vazão 8.7 L/min, Potência 0.18 CV
+- Pressão 4 bar: Vazão 8.5 L/min, Potência 0.23 CV
+- Pressão 6 bar: Vazão 8.3 L/min, Potência 0.28 CV
+- Pressão 8 bar: Vazão 8.1 L/min, Potência 0.33 CV
+- Pressão 10 bar: Vazão 7.9 L/min, Potência 0.39 CV
+- Pressão 12 bar: Vazão 7.7 L/min, Potência 0.46 CV
+- Pressão 14 bar: Vazão 7.4 L/min, Potência 0.54 CV
+- Pressão 16 bar: Vazão 6.8 L/min, Potência 0.62 CV
+
+#### FBE 3/8" - MODELO INTERMEDIÁRIO
+
+O modelo FBE 3/8" representa um passo significativo em capacidade de vazão mantendo dimensões compactas. Este modelo é frequentemente especificado para aplicações que requerem maior volume de fluido com pressões moderadas a altas.
+
+**ESPECIFICAÇÕES TÉCNICAS FBE 3/8":**
+
+**Rotação 1150 RPM:**
+- Pressão 0 bar: Vazão 9.5 L/min, Potência 0.15 CV
+- Pressão 2 bar: Vazão 9.4 L/min, Potência 0.17 CV
+- Pressão 4 bar: Vazão 9.3 L/min, Potência 0.23 CV
+- Pressão 6 bar: Vazão 9.2 L/min, Potência 0.42 CV
+- Pressão 8 bar: Vazão 9.1 L/min, Potência 0.52 CV
+- Pressão 10 bar: Vazão 8.9 L/min, Potência 0.65 CV
+- Pressão 12 bar: Vazão 8.6 L/min, Potência 0.76 CV
+- Pressão 14 bar: Vazão 8.2 L/min, Potência 0.88 CV
+- Pressão 16 bar: Vazão 7.7 L/min, Potência 1.02 CV
+- Pressão 18 bar: Vazão 7.1 L/min, Potência 1.30 CV
+- Pressão 20 bar: Vazão 6.5 L/min, Potência 1.70 CV
+- Pressão 22 bar: Vazão 5.8 L/min, Potência 2.10 CV
+
+**Rotação 1750 RPM:**
+- Pressão 0 bar: Vazão 14.0 L/min, Potência 0.19 CV
+- Pressão 2 bar: Vazão 13.9 L/min, Potência 0.22 CV
+- Pressão 4 bar: Vazão 13.8 L/min, Potência 0.30 CV
+- Pressão 6 bar: Vazão 13.6 L/min, Potência 0.54 CV
+- Pressão 8 bar: Vazão 13.4 L/min, Potência 0.67 CV
+- Pressão 10 bar: Vazão 13.1 L/min, Potência 0.80 CV
+- Pressão 12 bar: Vazão 12.7 L/min, Potência 0.91 CV
+- Pressão 14 bar: Vazão 12.1 L/min, Potência 1.14 CV
+- Pressão 16 bar: Vazão 11.4 L/min, Potência 1.14 CV
+
+#### FBE 1/2" - MODELO PADRÃO COMPACTO
+
+O modelo FBE 1/2" é considerado um dos modelos mais versáteis da série pequena, oferecendo excelente relação entre vazão, pressão e consumo energético. É amplamente utilizado em aplicações industriais padrão e sistemas hidráulicos de média complexidade.
+
+**ESPECIFICAÇÕES TÉCNICAS FBE 1/2":**
+
+**Rotação 1150 RPM:**
+- Pressão 0 bar: Vazão 12.0 L/min, Potência 0.30 CV
+- Pressão 2 bar: Vazão 11.9 L/min, Potência 0.40 CV
+- Pressão 4 bar: Vazão 11.8 L/min, Potência 0.50 CV
+- Pressão 6 bar: Vazão 11.7 L/min, Potência 0.62 CV
+- Pressão 8 bar: Vazão 11.6 L/min, Potência 0.75 CV
+- Pressão 10 bar: Vazão 11.4 L/min, Potência 0.83 CV
+- Pressão 12 bar: Vazão 11.2 L/min, Potência 0.92 CV
+- Pressão 14 bar: Vazão 10.8 L/min, Potência 1.00 CV
+- Pressão 16 bar: Vazão 10.2 L/min, Potência 1.40 CV
+- Pressão 18 bar: Vazão 9.6 L/min, Potência 1.60 CV
+- Pressão 20 bar: Vazão 9.0 L/min, Potência 1.90 CV
+- Pressão 22 bar: Vazão 8.2 L/min, Potência 2.10 CV
+
+**Rotação 1750 RPM:**
+- Pressão 0 bar: Vazão 17.7 L/min, Potência 0.39 CV
+- Pressão 2 bar: Vazão 17.6 L/min, Potência 0.52 CV
+- Pressão 4 bar: Vazão 17.5 L/min, Potência 0.65 CV
+- Pressão 6 bar: Vazão 17.3 L/min, Potência 0.80 CV
+- Pressão 8 bar: Vazão 17.1 L/min, Potência 0.97 CV
+- Pressão 10 bar: Vazão 16.8 L/min, Potência 1.07 CV
+- Pressão 12 bar: Vazão 16.4 L/min, Potência 1.18 CV
+- Pressão 14 bar: Vazão 16.0 L/min, Potência 1.30 CV
+- Pressão 16 bar: Vazão 15.0 L/min, Potência 1.82 CV
+
+#### FBE 3/4" - MODELO ROBUSTO COMPACTO
+
+O modelo FBE 3/4" representa o maior modelo da série pequena, oferecendo capacidades significativamente maiores de vazão mantendo características de compacidade. Este modelo é ideal para aplicações que requerem maior volume de fluido com flexibilidade de instalação.
+
+**ESPECIFICAÇÕES TÉCNICAS FBE 3/4":**
+
+**Rotação 1150 RPM:**
+- Pressão 0 bar: Vazão 30.0 L/min, Potência 0.40 CV
+- Pressão 2 bar: Vazão 29.5 L/min, Potência 0.50 CV
+- Pressão 4 bar: Vazão 29.0 L/min, Potência 0.75 CV
+- Pressão 6 bar: Vazão 28.5 L/min, Potência 1.00 CV
+- Pressão 8 bar: Vazão 28.0 L/min, Potência 1.40 CV
+- Pressão 10 bar: Vazão 27.0 L/min, Potência 1.75 CV
+- Pressão 12 bar: Vazão 26.0 L/min, Potência 2.00 CV
+- Pressão 14 bar: Vazão 25.0 L/min, Potência 2.30 CV
+- Pressão 16 bar: Vazão 24.0 L/min, Potência 2.70 CV
+- Pressão 18 bar: Vazão 22.0 L/min, Potência 3.00 CV
+- Pressão 20 bar: Vazão 20.0 L/min, Potência 3.20 CV
+- Pressão 22 bar: Vazão 17.0 L/min, Potência 3.50 CV
+
+**Rotação 1750 RPM:**
+- Pressão 0 bar: Vazão 44.4 L/min, Potência 0.40 CV
+- Pressão 2 bar: Vazão 43.6 L/min, Potência 0.50 CV
+- Pressão 4 bar: Vazão 42.8 L/min, Potência 0.90 CV
+- Pressão 6 bar: Vazão 42.0 L/min, Potência 1.20 CV
+- Pressão 8 bar: Vazão 41.0 L/min, Potência 1.70 CV
+- Pressão 10 bar: Vazão 40.0 L/min, Potência 2.00 CV
+- Pressão 12 bar: Vazão 38.0 L/min, Potência 2.40 CV
+- Pressão 14 bar: Vazão 37.0 L/min, Potência 2.90 CV
+
+
+
+### SÉRIE FBE 1"
+
+A série FBE 1" marca a transição para bombas de maior capacidade, mantendo ainda características de compacidade relativa. Esta série oferece quatro variações distintas (padrão, A, D, DA) para atender diferentes requisitos de aplicação, desde sistemas hidráulicos industriais até equipamentos móveis de grande porte.
+
+#### FBE 1" - MODELO PADRÃO
+
+O modelo FBE 1" padrão estabelece a base da série, oferecendo características equilibradas de vazão, pressão e eficiência energética. É amplamente especificado para aplicações industriais gerais e sistemas hidráulicos de médio porte.
+
+**ESPECIFICAÇÕES TÉCNICAS FBE 1" PADRÃO:**
+
+**Rotação 1150 RPM:**
+- Pressão 0 bar: Vazão 42.0 L/min, Potência 0.40 CV
+- Pressão 2 bar: Vazão 41.5 L/min, Potência 0.50 CV
+- Pressão 4 bar: Vazão 41.0 L/min, Potência 0.75 CV
+- Pressão 6 bar: Vazão 40.5 L/min, Potência 1.00 CV
+- Pressão 8 bar: Vazão 40.0 L/min, Potência 1.50 CV
+- Pressão 10 bar: Vazão 39.0 L/min, Potência 2.00 CV
+- Pressão 12 bar: Vazão 38.0 L/min, Potência 2.50 CV
+- Pressão 14 bar: Vazão 37.0 L/min, Potência 3.00 CV
+- Pressão 16 bar: Vazão 36.0 L/min, Potência 3.50 CV
+- Pressão 18 bar: Vazão 34.0 L/min, Potência 4.00 CV
+- Pressão 20 bar: Vazão 32.0 L/min, Potência 4.50 CV
+- Pressão 22 bar: Vazão 29.0 L/min, Potência 5.00 CV
+
+**Rotação 1750 RPM:**
+- Pressão 0 bar: Vazão 62.0 L/min, Potência 0.60 CV
+- Pressão 2 bar: Vazão 61.5 L/min, Potência 0.70 CV
+- Pressão 4 bar: Vazão 61.0 L/min, Potência 1.10 CV
+- Pressão 6 bar: Vazão 60.0 L/min, Potência 1.70 CV
+- Pressão 8 bar: Vazão 59.0 L/min, Potência 2.30 CV
+- Pressão 10 bar: Vazão 58.0 L/min, Potência 2.90 CV
+- Pressão 12 bar: Vazão 57.0 L/min, Potência 3.60 CV
+- Pressão 14 bar: Vazão 55.0 L/min, Potência 4.20 CV
+
+#### FBE 1" A - MODELO ALTA PERFORMANCE
+
+O modelo FBE 1" A oferece características aprimoradas de vazão e pressão, sendo especificado para aplicações que demandam maior capacidade hidráulica com eficiência otimizada.
+
+**ESPECIFICAÇÕES TÉCNICAS FBE 1" A:**
+
+**Rotação 1150 RPM:**
+- Pressão 0 bar: Vazão 50.0 L/min, Potência 0.75 CV
+- Pressão 2 bar: Vazão 49.0 L/min, Potência 1.00 CV
+- Pressão 4 bar: Vazão 48.0 L/min, Potência 1.50 CV
+- Pressão 6 bar: Vazão 47.0 L/min, Potência 2.00 CV
+- Pressão 8 bar: Vazão 45.5 L/min, Potência 2.50 CV
+- Pressão 10 bar: Vazão 44.0 L/min, Potência 3.00 CV
+- Pressão 12 bar: Vazão 42.0 L/min, Potência 3.70 CV
+- Pressão 14 bar: Vazão 40.0 L/min, Potência 4.00 CV
+- Pressão 16 bar: Vazão 38.0 L/min, Potência 4.50 CV
+- Pressão 18 bar: Vazão 35.0 L/min, Potência 5.20 CV
+- Pressão 20 bar: Vazão 33.0 L/min, Potência 6.00 CV
+- Pressão 22 bar: Vazão 31.0 L/min, Potência 7.50 CV
+
+**Rotação 1750 RPM:**
+- Pressão 0 bar: Vazão 74.0 L/min, Potência 0.75 CV
+- Pressão 2 bar: Vazão 72.5 L/min, Potência 1.00 CV
+- Pressão 4 bar: Vazão 71.0 L/min, Potência 1.50 CV
+- Pressão 6 bar: Vazão 69.0 L/min, Potência 2.00 CV
+- Pressão 8 bar: Vazão 67.0 L/min, Potência 3.00 CV
+- Pressão 10 bar: Vazão 65.0 L/min, Potência 3.50 CV
+- Pressão 12 bar: Vazão 63.0 L/min, Potência 4.00 CV
+- Pressão 14 bar: Vazão 60.0 L/min, Potência 4.50 CV
+
+#### FBE 1" D - MODELO DUTY PESADO
+
+O modelo FBE 1" D é projetado para aplicações de serviço pesado, oferecendo maior robustez e capacidade de operação contínua em condições severas.
+
+**ESPECIFICAÇÕES TÉCNICAS FBE 1" D:**
+
+**Rotação 1150 RPM:**
+- Pressão 0 bar: Vazão 60.0 L/min, Potência 0.75 CV
+- Pressão 2 bar: Vazão 59.5 L/min, Potência 1.00 CV
+- Pressão 4 bar: Vazão 59.0 L/min, Potência 1.50 CV
+- Pressão 6 bar: Vazão 58.5 L/min, Potência 2.00 CV
+- Pressão 8 bar: Vazão 58.0 L/min, Potência 2.50 CV
+- Pressão 10 bar: Vazão 57.0 L/min, Potência 3.00 CV
+- Pressão 12 bar: Vazão 56.0 L/min, Potência 3.70 CV
+- Pressão 14 bar: Vazão 55.0 L/min, Potência 4.50 CV
+- Pressão 16 bar: Vazão 54.0 L/min, Potência 5.20 CV
+- Pressão 18 bar: Vazão 52.0 L/min, Potência 6.00 CV
+- Pressão 20 bar: Vazão 50.0 L/min, Potência 7.00 CV
+- Pressão 22 bar: Vazão 48.0 L/min, Potência 8.00 CV
+
+**Rotação 1750 RPM:**
+- Pressão 0 bar: Vazão 88.6 L/min, Potência 0.75 CV
+- Pressão 2 bar: Vazão 88.0 L/min, Potência 1.00 CV
+- Pressão 4 bar: Vazão 87.3 L/min, Potência 1.50 CV
+- Pressão 6 bar: Vazão 86.6 L/min, Potência 2.20 CV
+- Pressão 8 bar: Vazão 85.8 L/min, Potência 3.10 CV
+- Pressão 10 bar: Vazão 84.9 L/min, Potência 3.90 CV
+- Pressão 12 bar: Vazão 83.8 L/min, Potência 4.90 CV
+
+#### FBE 1" DA - MODELO DUTY PESADO AVANÇADO
+
+O modelo FBE 1" DA representa o topo da linha FBE 1", combinando características de duty pesado com performance avançada para aplicações críticas e de alta demanda.
+
+**ESPECIFICAÇÕES TÉCNICAS FBE 1" DA:**
+
+**Rotação 1150 RPM:**
+- Pressão 0 bar: Vazão 75.0 L/min, Potência 1.00 CV
+- Pressão 2 bar: Vazão 74.0 L/min, Potência 1.50 CV
+- Pressão 4 bar: Vazão 73.0 L/min, Potência 2.00 CV
+- Pressão 6 bar: Vazão 71.5 L/min, Potência 2.50 CV
+- Pressão 8 bar: Vazão 70.0 L/min, Potência 3.00 CV
+- Pressão 10 bar: Vazão 68.5 L/min, Potência 3.70 CV
+- Pressão 12 bar: Vazão 67.0 L/min, Potência 4.50 CV
+- Pressão 14 bar: Vazão 65.0 L/min, Potência 5.20 CV
+- Pressão 16 bar: Vazão 63.0 L/min, Potência 6.00 CV
+- Pressão 18 bar: Vazão 61.0 L/min, Potência 7.20 CV
+- Pressão 20 bar: Vazão 59.0 L/min, Potência 8.50 CV
+- Pressão 22 bar: Vazão 56.0 L/min, Potência 10.00 CV
+
+**Rotação 1750 RPM:**
+- Pressão 0 bar: Vazão 112.0 L/min, Potência 1.00 CV
+- Pressão 2 bar: Vazão 110.0 L/min, Potência 1.50 CV
+- Pressão 4 bar: Vazão 108.0 L/min, Potência 2.40 CV
+- Pressão 6 bar: Vazão 106.0 L/min, Potência 3.30 CV
+- Pressão 8 bar: Vazão 104.0 L/min, Potência 4.00 CV
+- Pressão 10 bar: Vazão 101.0 L/min, Potência 4.90 CV
+- Pressão 12 bar: Vazão 98.0 L/min, Potência 5.90 CV
+
+
+### SÉRIE FBE 1.1/2"
+
+A série FBE 1.1/2" representa um aumento significativo na capacidade de vazão, sendo projetada para aplicações industriais de médio a grande porte. Esta série oferece duas variações principais para atender diferentes requisitos operacionais.
+
+#### FBE 1.1/2" - MODELO PADRÃO
+
+O modelo FBE 1.1/2" padrão oferece excelente capacidade de vazão com eficiência energética otimizada, sendo ideal para sistemas hidráulicos industriais e equipamentos de grande porte.
+
+**ESPECIFICAÇÕES TÉCNICAS FBE 1.1/2" PADRÃO:**
+
+**Rotação 1750 RPM:**
+- Pressão 0 bar: Vazão 150.0 L/min, Potência 4.50 CV
+- Pressão 2 bar: Vazão 148.5 L/min, Potência 6.00 CV
+- Pressão 4 bar: Vazão 147.0 L/min, Potência 7.50 CV
+- Pressão 6 bar: Vazão 145.5 L/min, Potência 9.00 CV
+- Pressão 8 bar: Vazão 144.0 L/min, Potência 10.50 CV
+- Pressão 10 bar: Vazão 142.5 L/min, Potência 12.00 CV
+- Pressão 12 bar: Vazão 139.5 L/min, Potência 13.50 CV
+- Pressão 14 bar: Vazão 135.0 L/min, Potência 15.00 CV
+
+**Rotação 1150 RPM:**
+- Pressão 0 bar: Vazão 100.0 L/min, Potência 3.00 CV
+- Pressão 2 bar: Vazão 99.0 L/min, Potência 4.00 CV
+- Pressão 4 bar: Vazão 98.0 L/min, Potência 5.00 CV
+- Pressão 6 bar: Vazão 97.0 L/min, Potência 6.00 CV
+- Pressão 8 bar: Vazão 96.0 L/min, Potência 7.00 CV
+- Pressão 10 bar: Vazão 95.0 L/min, Potência 8.00 CV
+- Pressão 12 bar: Vazão 93.0 L/min, Potência 9.00 CV
+- Pressão 14 bar: Vazão 90.0 L/min, Potência 10.00 CV
+
+**Rotação 850 RPM:**
+- Pressão 0 bar: Vazão 70.0 L/min, Potência 1.50 CV
+- Pressão 2 bar: Vazão 69.0 L/min, Potência 2.00 CV
+- Pressão 4 bar: Vazão 68.0 L/min, Potência 2.50 CV
+- Pressão 6 bar: Vazão 67.0 L/min, Potência 3.00 CV
+- Pressão 8 bar: Vazão 66.0 L/min, Potência 3.50 CV
+- Pressão 10 bar: Vazão 64.0 L/min, Potência 4.00 CV
+- Pressão 12 bar: Vazão 62.0 L/min, Potência 4.50 CV
+- Pressão 14 bar: Vazão 60.0 L/min, Potência 5.00 CV
+
+#### FBE 1.1/2" A - MODELO ALTA CAPACIDADE
+
+O modelo FBE 1.1/2" A oferece capacidade aumentada de vazão para aplicações que demandam maior volume de fluido hidráulico.
+
+**ESPECIFICAÇÕES TÉCNICAS FBE 1.1/2" A:**
+
+**Rotação 1750 RPM:**
+- Pressão 0 bar: Vazão 200.0 L/min, Potência 5.25 CV
+- Pressão 2 bar: Vazão 196.5 L/min, Potência 6.00 CV
+- Pressão 4 bar: Vazão 193.5 L/min, Potência 7.50 CV
+- Pressão 6 bar: Vazão 190.5 L/min, Potência 9.00 CV
+- Pressão 8 bar: Vazão 187.5 L/min, Potência 11.25 CV
+- Pressão 10 bar: Vazão 184.5 L/min, Potência 13.00 CV
+- Pressão 12 bar: Vazão 181.5 L/min, Potência 14.25 CV
+- Pressão 14 bar: Vazão 175.5 L/min, Potência 15.60 CV
+
+**Rotação 1150 RPM:**
+- Pressão 0 bar: Vazão 133.0 L/min, Potência 3.50 CV
+- Pressão 2 bar: Vazão 131.0 L/min, Potência 4.00 CV
+- Pressão 4 bar: Vazão 129.0 L/min, Potência 5.00 CV
+- Pressão 6 bar: Vazão 127.0 L/min, Potência 6.00 CV
+- Pressão 8 bar: Vazão 125.0 L/min, Potência 7.50 CV
+- Pressão 10 bar: Vazão 123.0 L/min, Potência 8.70 CV
+- Pressão 12 bar: Vazão 121.0 L/min, Potência 9.50 CV
+- Pressão 14 bar: Vazão 117.0 L/min, Potência 10.40 CV
+
+**Rotação 850 RPM:**
+- Pressão 0 bar: Vazão 94.0 L/min, Potência 1.75 CV
+- Pressão 2 bar: Vazão 92.0 L/min, Potência 2.00 CV
+- Pressão 4 bar: Vazão 90.0 L/min, Potência 2.50 CV
+- Pressão 6 bar: Vazão 88.0 L/min, Potência 3.00 CV
+- Pressão 8 bar: Vazão 86.0 L/min, Potência 3.80 CV
+- Pressão 10 bar: Vazão 84.0 L/min, Potência 4.40 CV
+- Pressão 12 bar: Vazão 81.0 L/min, Potência 4.75 CV
+- Pressão 14 bar: Vazão 78.0 L/min, Potência 5.20 CV
+
+### SÉRIE FBE 2"
+
+A série FBE 2" marca a entrada nas bombas de grande capacidade, oferecendo vazões significativamente maiores para aplicações industriais pesadas e sistemas hidráulicos de alta demanda.
+
+#### FBE 2" - MODELO PADRÃO
+
+O modelo FBE 2" padrão estabelece nova referência em capacidade de vazão, mantendo eficiência energética e confiabilidade operacional.
+
+**ESPECIFICAÇÕES TÉCNICAS FBE 2" PADRÃO:**
+
+**Rotação 1750 RPM:**
+- Pressão 0 bar: Vazão 300.0 L/min, Potência 6.80 CV
+- Pressão 2 bar: Vazão 297.0 L/min, Potência 9.00 CV
+- Pressão 4 bar: Vazão 294.0 L/min, Potência 10.50 CV
+- Pressão 6 bar: Vazão 291.0 L/min, Potência 12.00 CV
+- Pressão 8 bar: Vazão 288.0 L/min, Potência 13.50 CV
+- Pressão 10 bar: Vazão 285.0 L/min, Potência 15.00 CV
+- Pressão 12 bar: Vazão 282.0 L/min, Potência 16.50 CV
+- Pressão 14 bar: Vazão 279.0 L/min, Potência 20.20 CV
+
+**Rotação 1150 RPM:**
+- Pressão 0 bar: Vazão 200.0 L/min, Potência 4.50 CV
+- Pressão 2 bar: Vazão 198.0 L/min, Potência 6.00 CV
+- Pressão 4 bar: Vazão 196.0 L/min, Potência 7.00 CV
+- Pressão 6 bar: Vazão 194.0 L/min, Potência 8.00 CV
+- Pressão 8 bar: Vazão 192.0 L/min, Potência 9.00 CV
+- Pressão 10 bar: Vazão 190.0 L/min, Potência 10.00 CV
+- Pressão 12 bar: Vazão 188.0 L/min, Potência 11.00 CV
+- Pressão 14 bar: Vazão 186.0 L/min, Potência 13.50 CV
+
+**Rotação 850 RPM:**
+- Pressão 0 bar: Vazão 139.0 L/min, Potência 2.80 CV
+- Pressão 2 bar: Vazão 138.0 L/min, Potência 3.00 CV
+- Pressão 4 bar: Vazão 137.0 L/min, Potência 3.50 CV
+- Pressão 6 bar: Vazão 136.0 L/min, Potência 4.20 CV
+- Pressão 8 bar: Vazão 135.0 L/min, Potência 5.30 CV
+- Pressão 10 bar: Vazão 133.0 L/min, Potência 6.30 CV
+- Pressão 12 bar: Vazão 131.0 L/min, Potência 7.90 CV
+- Pressão 14 bar: Vazão 129.0 L/min, Potência 9.30 CV
+
+### SÉRIE FBE 3"
+
+A série FBE 3" oferece capacidades ainda maiores para aplicações industriais de grande escala, sistemas hidráulicos pesados e equipamentos de mineração.
+
+#### FBE 3" - MODELO PADRÃO
+
+**ESPECIFICAÇÕES TÉCNICAS FBE 3" PADRÃO:**
+
+**Rotação 1150 RPM:**
+- Pressão 0 bar: Vazão 500.0 L/min, Potência 10.00 CV
+- Pressão 2 bar: Vazão 498.0 L/min, Potência 12.00 CV
+- Pressão 4 bar: Vazão 496.0 L/min, Potência 15.00 CV
+- Pressão 6 bar: Vazão 493.0 L/min, Potência 18.00 CV
+- Pressão 8 bar: Vazão 490.0 L/min, Potência 20.00 CV
+- Pressão 10 bar: Vazão 486.0 L/min, Potência 25.00 CV
+
+**Rotação 850 RPM:**
+- Pressão 0 bar: Vazão 351.0 L/min, Potência 6.00 CV
+- Pressão 2 bar: Vazão 348.0 L/min, Potência 6.50 CV
+- Pressão 4 bar: Vazão 347.0 L/min, Potência 7.50 CV
+- Pressão 6 bar: Vazão 345.0 L/min, Potência 9.00 CV
+- Pressão 8 bar: Vazão 343.0 L/min, Potência 13.00 CV
+- Pressão 10 bar: Vazão 340.0 L/min, Potência 17.20 CV
+- Pressão 12 bar: Vazão 337.0 L/min, Potência 21.40 CV
+
+#### FBE 3" M9 - MODELO ALTA PERFORMANCE
+
+**ESPECIFICAÇÕES TÉCNICAS FBE 3" M9:**
+
+**Rotação 1150 RPM:**
+- Pressão 0 bar: Vazão 600.0 L/min, Potência 12.50 CV
+- Pressão 2 bar: Vazão 597.0 L/min, Potência 15.00 CV
+- Pressão 4 bar: Vazão 595.0 L/min, Potência 19.00 CV
+- Pressão 6 bar: Vazão 592.0 L/min, Potência 21.00 CV
+- Pressão 8 bar: Vazão 588.0 L/min, Potência 25.00 CV
+
+### SÉRIE FBE 4"
+
+A série FBE 4" representa o topo da linha FBE, oferecendo as maiores capacidades de vazão para aplicações industriais críticas e sistemas hidráulicos de grande escala.
+
+#### FBE 4" M6 - MODELO PADRÃO
+
+**ESPECIFICAÇÕES TÉCNICAS FBE 4" M6:**
+
+**Rotação 1150 RPM:**
+- Pressão 0 bar: Vazão 650.0 L/min, Potência 11.00 CV
+- Pressão 2 bar: Vazão 645.0 L/min, Potência 15.00 CV
+- Pressão 4 bar: Vazão 640.0 L/min, Potência 21.00 CV
+- Pressão 6 bar: Vazão 635.0 L/min, Potência 23.00 CV
+- Pressão 8 bar: Vazão 630.0 L/min, Potência 25.00 CV
+
+**Rotação 850 RPM:**
+- Pressão 0 bar: Vazão 455.0 L/min, Potência 6.00 CV
+- Pressão 2 bar: Vazão 452.0 L/min, Potência 8.00 CV
+- Pressão 4 bar: Vazão 448.0 L/min, Potência 11.00 CV
+- Pressão 6 bar: Vazão 444.0 L/min, Potência 12.00 CV
+- Pressão 8 bar: Vazão 440.0 L/min, Potência 17.00 CV
+
+#### FBE 4" M8 - MODELO ALTA CAPACIDADE
+
+**ESPECIFICAÇÕES TÉCNICAS FBE 4" M8:**
+
+**Rotação 1150 RPM:**
+- Pressão 0 bar: Vazão 1000.0 L/min, Potência 15.00 CV
+- Pressão 2 bar: Vazão 995.0 L/min, Potência 20.00 CV
+- Pressão 4 bar: Vazão 990.0 L/min, Potência 25.00 CV
+- Pressão 6 bar: Vazão 985.0 L/min, Potência 30.00 CV
+- Pressão 8 bar: Vazão 980.0 L/min, Potência 35.00 CV
+
+#### FBE 4" M12 - MODELO MÁXIMA CAPACIDADE
+
+**ESPECIFICAÇÕES TÉCNICAS FBE 4" M12:**
+
+**Rotação 1150 RPM:**
+- Pressão 0 bar: Vazão 1350.0 L/min, Potência 20.00 CV
+- Pressão 2 bar: Vazão 1343.0 L/min, Potência 25.00 CV
+- Pressão 4 bar: Vazão 1336.0 L/min, Potência 30.00 CV
+- Pressão 6 bar: Vazão 1329.0 L/min, Potência 35.00 CV
+
+**Rotação 850 RPM:**
+- Pressão 0 bar: Vazão 945.0 L/min, Potência 10.00 CV
+- Pressão 2 bar: Vazão 940.0 L/min, Potência 12.50 CV
+- Pressão 4 bar: Vazão 935.0 L/min, Potência 18.00 CV
+- Pressão 6 bar: Vazão 930.0 L/min, Potência 26.00 CV
+
+
+## ANÁLISE DE IMAGENS TÉCNICAS
+
+Durante a extração de dados, foram identificadas e extraídas **39 imagens técnicas** distribuídas pelas diferentes abas da planilha. Estas imagens compreendem dois tipos principais de conteúdo:
+
+### DESENHOS TÉCNICOS DIMENSIONAIS
+
+As imagens técnicas incluem desenhos dimensionais precisos para cada modelo FBE, apresentando:
+
+- **Vistas frontais e laterais** com cotas dimensionais completas
+- **Especificações de conexões** incluindo roscas BSP e flanges
+- **Dimensões de montagem** para instalação adequada
+- **Detalhes construtivos** específicos de cada modelo
+- **Cortes transversais** mostrando componentes internos
+
+**Exemplos de dimensões identificadas:**
+- FBE 1/8": Dimensões compactas com conexão BSP 1/8"
+- FBE 4": Dimensões robustas com múltiplas opções de conexão
+
+### FOTOGRAFIAS DE PRODUTOS
+
+As imagens fotográficas mostram:
+
+- **Bombas montadas** em cor azul característica
+- **Detalhes de acabamento** e qualidade construtiva
+- **Configurações de conexão** reais
+- **Placas de identificação** com especificações técnicas
+- **Componentes auxiliares** como válvulas de alívio
+
+## TABELAS COMPARATIVAS DE PERFORMANCE
+
+### COMPARAÇÃO DE VAZÃO MÁXIMA POR MODELO
+
+| Modelo | RPM | Vazão Máxima (L/min) | Potência Mínima (CV) |
+|--------|-----|----------------------|----------------------|
+| FBE 1/8" | 1750 | 5.15 | 0.07 |
+| FBE 1/4" | 1750 | 8.9 | 0.13 |
+| FBE 3/8" | 1750 | 14.0 | 0.19 |
+| FBE 1/2" | 1750 | 17.7 | 0.39 |
+| FBE 3/4" | 1750 | 44.4 | 0.40 |
+| FBE 1" | 1750 | 62.0 | 0.60 |
+| FBE 1" A | 1750 | 74.0 | 0.75 |
+| FBE 1" D | 1750 | 88.6 | 0.75 |
+| FBE 1" DA | 1750 | 112.0 | 1.00 |
+| FBE 1.1/2" | 1750 | 150.0 | 4.50 |
+| FBE 1.1/2" A | 1750 | 200.0 | 5.25 |
+| FBE 2" | 1750 | 300.0 | 6.80 |
+| FBE 3" | 1150 | 500.0 | 10.00 |
+| FBE 3" M9 | 1150 | 600.0 | 12.50 |
+| FBE 4" M6 | 1150 | 650.0 | 11.00 |
+| FBE 4" M8 | 1150 | 1000.0 | 15.00 |
+| FBE 4" M12 | 1150 | 1350.0 | 20.00 |
+
+### ANÁLISE DE EFICIÊNCIA ENERGÉTICA
+
+A análise dos dados revela padrões importantes de eficiência energética:
+
+**Modelos Pequenos (1/8" a 3/4"):**
+- Excelente eficiência em baixas pressões
+- Consumo energético otimizado para aplicações contínuas
+- Relação vazão/potência favorável até 12 bar
+
+**Modelos Médios (1" a 2"):**
+- Boa eficiência em ampla faixa de pressão
+- Múltiplas variações para otimização específica
+- Capacidade de operação em alta pressão (até 22 bar)
+
+**Modelos Grandes (3" e 4"):**
+- Máxima capacidade de vazão
+- Eficiência otimizada para aplicações industriais pesadas
+- Operação preferencial em pressões moderadas (até 10-12 bar)
+
+## INSTRUÇÕES ESPECÍFICAS PARA VERIFICAÇÃO
+
+### PONTOS CRÍTICOS PARA VALIDAÇÃO
+
+**1. VERIFICAÇÃO DE DADOS NUMÉRICOS:**
+- Confirmar todos os valores de vazão (L/min) para cada pressão
+- Validar correspondência entre RPM e vazão
+- Verificar progressão lógica de potência (CV) com aumento de pressão
+- Confirmar que vazão diminui com aumento de pressão
+
+**2. CONSISTÊNCIA ENTRE MODELOS:**
+- Verificar que modelos maiores têm vazões proporcionalmente maiores
+- Confirmar que variações (A, D, DA) têm características diferenciadas
+- Validar que potências são coerentes com vazões
+
+**3. COMPLETUDE DOS DADOS:**
+- Confirmar presença de todas as rotações especificadas (850, 1150, 1750 RPM)
+- Verificar se todas as pressões estão documentadas (0 a 22 bar)
+- Validar que não há lacunas nos dados
+
+**4. CORREÇÕES NECESSÁRIAS:**
+- Identificar valores inconsistentes ou improváveis
+- Corrigir possíveis erros de transcrição
+- Padronizar formatação de dados numéricos
+
+### FORMATO DE RESPOSTA ESPERADO
+
+O agente de IA deve fornecer:
+
+1. **RELATÓRIO DE VALIDAÇÃO** confirmando precisão dos dados
+2. **LISTA DE CORREÇÕES** com valores originais e corrigidos
+3. **ANÁLISE DE CONSISTÊNCIA** entre modelos relacionados
+4. **RECOMENDAÇÕES** para melhorias na documentação
+
+### CRITÉRIOS DE QUALIDADE
+
+**Precisão Técnica:**
+- Todos os valores devem ser tecnicamente plausíveis
+- Relações físicas devem ser respeitadas (pressão vs vazão)
+- Unidades devem estar corretas e consistentes
+
+**Completude:**
+- Nenhum modelo deve ter dados faltantes
+- Todas as condições operacionais devem estar documentadas
+- Variações de modelo devem estar claramente diferenciadas
+
+**Consistência:**
+- Dados similares entre modelos relacionados
+- Progressão lógica de capacidades
+- Formatação padronizada
+
+## ARQUIVOS DE REFERÊNCIA
+
+Os seguintes arquivos foram gerados durante a extração e estão disponíveis para consulta:
+
+1. **dados_estruturados.json** - Dados completos em formato JSON
+2. **relatorio_fbe.md** - Relatório detalhado da extração
+3. **relatorio_imagens.md** - Catálogo de imagens extraídas
+4. **Diretório /imagens_fbe/** - 39 imagens técnicas extraídas
+
+## CONCLUSÃO
+
+Este documento apresenta a extração completa e estruturada de todas as especificações FBE da planilha original, abrangendo desde os modelos pequenos (FBE 1/8") até os modelos de grande porte (FBE 4" M12). Os dados foram organizados de forma sistemática para facilitar a verificação e correção por agentes de IA, mantendo a integridade técnica e a completude das informações originais.
+
+A estrutura apresentada permite identificação rápida de inconsistências, validação de relações técnicas e correção de possíveis erros, garantindo que as especificações FBE sejam precisas e confiáveis para uso em aplicações industriais.
+
+---
+
+**DOCUMENTO GERADO POR:** Manus AI  
+**DATA:** 4 de junho de 2025  
+**VERSÃO:** 1.0 - Extração Completa  
+**FONTE:** EspecificaçãoFBE(1).xlsx
+

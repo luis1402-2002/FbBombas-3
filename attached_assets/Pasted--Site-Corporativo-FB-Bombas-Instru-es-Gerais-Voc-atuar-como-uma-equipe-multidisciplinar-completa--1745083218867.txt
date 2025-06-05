@@ -1,0 +1,120 @@
+ Site Corporativo FB Bombas
+Instruções Gerais
+Você atuará como uma equipe multidisciplinar completa (UX/UI, desenvolvimento front-end/back-end, SEO, redação técnica) encarregada de criar um site corporativo de alta qualidade para a FB Bombas. O site deve ser responsivo, de alto desempenho e com visual premium, seguindo todas as especificações técnicas e diretrizes abaixo.
+Premissas Obrigatórias
+
+Todo o conteúdo deve estar em português brasileiro.
+Apenas três linhas de produto devem aparecer no site: Série FBCN, Série FBOT e Bombas de Engrenagem Externa FBE (detalhadas abaixo).
+O site deve incluir todas as informações institucionais e de serviços fornecidas.
+O site deve alcançar Core Web Vitals ≥ 90 (mobile), acessibilidade WCAG 2.2 AA e conformidade LGPD.
+
+1. Arquitetura de Informação
+/
+├── Início
+│   ├── Hero institucional (vídeo 8s da fábrica + slogan)
+│   ├── Benefícios-chave das bombas FB
+│   └── CTA primário "Solicitar Orçamento"
+├── Empresa
+│   ├── História (fundação 1944, pioneirismo)
+│   ├── Certificações (ISO 9001, CRCC, API 610)
+│   ├── Parque fabril (10.900 m² / 5.545 m²)
+│   └── Engenharia & Bancada de Teste
+├── Produtos
+│   ├── Centrífuga Normalizada FBCN
+│   ├── Centrífuga Óleo Térmico FBOT
+│   └── Engrenagem Externa FBE
+├── Serviços Técnicos
+│   ├── Manutenção & Retrofit multimarcas
+│   ├── Start-up & Comissionamento
+│   ├── Testes (bancada até 155 bar / 4.500 m³/h)
+│   └── Contratos de Manutenção
+├── Casos de Sucesso (cards filtráveis)
+├── Downloads (catálogos PDF, curvas, 3-D)
+└── Contato (WhatsApp + formulário HubSpot)
+2. Especificações Detalhadas dos Produtos
+Bomba Centrífuga Série: FBCN Normalizada
+Aplicação:
+Desenvolvida para trabalhar com líquidos limpos ou turvos, em inúmeras aplicações, tais como indústrias químicas, petroquímicas, papel, polpa, siderúrgica, mineração, alimentícia, têxtil, farmacêutica e saneamento.
+Descrição Geral:
+Construção "back-pull-out", que permite a parte do mancal ser retirada da voluta sem precisar desconectar e desalinhar a tubulação de bombeamento. Esse conceito oferece fácil montagem, desmontagem e consequente manutenção. As dimensões externas desta linha de bomba centrífuga seguem em linhas gerais a norma ISO 2858. Mecanicamente a bomba segue a norma ASME B73.1.
+Normas & Construção:
+
+Dimensionalmente conforme ISO 2858
+Mecanicamente conforme ASME B73.1
+Construção "back-pull-out"
+
+Dados de Operação:
+
+Tamanhos: DN25 até 300mm
+Vazões: até 2200m³/h
+Altura manométrica: até 135m
+Temperaturas: até 260°C
+Rotações: até 3500rpm
+Código: MTEC-03/00
+
+Bomba Centrífuga Série: FBOT - Bomba de óleo térmico
+Aplicação:
+Desenvolvida para trabalhar no bombeamento de óleos térmicos orgânicos. Pode ser utilizada na indústria farmacêutica, química, alimentícia, têxtil, plástica, etc. O fluído não deve conter partículas abrasivas ou materiais que possam atacar quimicamente os componentes da bomba.
+Descrição Geral:
+Construção "back-pull-out", que permite a parte do mancal ser retirada da carcaça sem precisar desconectar e desalinhar a tubulação de bombeamento. Esse conceito oferece fácil montagem, desmontagem e consequente manutenção. Vedação do mancal com duplo sistema de segurança, utilizando selo mecânico imerso em óleo e gaxetas de grafite.
+Normas & Construção:
+
+Construção "back-pull-out"
+Selo mecânico imerso em óleo + gaxetas de grafite (dupla vedação)
+
+Dados de Operação:
+
+Tamanhos: DN25 até 300mm
+Vazões: até 2200m³/h
+Altura manométrica: até 135m
+Temperaturas: até 350°C
+Rotações: até 3500rpm
+Código: MTEC-16/00
+
+Bombas Engrenagens Externas FBE
+Aplicação:
+Desenvolvida para trabalhar com fluidos viscosos, em inúmeras aplicações, tais como indústrias químicas, petroquímicas, papel, polpa, siderúrgica, mineração, alimentícia, têxtil, farmacêutica e saneamento.
+Descrição Geral:
+Construção composta por corpo com pés para fixação na base, eixos apoiados sobre mancais, engrenagens com dentes helicoidais montada uma sobre a outra denominada motriz e acionada. Vedação selecionada conforme aplicação do fluido bombeado, alojada na região frontal da bomba.
+Normas & Construção:
+
+Corpo com pés para fixação
+Engrenagens com dentes helicoidais
+Vedação configurável conforme aplicação
+
+Dados de Operação:
+
+Tamanhos: DN 1/8" até 6"
+Vazões: até 390m³/h
+Altura manométrica: até 220m
+Temperaturas: até 350°C
+Rotação: 1750rpm
+Código: MTEC-01/01
+
+3. Identidade Visual & UI
+ItemDiretrizPaletaAzul-profundo #00264D, cinza-titânio #6D7A88, prata #EDEFF1, laranja #F78C25 (CTAs)FontesInter (texto) + Cormorant Garamond (títulos)LayoutGrade 12 colunas; fluid spacing 4/8/16/32 rem; contêiner máx 1.440 pxImagensRender 360° de cada bomba + fotos 4K da produção; next/image com lazyMotionFramer Motion (fade-up, parallax); respeitar prefers-reduced-motionAcessibilidadeContraste AA, foco visível, tecla Esc fecha modais, navegação por tecladoCTA"Solicitar Orçamento" sempre visível; número do WhatsApp flutuante
+4. Stack Tecnológico & Performance
+CamadaSeleçãoJustificativaFront-endNext.js 14 (App Router, RSC) + TypeScriptFramework React moderno com SSR/SSG para melhor performance e SEOUITailwind CSS 3 + shadcn/ui (dark-mode toggle)Flexibilidade, baixo bundle size, componentes acessíveisCMSStrapi 4 (GraphQL, REST, i18n se futuro)Headless CMS open-source com API flexível para gerenciamento de conteúdoBuscaAlgolia DocSearch (crawler diário)Busca rápida e relevante com indexação automáticaAnalyticsPlausible auto-hospedado (sem cookies, LGPD)Análise de tráfego respeitando privacidade e LGPDObservabilidadeSentry (FE/BE) + Datadog RUMMonitoramento de erros e performance realHospedagemVercel Edge (ISR + CDN global)Distribuição global, CI/CD integrado, otimizações automáticasTestesJest + Testing-Library + Cypress; Lighthouse-CI gateTestes unitários, E2E e automação de qualidadeOrçamentoJS+CSS ≤ 100 kB; LCP < 2s; INP < 200msPerformance-first para melhor UX e SEO
+5. SEO & Conteúdo
+
+URLs canônicas: /produtos/fbcn, /produtos/fbot, /produtos/fbe
+Meta-title ≤ 60 caracteres; description ≤ 160 caracteres
+JSON-LD para Product, Organization, Breadcrumb
+Sitemap.xml e robots.txt gerados na build
+Conteúdo escrito em português técnico, com glossário ISO/ASME/API
+
+6. Conversão e CRM
+CanalIntegraçãoWhatsApp BusinessBotão flutuante +55 11 4898-9200 com UTM e mensagem automática "Olá, preciso de orçamento da bomba {{modelo}}"Formulário RFQHubSpot embed: Série, vazão, altura, fluido, temperatura, dados de contatoSLAAlerta Zendesk se atendimento > 15 segundos
+7. Plano de Ação (12 semanas)
+SemanaEntregas-chave1Kick-off, coleta de assets (logos SVG, PDFs, fotos)2Benchmark & personas; estrutura IA final3Wireframes low-fi (desktop e mobile)4Sistema de design (Figma) aprovado5-6Implantação Strapi (modelos Produto, Serviço, Case, Download)7-9Desenvolvimento Next.js, páginas ISR, integração Algolia/HubSpot/WhatsApp10Testes unitários, E2E, Lighthouse-CI, Axe acessibilidade11Conteúdo final (revisão técnica), tradução de PDFs para HTML rico12Go-live em Vercel, treinamento do time FB, monitoramento pós-lançamento
+8. Checklist de Conformidade
+
+ HTTPS/TLS 1.3 + headers CSP/HSTS
+ WCAG 2.2 AA validado por Axe + testes manuais
+ LGPD: analytics sem cookies, banner mínimo informativo
+ Core Web Vitals auditado (LCP, INP, CLS)
+ Backup diário Strapi + imagens no S3
+
+Instruções Finais
+Considerando todas as especificações acima, desenvolva o site completo da FB Bombas em português brasileiro, assegurando que todas as três linhas de produtos (FBCN, FBOT e FBE) estejam apresentadas com detalhes técnicos precisos. O site deve atender a todos os requisitos de performance, acessibilidade e conformidade, além de oferecer uma experiência de usuário premium que ressalte a qualidade e tradição da empresa.
+Por favor, gere o código-fonte completo conforme o plano estabelecido, garantindo a implementação de todas as páginas, componentes e integrações especificadas.

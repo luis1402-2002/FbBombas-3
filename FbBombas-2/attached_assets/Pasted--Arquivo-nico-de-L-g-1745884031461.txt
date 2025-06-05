@@ -1,0 +1,721 @@
+// ========================================================================
+// Arquivo Único de Lógica da Calculadora de Bombas FB (TypeScript)
+// ========================================================================
+
+// ----------------------------------------
+// Tipos e Interfaces
+// ----------------------------------------
+
+/**
+ * Tipos de bombas suportadas pela calculadora.
+ */
+export enum PumpType {
+  FBCN = 'FBCN',  // Bomba Centrífuga Normalizada
+  FBOT = 'FBOT',  // Bomba de Óleo Térmico
+  FBE = 'FBE'     // Bomba de Engrenagens Externas
+}
+
+/**
+ * Representa um ponto na curva do sistema (Vazão x Altura).
+ */
+export interface SystemCurvePoint {
+  flow: number;       // Vazão (m³/h)
+  systemHead: number; // Altura requerida pelo sistema (m)
+}
+
+/**
+ * Representa um ponto na curva de desempenho da bomba.
+ */
+export interface PumpCurvePoint {
+  flow: number;       // Vazão (m³/h)
+  pumpHead: number;   // Altura fornecida pela bomba (m)
+  efficiency: number; // Eficiência da bomba (%)
+  npsh: number;       // NPSH requerido pela bomba (m)
+  power: number;      // Potência consumida pela bomba (kW)
+}
+
+/**
+ * Representa um ponto combinado para o gráfico, incluindo dados da bomba e do sistema.
+ */
+export interface CombinedPoint {
+  flow: number;             // Vazão (m³/h)
+  pumpHead: number | null;    // Altura da bomba (m)
+  systemHead: number | null;  // Altura do sistema (m)
+  efficiency: number | null;  // Eficiência da bomba (%)
+  npsh?: number | null;       // NPSH requerido (m)
+  power?: number | null;      // Potência consumida (kW)
+}
+
+/**
+ * Resultado completo do cálculo da bomba.
+ */
+export interface CalculationResult {
+  pumpModel: string;                // Modelo específico da bomba recomendado (ex: "FBCN 40-160")
+  pumpType: PumpType;               // Tipo da bomba recomendada (FBCN, FBOT, FBE)
+  operationPoint: PumpCurvePoint;   // Ponto de operação calculado (interseção das curvas)
+  systemCurve: SystemCurvePoint[];  // Pontos da curva do sistema
+  pumpCurve: PumpCurvePoint[];      // Pontos da curva da bomba selecionada
+  combinedCurve: CombinedPoint[]; // Pontos combinados para gráfico
+  rotationSpeed: number;            // Rotação utilizada no cálculo (RPM)
+  specificRecommendations?: string[]; // Recomendações específicas (ex: alta viscosidade)
+  motorPowerSuggestionKw?: number; // Sugestão de potência do motor (kW)
+}
+
+/**
+ * Parâmetros de entrada para o cálculo.
+ */
+export interface CalculationInput {
+  flowRate: number;       // Vazão requerida (m³/h)
+  head: number;           // Altura manométrica requerida (m)
+  viscosity: number;      // Viscosidade do fluido (cP)
+  temperature: number;    // Temperatura do fluido (°C)
+  density: number;        // Densidade do fluido (kg/m³)
+  fluidType: string;      // Identificador do tipo de fluido (ex: "water", "thermalOil")
+  rotationSpeed: number;  // Rotação selecionada (RPM)
+  selectedPumpType: PumpType; // Tipo de bomba selecionado pelo usuário
+}
+
+// ----------------------------------------
+// Constantes e Dados (Exemplo Simplificado)
+// TODO: Substituir por dados reais extraídos dos arquivos
+// ----------------------------------------
+
+// Exemplo de dados de bombas (simplificado - precisa ser preenchido com dados reais)
+// Idealmente, isso viria de uma fonte de dados mais estruturada.
+const PUMP_DATA = {
+  [PumpType.FBCN]: {
+    models: [
+      { model: "FBCN 32-125", baseFlow: 10, baseHead: 8, baseEff: 60, baseNPSH: 1.5 },
+      { model: "FBCN 40-160", baseFlow: 30, baseHead: 18, baseEff: 70, baseNPSH: 2.0 },
+      { model: "FBCN 50-200", baseFlow: 70, baseHead: 30, baseEff: 75, baseNPSH: 2.5 },
+      // ... adicionar todos os modelos FBCN com dados base (ex: para 1750 RPM)
+    ]
+  },
+  [PumpType.FBOT]: {
+    models: [
+      { model: "FBOT 32-160", baseFlow: 15, baseHead: 15, baseEff: 65, baseNPSH: 2.2 },
+      { model: "FBOT 40-200", baseFlow: 40, baseHead: 25, baseEff: 68, baseNPSH: 2.8 },
+      // ... adicionar todos os modelos FBOT
+    ]
+  },
+  [PumpType.FBE]: {
+    models: [
+      { model: "FBE 1.0\"", baseFlow: 4, baseHead: 100, baseEff: 55, baseNPSH: 1.0 }, // Vazão em m³/h, Head em m (convertido de pressão)
+      { model: "FBE 2.0\"", baseFlow: 20, baseHead: 100, baseEff: 60, baseNPSH: 1.2 },
+      // ... adicionar todos os modelos FBE
+    ]
+  }
+};
+
+// ----------------------------------------
+// Funções de Cálculo Principais
+// ----------------------------------------
+
+/**
+ * Função principal que orquestra o cálculo da bomba ideal.
+ * @param input Parâmetros de entrada fornecidos pelo usuário.
+ * @returns Objeto com o resultado completo do cálculo ou null em caso de erro.
+ */
+export function calculateIdealPump(input: CalculationInput): CalculationResult | null {
+  try {
+    // 1. Determinar modelo específico (pode usar a seleção do usuário ou lógica interna)
+    //    Aqui, usamos a lógica interna baseada no tipo selecionado e nos parâmetros.
+    const recommendedModel = determineSpecificPumpModel(
+      input.selectedPumpType,
+      input.flowRate,
+      input.head,
+      input.viscosity
+    );
+
+    // 2. Calcular curva do sistema
+    const systemCurvePoints = calculateSystemCurve(input.flowRate, input.head);
+
+    // 3. Obter curva da bomba para o modelo e rotação especificados
+    const pumpCurvePoints = getPumpCurveData(
+      recommendedModel,
+      input.rotationSpeed,
+      input.viscosity,
+      input.density,
+      input.temperature
+    );
+
+    if (!pumpCurvePoints || pumpCurvePoints.length === 0) {
+      console.error(`Não foi possível gerar a curva para o modelo ${recommendedModel}`);
+      return null; // Ou lançar um erro
+    }
+
+    // 4. Encontrar ponto de operação (interseção das curvas)
+    const operationPoint = findOperationPoint(systemCurvePoints, pumpCurvePoints);
+
+    // 5. Combinar dados para o gráfico
+    const combinedPoints = combineChartData(systemCurvePoints, pumpCurvePoints);
+
+    // 6. Identificar recomendações específicas
+    const recommendations = generateSpecificRecommendations(input, operationPoint, input.selectedPumpType);
+
+    // 7. Sugestão de potência do motor (kW)
+    // Adiciona uma margem de segurança (ex: 15-20%) à potência no ponto de operação
+    const motorPowerSuggestion = operationPoint.power ? Math.ceil(operationPoint.power * 1.15) : undefined;
+
+    // 8. Montar objeto de resultado
+    const result: CalculationResult = {
+      pumpModel: recommendedModel,
+      pumpType: input.selectedPumpType,
+      operationPoint: operationPoint,
+      systemCurve: systemCurvePoints,
+      pumpCurve: pumpCurvePoints,
+      combinedCurve: combinedPoints,
+      rotationSpeed: input.rotationSpeed,
+      specificRecommendations: recommendations,
+      motorPowerSuggestionKw: motorPowerSuggestion
+    };
+
+    return result;
+
+  } catch (error) {
+    console.error("Erro detalhado ao calcular bomba ideal:", error);
+    // Em um cenário real, poderia retornar um objeto de erro mais detalhado
+    return null;
+  }
+}
+
+// ----------------------------------------
+// Funções de Cálculo Auxiliares
+// ----------------------------------------
+
+/**
+ * Calcula os pontos da curva do sistema (parábola H = K * Q²).
+ * @param targetFlow Vazão desejada (m³/h).
+ * @param targetHead Altura desejada (m).
+ * @returns Array de pontos da curva do sistema.
+ */
+export function calculateSystemCurve(targetFlow: number, targetHead: number): SystemCurvePoint[] {
+  const points: SystemCurvePoint[] = [];
+  const numPoints = 40; // Número de pontos para gerar a curva
+
+  // Evita divisão por zero ou K muito grande para vazão zero
+  if (targetFlow <= 0) {
+      targetFlow = 0.1;
+  }
+  // Calcula a constante K da curva do sistema: K = H / Q²
+  const k = targetHead / (targetFlow * targetFlow);
+
+  // Gera pontos da curva do sistema até ~1.5x a vazão desejada
+  const maxFlow = targetFlow * 1.5;
+  const minFlow = 0; // Começa do zero
+
+  for (let i = 0; i <= numPoints; i++) {
+    const flow = minFlow + (maxFlow - minFlow) * i / numPoints;
+    const systemHead = k * flow * flow;
+    points.push({ flow, systemHead });
+  }
+
+  return points;
+}
+
+/**
+ * Determina um modelo específico de bomba com base no tipo e nos parâmetros.
+ * Esta é uma lógica SIMPLIFICADA e precisa ser REFINADA com dados reais da FB Bombas.
+ * @param pumpType Tipo de bomba (FBCN, FBOT, FBE).
+ * @param flowRate Vazão requerida (m³/h).
+ * @param head Altura requerida (m).
+ * @param viscosity Viscosidade (cP).
+ * @returns String com o nome do modelo recomendado (ex: "FBCN 40-160").
+ */
+export function determineSpecificPumpModel(
+  pumpType: PumpType,
+  flowRate: number,
+  head: number,
+  viscosity: number
+): string {
+  // --- Lógica de Seleção FBCN ---
+  if (pumpType === PumpType.FBCN) {
+    let inletDiameter = 40;
+    if (flowRate <= 15) inletDiameter = 32;
+    else if (flowRate <= 40) inletDiameter = 40;
+    else if (flowRate <= 90) inletDiameter = 50;
+    else if (flowRate <= 150) inletDiameter = 65;
+    else if (flowRate <= 250) inletDiameter = 80;
+    else if (flowRate <= 400) inletDiameter = 100;
+    else if (flowRate <= 700) inletDiameter = 125;
+    else inletDiameter = 150;
+
+    let impellerDiameter = 160;
+    if (head <= 10) impellerDiameter = 125;
+    else if (head <= 20) impellerDiameter = 160;
+    else if (head <= 35) impellerDiameter = 200;
+    else if (head <= 50) impellerDiameter = 250;
+    else if (head <= 80) impellerDiameter = 315;
+    else impellerDiameter = 400;
+
+    // Lógica adicional para refinar a seleção (ex: verificar se a combinação existe)
+    // Ex: if (inletDiameter === 32 && impellerDiameter > 200) impellerDiameter = 200;
+
+    return `FBCN ${inletDiameter}-${impellerDiameter}`;
+  }
+  // --- Lógica de Seleção FBOT ---
+  else if (pumpType === PumpType.FBOT) {
+    let inletDiameter = 40;
+    if (flowRate <= 20) inletDiameter = 32;
+    else if (flowRate <= 50) inletDiameter = 40;
+    else if (flowRate <= 100) inletDiameter = 50;
+    else if (flowRate <= 180) inletDiameter = 65;
+    else if (flowRate <= 300) inletDiameter = 80;
+    else if (flowRate <= 450) inletDiameter = 100;
+    else inletDiameter = 125;
+
+    let impellerDiameter = 200;
+    if (head <= 12) impellerDiameter = 160;
+    else if (head <= 25) impellerDiameter = 200;
+    else if (head <= 40) impellerDiameter = 250;
+    else if (head <= 60) impellerDiameter = 315;
+    else impellerDiameter = 400;
+
+    // Refinamento
+    // Ex: if (inletDiameter === 32 && impellerDiameter > 250) impellerDiameter = 250;
+
+    return `FBOT ${inletDiameter}-${impellerDiameter}`;
+  }
+  // --- Lógica de Seleção FBE ---
+  else if (pumpType === PumpType.FBE) {
+    let sizeInches = 1.0;
+    // Ajusta a vazão para uma viscosidade de referência (ex: 100 cP) para seleção
+    // A performance de bombas de engrenagem varia muito com a viscosidade.
+    const viscosityFactor = Math.sqrt(100 / Math.max(1, viscosity));
+    const adjustedFlow = flowRate * viscosityFactor;
+
+    if (adjustedFlow <= 2) sizeInches = 0.5;
+    else if (adjustedFlow <= 5) sizeInches = 1.0;
+    else if (adjustedFlow <= 12) sizeInches = 1.5;
+    else if (adjustedFlow <= 25) sizeInches = 2.0;
+    else if (adjustedFlow <= 50) sizeInches = 3.0;
+    else sizeInches = 4.0;
+
+    // Formata para string com uma casa decimal se não for inteiro
+    const sizeString = sizeInches % 1 === 0 ? sizeInches.toFixed(0) : sizeInches.toFixed(1);
+    return `FBE ${sizeString}"`;
+  }
+
+  // Fallback
+  console.warn(`Tipo de bomba desconhecido para seleção de modelo: ${pumpType}`);
+  return "Modelo Indisponível";
+}
+
+/**
+ * Gera os pontos da curva de desempenho para um modelo de bomba específico.
+ * Esta é uma função CRÍTICA e precisa implementar a lógica EXATA de cálculo
+ * das curvas H-Q, Eficiência-Q, Potência-Q e NPSH-Q para cada modelo FB,
+ * considerando rotação, viscosidade, densidade e temperatura.
+ * A implementação atual é uma APROXIMAÇÃO e deve ser SUBSTITUÍDA.
+ *
+ * @param model Modelo da bomba (ex: "FBCN 40-160").
+ * @param rotation Rotação (RPM).
+ * @param viscosity Viscosidade (cP).
+ * @param density Densidade (kg/m³).
+ * @param temperature Temperatura (°C).
+ * @returns Array de pontos da curva da bomba.
+ */
+export function getPumpCurveData(
+  model: string,
+  rotation: number,
+  viscosity: number,
+  density: number,
+  temperature: number
+): PumpCurvePoint[] {
+  const points: PumpCurvePoint[] = [];
+  const numPoints = 30; // Número de pontos para gerar a curva
+  const pumpType = getPumpTypeFromModel(model);
+
+  // --- Fatores de Correção (Exemplos - PRECISAM SER VALIDADOS/AJUSTADOS) ---
+  // Fator de correção de viscosidade para altura (simplificado)
+  const viscHeadFactor = Math.max(0.5, Math.min(1, Math.pow(10 / Math.max(1, viscosity), 0.05)));
+  // Fator de correção de viscosidade para vazão (simplificado)
+  const viscFlowFactor = Math.max(0.6, Math.min(1, Math.pow(10 / Math.max(1, viscosity), 0.1)));
+  // Fator de correção de viscosidade para eficiência (simplificado)
+  const viscEffFactor = Math.max(0.4, Math.min(1, Math.pow(10 / Math.max(1, viscosity), 0.25)));
+
+  try {
+    // --- Lógica para FBCN / FBOT (Centrífugas) ---
+    if (pumpType === PumpType.FBCN || pumpType === PumpType.FBOT) {
+      const isFBOT = pumpType === PumpType.FBOT;
+      const modelPrefix = isFBOT ? "FBOT " : "FBCN ";
+      const dimensions = model.replace(modelPrefix, "").split("-");
+      if (dimensions.length !== 2) throw new Error(`Modelo inválido: ${model}`);
+      const inletDiameter = parseInt(dimensions[0]);
+      const impellerDiameter = parseInt(dimensions[1]);
+
+      // Dados base (aproximados - USAR DADOS REAIS)
+      // Estes valores deveriam vir de PUMP_DATA ou similar, específicos para o modelo
+      const baseImpeller = isFBOT ? 200 : 160;
+      const baseRotation = 1750;
+      const baseHeadMax = (isFBOT ? 60 : 50) * (impellerDiameter / baseImpeller);
+      const baseFlowMax = (isFBOT ? 1.8 : 2.0) * inletDiameter * (impellerDiameter / baseImpeller);
+      const baseEffMax = isFBOT ? 70 : 75;
+      const baseNPSHMin = isFBOT ? 2.5 : 2.0;
+
+      // Fatores de Afinidade (Leis de Semelhança)
+      const rotationRatio = rotation / baseRotation;
+      const headAffinity = Math.pow(rotationRatio, 2);
+      const flowAffinity = rotationRatio;
+      // Potência varia com o cubo da rotação e com a densidade
+      // Eficiência é afetada, mas de forma mais complexa (simplificadamente, pode diminuir fora da rotação nominal)
+
+      // Aplicar fatores de afinidade e correção de viscosidade
+      const headMax = baseHeadMax * headAffinity * viscHeadFactor;
+      const flowMax = baseFlowMax * flowAffinity * viscFlowFactor;
+      const effMax = baseEffMax * viscEffFactor;
+      const npshMin = baseNPSHMin * Math.pow(rotationRatio, 1.5); // NPSH aumenta com rotação
+
+      // Gerar pontos da curva H-Q (parábola invertida aproximada)
+      for (let i = 0; i <= numPoints; i++) {
+        const flowPercent = i / numPoints;
+        const flow = flowMax * flowPercent;
+
+        // Curva H-Q (Exemplo: H = Hmax * (1 - (Q/Qmax)^exp))
+        const headExponent = 1.8; // Ajustar conforme a bomba
+        const headFactor = 1 - Math.pow(flowPercent, headExponent);
+        const pumpHead = headMax * Math.max(0.1, headFactor); // Garante altura mínima
+
+        // Curva de Eficiência (Exemplo: parábola com pico em ~75% Qmax)
+        let efficiency = 0;
+        const effPeakFlowRatio = 0.75;
+        if (flowPercent > 0.1 && flowPercent < 1.1) { // Permite um pouco além do Qmax
+          efficiency = effMax * (1 - Math.pow((flowPercent - effPeakFlowRatio) / (1 - effPeakFlowRatio), 2) * 1.5);
+          efficiency = Math.max(0, Math.min(effMax, efficiency)); // Limita entre 0 e effMax
+        }
+
+        // Curva de NPSH (Exemplo: NPSH = NPSHmin + C * Q^2)
+        const npshExponent = 2.0;
+        const npshFactor = 0.1 * headMax / Math.pow(flowMax, npshExponent); // Constante C aproximada
+        const npsh = npshMin + npshFactor * Math.pow(flow, npshExponent);
+
+        // Cálculo da Potência (kW)
+        // P(kW) = (Q(m³/h) * H(m) * density(kg/m³) * g(9.81)) / (3.6 * 10^6 * efficiency(%)/100)
+        const efficiencyDecimal = efficiency / 100;
+        let power = 0;
+        if (efficiencyDecimal > 0.05) { // Evita divisão por zero ou valores irreais com eficiência muito baixa
+          power = (flow * pumpHead * density * 9.81) / (3.6e6 * efficiencyDecimal);
+        } else if (flow > 0) {
+          // Estima potência mínima se a eficiência for muito baixa (ex: baseado em 10% eff)
+          power = (flow * pumpHead * density * 9.81) / (3.6e6 * 0.10);
+        }
+
+        // Correção de potência para FBOT (temperatura)
+        if (isFBOT && temperature > 20) {
+             // Aproximação: Aumenta a potência necessária com a temperatura devido à menor densidade do óleo
+             // Esta lógica pode precisar de revisão com dados reais
+             const tempPowerFactor = 1 + (temperature - 20) * 0.001;
+             power *= tempPowerFactor;
+        }
+
+        points.push({ flow, pumpHead, efficiency, npsh, power });
+      }
+    }
+    // --- Lógica para FBE (Engrenagens) ---
+    else if (pumpType === PumpType.FBE) {
+      const sizeMatch = model.match(/(\d+(\.\d+)?)/);
+      if (!sizeMatch) throw new Error(`Modelo FBE inválido: ${model}`);
+      const size = parseFloat(sizeMatch[0]); // Tamanho em polegadas
+
+      // Dados base (aproximados - USAR DADOS REAIS)
+      const baseRotation = 1750;
+      // Vazão é quase linear com rotação e tamanho, mas afetada por slip (viscosidade)
+      const baseFlowLPM = size * 60; // Vazão teórica em L/min a 1750 RPM
+      const baseMaxPressureBar = 25 * Math.min(1, size / 3); // Pressão máx limitada pelo tamanho
+      const baseEffMax = 65;
+
+      // Fatores de Afinidade e Correção
+      const rotationRatio = rotation / baseRotation;
+      const flowAffinity = rotationRatio;
+
+      // Slip aumenta com menor viscosidade e maior pressão diferencial
+      // Vazão real = Vazão teórica - Slip
+      // Slip é complexo, aqui uma aproximação MUITO simplificada:
+      const slipFactor = Math.max(0.05, Math.min(0.5, 50 / Math.max(1, viscosity))); // Maior slip com baixa visc.
+
+      const theoreticalFlow = (baseFlowLPM * flowAffinity) / 16.6667; // m³/h
+      const maxPressureHead = baseMaxPressureBar * 10.2 * (density / 1000); // mca
+      const effMax = baseEffMax * Math.max(0.5, Math.min(1, Math.pow(viscosity / 100, 0.1))); // Eficiência melhora um pouco com visc.
+
+      // Gerar pontos
+      for (let i = 0; i <= numPoints; i++) {
+        const pressurePercent = i / numPoints; // Varia a pressão (altura) de 0 a max
+        const pumpHead = maxPressureHead * pressurePercent;
+
+        // Calcular Vazão (Q) em função da Altura (H) e Slip
+        // Q = Q_teorica * (1 - slip_fator * (H / Hmax))
+        const flow = theoreticalFlow * (1 - slipFactor * pressurePercent);
+
+        // Eficiência (relativamente constante, mas cai em extremos de pressão/vazão)
+        let efficiency = effMax * (1 - Math.pow(1 - flow / theoreticalFlow, 2) * 0.5); // Pico perto da vazão teórica
+        efficiency = Math.max(0, Math.min(effMax, efficiency));
+
+        // NPSH (baixo, mas aumenta com viscosidade e rotação)
+        const npsh = 1.0 + 1.5 * Math.log10(Math.max(1, viscosity / 10)) + 0.5 * rotationRatio;
+
+        // Potência (kW)
+        const efficiencyDecimal = efficiency / 100;
+        let power = 0;
+        if (efficiencyDecimal > 0.05 && flow > 0) {
+          power = (flow * pumpHead * density * 9.81) / (3.6e6 * efficiencyDecimal);
+        } else if (flow > 0) {
+          power = (flow * pumpHead * density * 9.81) / (3.6e6 * 0.10); // Estima com 10% eff
+        }
+
+        // Adiciona o ponto, garantindo que a vazão não seja negativa
+        points.push({ flow: Math.max(0, flow), pumpHead, efficiency, npsh, power });
+      }
+      // Ordena por vazão, pois calculamos baseado na pressão
+      points.sort((a, b) => a.flow - b.flow);
+    }
+    else {
+      throw new Error(`Tipo de bomba não suportado para geração de curva: ${pumpType}`);
+    }
+
+  } catch (error) {
+    console.error(`Erro ao gerar curva para ${model}:`, error);
+    return []; // Retorna vazio em caso de erro
+  }
+
+  // Garante que não há pontos duplicados e ordena por vazão
+  const uniquePoints = Array.from(new Map(points.map(p => [p.flow.toFixed(3), p])).values());
+  return uniquePoints.sort((a, b) => a.flow - b.flow);
+}
+
+
+/**
+ * Encontra o ponto de operação onde a curva da bomba intercepta a curva do sistema.
+ * @param systemCurve Pontos da curva do sistema.
+ * @param pumpCurve Pontos da curva da bomba.
+ * @returns O ponto da curva da bomba mais próximo da interseção.
+ */
+export function findOperationPoint(systemCurve: SystemCurvePoint[], pumpCurve: PumpCurvePoint[]): PumpCurvePoint {
+  let operationPoint: PumpCurvePoint = pumpCurve[0] || { flow: 0, pumpHead: 0, efficiency: 0, npsh: 0, power: 0 }; // Default
+  let minDiff = Infinity;
+
+  if (pumpCurve.length === 0 || systemCurve.length === 0) {
+      console.warn("Curvas vazias fornecidas para encontrar ponto de operação.");
+      return operationPoint;
+  }
+
+  // Itera sobre os pontos da curva da bomba
+  for (const pumpPoint of pumpCurve) {
+    const flow = pumpPoint.flow;
+    // Encontra a altura correspondente na curva do sistema por interpolação linear
+    const systemHead = interpolate(systemCurve, flow, 'flow', 'systemHead');
+
+    if (systemHead !== null) {
+      const diff = Math.abs(pumpPoint.pumpHead - systemHead);
+      if (diff < minDiff) {
+        minDiff = diff;
+        operationPoint = { ...pumpPoint }; // Cria cópia do ponto
+      }
+    }
+  }
+
+  // Refinamento: Interpolação mais precisa perto do ponto encontrado
+  // (Opcional, mas pode melhorar a precisão)
+  // Encontra os pontos da bomba antes e depois do ponto de operação bruto
+  const opIndex = pumpCurve.findIndex(p => p.flow >= operationPoint.flow);
+  if (opIndex > 0 && opIndex < pumpCurve.length) {
+      const p1 = pumpCurve[opIndex - 1];
+      const p2 = pumpCurve[opIndex];
+      const s1_h = interpolate(systemCurve, p1.flow, 'flow', 'systemHead') ?? 0;
+      const s2_h = interpolate(systemCurve, p2.flow, 'flow', 'systemHead') ?? 0;
+
+      // Diferenças em relação à curva do sistema
+      const diff1 = p1.pumpHead - s1_h;
+      const diff2 = p2.pumpHead - s2_h;
+
+      // Se os sinais das diferenças forem opostos, a interseção está entre p1 e p2
+      if (diff1 * diff2 < 0) {
+          // Interpolação linear para encontrar a vazão onde a diferença é zero
+          const interpFlow = p1.flow - diff1 * (p2.flow - p1.flow) / (diff2 - diff1);
+
+          // Interpola os outros valores da bomba para esta vazão
+          const ratio = (interpFlow - p1.flow) / (p2.flow - p1.flow);
+          operationPoint.flow = interpFlow;
+          operationPoint.pumpHead = p1.pumpHead + ratio * (p2.pumpHead - p1.pumpHead);
+          operationPoint.efficiency = p1.efficiency + ratio * (p2.efficiency - p1.efficiency);
+          operationPoint.npsh = p1.npsh + ratio * (p2.npsh - p1.npsh);
+          operationPoint.power = p1.power + ratio * (p2.power - p1.power);
+      }
+  }
+
+  return operationPoint;
+}
+
+/**
+ * Combina os dados das curvas do sistema e da bomba em um único array para gráfico.
+ * @param systemCurve Pontos da curva do sistema.
+ * @param pumpCurve Pontos da curva da bomba.
+ * @returns Array de pontos combinados, ordenados por vazão.
+ */
+export function combineChartData(systemCurve: SystemCurvePoint[], pumpCurve: PumpCurvePoint[]): CombinedPoint[] {
+  const combinedPointsMap = new Map<number, CombinedPoint>();
+
+  // Adiciona pontos da curva do sistema
+  systemCurve.forEach(p => {
+    if (!combinedPointsMap.has(p.flow)) {
+      combinedPointsMap.set(p.flow, { flow: p.flow, systemHead: p.systemHead, pumpHead: null, efficiency: null });
+    } else {
+      combinedPointsMap.get(p.flow)!.systemHead = p.systemHead;
+    }
+  });
+
+  // Adiciona/atualiza com pontos da curva da bomba
+  pumpCurve.forEach(p => {
+    if (!combinedPointsMap.has(p.flow)) {
+      combinedPointsMap.set(p.flow, {
+        flow: p.flow,
+        systemHead: null,
+        pumpHead: p.pumpHead,
+        efficiency: p.efficiency,
+        npsh: p.npsh,
+        power: p.power
+      });
+    } else {
+      const existing = combinedPointsMap.get(p.flow)!;
+      existing.pumpHead = p.pumpHead;
+      existing.efficiency = p.efficiency;
+      existing.npsh = p.npsh;
+      existing.power = p.power;
+    }
+  });
+
+  // Converte o Map para Array e ordena por vazão
+  const combinedPoints = Array.from(combinedPointsMap.values()).sort((a, b) => a.flow - b.flow);
+
+  // Interpola valores nulos para suavizar o gráfico
+  combinedPoints.forEach((point, index) => {
+      if (point.systemHead === null && index > 0 && index < combinedPoints.length - 1) {
+          point.systemHead = interpolate(systemCurve, point.flow, 'flow', 'systemHead');
+      }
+      if (point.pumpHead === null && index > 0 && index < combinedPoints.length - 1) {
+          point.pumpHead = interpolate(pumpCurve, point.flow, 'flow', 'pumpHead');
+          point.efficiency = interpolate(pumpCurve, point.flow, 'flow', 'efficiency');
+          point.npsh = interpolate(pumpCurve, point.flow, 'flow', 'npsh');
+          point.power = interpolate(pumpCurve, point.flow, 'flow', 'power');
+      }
+  });
+
+  return combinedPoints;
+}
+
+/**
+ * Gera recomendações textuais com base nos parâmetros e resultados.
+ * @param input Parâmetros de entrada.
+ * @param opPoint Ponto de operação calculado.
+ * @param selectedType Tipo de bomba selecionado.
+ * @returns Array de strings com recomendações.
+ */
+function generateSpecificRecommendations(
+    input: CalculationInput,
+    opPoint: PumpCurvePoint,
+    selectedType: PumpType
+): string[] {
+    const recommendations: string[] = [];
+
+    // Viscosidade
+    if (input.viscosity > 50000) {
+        recommendations.push('Viscosidade extremamente alta (>50.000 cP). Considere pré-aquecimento ou bomba de deslocamento positivo mais robusta.');
+    } else if (input.viscosity > 10000) {
+        recommendations.push('Viscosidade muito alta (>10.000 cP). A eficiência da bomba será significativamente reduzida. Verifique a potência do motor.');
+    } else if (input.viscosity > 1000 && selectedType !== PumpType.FBE) {
+        recommendations.push('Viscosidade alta (>1000 cP). Bombas de engrenagens (FBE) podem ser mais adequadas.');
+    }
+
+    // Temperatura
+    if (input.temperature > 250 && selectedType !== PumpType.FBOT) {
+        recommendations.push('Temperatura muito alta (>250°C). Uso de bomba FBOT é fortemente recomendado.');
+    } else if (input.temperature > 120 && selectedType === PumpType.FBCN) {
+        recommendations.push('Temperatura elevada (>120°C). Considere bomba FBOT para maior durabilidade e segurança.');
+    }
+    if (input.temperature < 0) {
+        recommendations.push('Temperatura baixa (<0°C). Verifique a compatibilidade dos materiais e a viscosidade do fluido a esta temperatura.');
+    }
+
+    // NPSH
+    if (opPoint.npsh > 6) {
+        recommendations.push(`NPSH requerido (${opPoint.npsh.toFixed(1)}m) é elevado. Garanta NPSH disponível adequado na instalação para evitar cavitação.`);
+    } else if (opPoint.npsh > 4) {
+        recommendations.push(`NPSH requerido (${opPoint.npsh.toFixed(1)}m) moderado. Verifique o NPSH disponível.`);
+    }
+
+    // Eficiência
+    if (opPoint.efficiency < 40) {
+        recommendations.push(`Eficiência no ponto de operação (${opPoint.efficiency.toFixed(1)}%) é baixa. Considere um modelo de bomba diferente ou ajuste no sistema, se possível.`);
+    } else if (opPoint.efficiency < 55) {
+        recommendations.push(`Eficiência no ponto de operação (${opPoint.efficiency.toFixed(1)}%) é moderada.`);
+    }
+
+    // Ponto de Operação vs Curva
+    // (Adicionar lógica para verificar se o ponto está muito à esquerda ou direita da curva de eficiência)
+
+    return recommendations;
+}
+
+// ----------------------------------------
+// Funções Utilitárias
+// ----------------------------------------
+
+/**
+ * Obtém o tipo de bomba (enum) a partir do nome do modelo.
+ * @param model String do modelo (ex: "FBCN 40-160").
+ * @returns Enum PumpType correspondente ou FBCN como fallback.
+ */
+function getPumpTypeFromModel(model: string): PumpType {
+  if (model.startsWith("FBCN")) return PumpType.FBCN;
+  if (model.startsWith("FBOT")) return PumpType.FBOT;
+  if (model.startsWith("FBE")) return PumpType.FBE;
+  console.warn(`Não foi possível determinar o tipo de bomba para o modelo: ${model}. Usando FBCN como padrão.`);
+  return PumpType.FBCN; // Fallback
+}
+
+/**
+ * Interpola linearmente um valor Y em um array de pontos (X, Y).
+ * @param points Array de pontos ordenados por xKey.
+ * @param xValue Valor X para o qual interpolar Y.
+ * @param xKey Nome da chave X nos objetos de ponto.
+ * @param yKey Nome da chave Y nos objetos de ponto.
+ * @returns Valor Y interpolado ou null se não for possível interpolar.
+ */
+function interpolate<T extends Record<string, any>>(points: T[], xValue: number, xKey: keyof T, yKey: keyof T): number | null {
+    if (!points || points.length === 0) return null;
+
+    // Encontra os índices dos pontos que cercam xValue
+    let lowerIndex = -1;
+    let upperIndex = -1;
+
+    for (let i = 0; i < points.length; i++) {
+        if (points[i][xKey] <= xValue) lowerIndex = i;
+        if (points[i][xKey] >= xValue && upperIndex === -1) upperIndex = i;
+    }
+
+    // Trata casos extremos
+    if (lowerIndex === -1) return points[0]?.[yKey] ?? null; // Antes do primeiro ponto
+    if (upperIndex === -1) return points[points.length - 1]?.[yKey] ?? null; // Depois do último ponto
+    if (lowerIndex === upperIndex) return points[lowerIndex]?.[yKey] ?? null; // Exatamente em um ponto
+
+    // Interpolação linear
+    const lowerPoint = points[lowerIndex];
+    const upperPoint = points[upperIndex];
+
+    const x1 = lowerPoint[xKey] as number;
+    const y1 = lowerPoint[yKey] as number;
+    const x2 = upperPoint[xKey] as number;
+    const y2 = upperPoint[yKey] as number;
+
+    // Evita divisão por zero se os pontos X forem idênticos
+    if (x2 - x1 === 0) return y1;
+
+    // Fórmula de interpolação linear: y = y1 + (x - x1) * (y2 - y1) / (x2 - x1)
+    const interpolatedY = y1 + (xValue - x1) * (y2 - y1) / (x2 - x1);
+
+    return interpolatedY;
+}
+
+// ========================================================================
+// Fim do Arquivo Único de Lógica da Calculadora
+// ========================================================================
+

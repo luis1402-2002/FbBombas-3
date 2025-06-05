@@ -1,0 +1,90 @@
+{
+  "products": {
+    "title": "Nossos Produtos",
+    "subtitle": "Soluções completas em bombeamento industrial",
+    "categories": {
+      "all": "Todos",
+      "fbe": "Bombas de Engrenagem",
+      "fbcn": "Bombas Centrífugas",
+      "fbot": "Bombas Óleo Térmico"
+    },
+    "hero": {
+      "badge": "Linha Completa de Bombas Industriais",
+      "title": "Soluções de Bombeamento de Alta Performance",
+      "subtitle": "Tecnologia avançada e engenharia de precisão para os processos industriais mais exigentes. Qualidade e confiabilidade há mais de 80 anos."
+    },
+    "metrics": {
+      "pressure": "Pressão Máxima",
+      "flow": "Vazão Máxima", 
+      "temperature": "Temperatura Máxima"
+    },
+    "search": {
+      "placeholder": "Buscar produtos por nome ou especificação..."
+    },
+    "sort": {
+      "label": "Ordenar por",
+      "name": "Nome",
+      "flow": "Vazão"
+    },
+    "specs": {
+      "maxFlow": "Vazão Máx",
+      "maxHeight": "Altura Máx",
+      "maxTemp": "Temp. Máx"
+    },
+    "viewDetails": "Ver Detalhes",
+    "consultant": "Consultor",
+    "noResults": "Nenhum produto encontrado com os filtros aplicados.",
+    "clearFilters": "Limpar Filtros",
+    "cta": {
+      "title": "Não encontrou o que procura?",
+      "subtitle": "Nossa equipe técnica está pronta para ajudar você a encontrar a solução ideal para sua aplicação.",
+      "consultant": "Falar com Consultor",
+      "catalogs": "Baixar Catálogos"
+    },
+    "whatsapp": {
+      "consultMessage": "Olá! Gostaria de saber mais sobre as bombas FB Bombas.",
+      "gearPumpMessage": "Olá! Gostaria de saber mais sobre as bombas de engrenagem série FBE."
+    },
+    "gearPumps": {
+      "badge": "Série FBE",
+      "title": "Bombas de Engrenagem Externa",
+      "subtitle": "Soluções robustas e confiáveis para transferência e dosagem precisa de fluidos viscosos em aplicações industriais exigentes.",
+      "downloadManual": "Manual Técnico FBE",
+      "talkToConsultant": "Falar com Consultor",
+      "features": {
+        "flow": "Vazão Máxima",
+        "pressure": "Pressão Máxima",
+        "viscosity": "Viscosidade Máxima",
+        "sizes": "Diâmetros Disponíveis"
+      },
+      "searchPlaceholder": "Buscar por diâmetro ou modelo...",
+      "clearSearch": "Limpar Busca",
+      "selectDiameter": "Selecione o Diâmetro da Bomba",
+      "selectDiameterDesc": "Escolha o diâmetro desejado para visualizar os modelos disponíveis e suas especificações técnicas completas.",
+      "singleModel": "1 modelo disponível",
+      "multipleModels": "{{count}} modelos disponíveis",
+      "maxFlow": "Vazão Máxima",
+      "maxRPM": "Rotação Máxima",
+      "maxPressure": "Pressão Máxima",
+      "maxViscosity": "Viscosidade Máxima",
+      "viewVariations": "Ver Variações",
+      "backToDiameters": "Voltar aos Diâmetros",
+      "variationsFor": "Variações para {{diameter}}",
+      "viewSpecs": "Ver Especificações",
+      "completeSpecs": "Especificações técnicas completas e tabela de vazão",
+      "technicalData": "Dados Técnicos",
+      "specifications": "Especificações Técnicas",
+      "suction": "Sucção e Recalque",
+      "gears": "Engrenagens",
+      "sealing": "Vedação",
+      "bearings": "Mancais",
+      "construction": "Construção",
+      "optionals": "Opcionais",
+      "flowTable": "Tabela de Vazão e Pressão",
+      "pressure": "Pressão",
+      "flow": "Vazão",
+      "power": "Potência",
+      "requestQuote": "Solicitar Orçamento"
+    }
+  }
+}

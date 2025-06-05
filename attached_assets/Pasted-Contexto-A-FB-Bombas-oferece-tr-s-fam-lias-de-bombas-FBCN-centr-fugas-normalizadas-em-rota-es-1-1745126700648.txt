@@ -1,0 +1,146 @@
+Contexto
+A FB Bombas oferece três famílias de bombas:
+
+FBCN (centrífugas normalizadas) em rotações 1750 rpm e 3500 rpm
+
+FBOT (óleo térmico) em rotações 1750 rpm e 3500 rpm
+
+FBE (engrenagem externa) em rotações 1750 rpm, 1150 rpm e 850 rpm
+
+Cada modelo possui curvas de desempenho (vazão × altura), eficiência, NPSH e potência.
+
+O objetivo é que o cliente selecione parâmetros (vazão, altura, viscosidade, densidade, temperatura, tipo de bomba e rotação) e obtenha:
+
+Bomba recomendada
+
+Gráficos (curva da bomba, eficiência e curva do sistema) responsivos
+
+Recomendações técnicas específicas para cada caso
+
+2. Instruções de Alto Nível
+Papel da IA: “Você é um engenheiro front‑end sênior especialista em React, TypeScript e UX B2B.”
+
+Tarefa:
+
+Refatorar o componente PumpCalculatorSection (código abaixo) para torná‑lo:
+
+Modular: separar lógicas em hooks e utilitários.
+
+Extensível: fácil de acrescentar novas curvas/rotations.
+
+Acessível: WAI‑ARIA, labels, descrições e navegação por teclado.
+
+Internacionalizável: manter chaves t(…), sem texto hard‑coded.
+
+Testável: exportar lógica pura para unit tests (Jest).
+
+Performático: usar useMemo / useCallback, evitar recalculos desnecessários.
+
+Inserir todas as curvas (FBCN, FBOT, FBE) presentes nos documentos técnicos.
+
+Garantir responsividade para mobile e desktop, mantendo estilo da marca (azul, vermelho) via Tailwind CSS.
+
+Formato de saída:
+
+Fornecer um único componente React (ou vários arquivos se necessário), com:
+
+Comentários JSDoc para props e funções principais.
+
+Instruções de uso no README.
+
+Exemplo de teste unitário para a função de seleção de bomba.
+
+Restrições:
+
+Não remova nenhuma funcionalidade existente.
+
+Mantenha compatibilidade com Contexto de idioma (useLanguage).
+
+Preserve a UI (Tabs, Sliders, Cards, Gráficos), mas melhore usabilidade, loading states e mensagens de erro.
+
+3. Código de Referência
+<details> <summary>🚀 Clique para expandir o código atual `PumpCalculatorSection`</summary>
+tsx
+Copiar
+Editar
+// [Cole aqui o código completo que você enviou acima]
+</details>
+4. Critérios de Aceitação
+✅ Funcionalidade: a calculadora deve gerar mesmo resultado (pumpModel, eficiência, potência, NPSH, recomendações).
+
+✅ Modularidade: lógicas extraídas para hooks como useSystemCurve, usePumpSelection.
+
+✅ Acessibilidade: componentes navegáveis por teclado, labels associados, alertas de erro acessíveis.
+
+✅ Internacionalização: todo texto via t("…").
+
+✅ Performance: curvas e cálculos memoizados para evitar re‑renderizações desnecessárias.
+
+✅ Documentação: README breve explicando props, hooks e instruções de teste.
+
+✅ Testes: ao menos 1 unit test para a função que determina o modelo ideal.
+
+Use esta prompt como entrada para um agente IA (ChatGPT, Claude, etc.) para gerar o código refatorado, completo e pronto para entrega.
+
+
+
+
+
+
+
+Você disse:
+
+TA TUDO CERTO AQUI?
+
+O ChatGPT disse:
+A interface está muito bem construída do ponto de vista de layout, cores e hierarquia visual. Mas notei alguns desencontros de dados que precisam ser corrigidos para garantir que tudo reflita os parâmetros de entrada e os cálculos da calculadora:
+
+1. Resumo “Ponto de Operação”
+Vazão: 19.2 m³/h ✔️
+
+Altura: 45.1 m ✔️
+
+Eficiência: 53.7 % ✔️
+
+Potência requerida: 4.4 kW ✔️
+
+NPSH requerido: 2.1 m ✔️
+
+Rotação: 1750 RPM ✔️
+
+Estes valores batem com o exemplo de entrada de ~19 m³/h e 45 m de altura.
+
+2. Gráfico “Curvas de Desempenho”
+Linha vermelha (curva da bomba) e tracejado azul (curva do sistema) estão corretos e o ponto de interseção é destacado em verde.
+
+Legenda clara e os eixos estão corretamente rotulados em “Vazão (m³/h)” e “Altura (m)”.
+
+3. “Dados Técnicos Detalhados”
+❌ Aqui está o problema principal: os parâmetros listados não coincidem com os do resumo:
+
+
+Campo	Resumo (calculado)	Detalhado (exibido)
+Vazão	19.2 m³/h	10 m³/h
+Altura Manométrica	45.1 m	20 m
+Altura Estática	—	10 m
+Potência do Motor	4.4 kW	6.0 kW
+Fluído / Temperatura / Densidade / Viscosidade estão corretos, mas o cabeçalho está confuso dividindo “Parâmetros do Sistema” e “Parâmetros do Fluido” que poderiam estar mais próximos do resumo.		
+O que ajustar aqui:
+
+Vincular estes campos aos mesmos valores de entrada e resultado que você já calculou no resumo (flowRate, head, efficiency, power, npsh).
+
+Se quiser manter “Altura Estática” e “Altura Manométrica” como dados separados, esses valores devem vir do cálculo de curva de sistema (por exemplo staticHead vs systemHead).
+
+Potência do Motor: se existe um fator de reserva (ex.: 6 kW vs 4.4 kW calculados), deixe claro no título (“Potência requerida” vs “Potência recomendada com reserva”).
+
+4. Call‑to‑Action (“Solicitar Cotação”)
+👍 A CTA está bem posicionada e chama a atenção. Só vale renomear para “Solicitar Cotação Técnica” ou algo que deixe claro o que o cliente irá receber.
+
+Conclusão
+Layout e UX: perfeitos.
+
+Dados de operação e gráficos: corretos.
+
+Dados detalhados: precisam ser refeitos para usar exatamente os mesmos resultados calculados.
+
+Com esse ajuste de binding de dados, sua seção de calculadora ficará 100 % coerente e pronta para uso!

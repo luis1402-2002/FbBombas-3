@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="240" height="80" viewBox="0 0 240 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    .text-primary { fill: #00328E; }
+    .text-accent { fill: #E30613; }
+    .text-bg { fill: #FFFFFF; }
+    
+    @media (prefers-color-scheme: dark) {
+      .text-primary { fill: #FFFFFF; }
+      .text-bg { fill: transparent; }
+    }
+  </style>
+  
+  <!-- Background para o logo (visível apenas em tema claro) -->
+  <rect class="text-bg" x="10" y="10" width="220" height="60" rx="5" />
+  
+  <!-- FB Logo -->
+  <path class="text-primary" d="M20 15H55V30H30V35H50V50H30V65H20V15Z"/>
+  
+  <!-- Bombas text -->
+  <path class="text-primary" d="M65 30C65 22.268 71.268 15 79 15H95C102.732 15 110 22.268 110 30C110 37.732 102.732 45 95 45H79C71.268 45 65 37.732 65 30ZM79 30C79 34.971 83.029 40 88 40H95C99.971 40 104 34.971 104 30C104 25.029 99.971 20 95 20H88C83.029 20 79 25.029 79 30Z"/>
+  <path class="text-primary" d="M115 17.5C115 16.1193 116.119 15 117.5 15H152.5C153.881 15 155 16.1193 155 17.5C155 18.8807 153.881 20 152.5 20H117.5C116.119 20 115 18.8807 115 17.5Z"/>
+  <path class="text-primary" d="M115 30C115 22.268 121.268 15 129 15H145C152.732 15 160 22.268 160 30C160 37.732 152.732 45 145 45H129C121.268 45 115 37.732 115 30ZM129 30C129 34.971 133.029 40 138 40H145C149.971 40 154 34.971 154 30C154 25.029 149.971 20 145 20H138C133.029 20 129 25.029 129 30Z"/>
+  <path class="text-primary" d="M165 15C165 15 175 15 177.5 15C180 15 185 15 185 15V40C185 40 185 45 180 45C175 45 175 40 175 40V35H165V37.5C165 37.5 165 45 172.5 45C180 45 185 45 190 45V15H165Z"/>
+  <path class="text-primary" d="M165 30H175V25H165V30Z"/>
+  <path class="text-primary" d="M195 17.5C195 16.1193 196.119 15 197.5 15H225C226.381 15 227.5 16.1193 227.5 17.5C227.5 18.8807 226.381 20 225 20H215V45H207.5V20H197.5C196.119 20 195 18.8807 195 17.5Z"/>
+  <path class="text-primary" d="M165 17.5C165 16.1193 166.119 15 167.5 15H177.5C178.881 15 180 16.1193 180 17.5C180 18.8807 178.881 20 177.5 20H167.5C166.119 20 165 18.8807 165 17.5Z"/>
+  
+  <!-- Slogan/Tagline -->
+  <path class="text-primary" d="M60 55H180C180 55 190 55 190 60C190 65 180 65 180 65H60C60 65 50 65 50 60C50 55 60 55 60 55Z"/>
+  
+  <!-- Accent elements -->
+  <circle class="text-accent" cx="195" cy="60" r="8"/>
+  <path class="text-accent" d="M20 70H220C225 70 230 70 230 65C230 60 225 60 220 60"/>
+</svg>

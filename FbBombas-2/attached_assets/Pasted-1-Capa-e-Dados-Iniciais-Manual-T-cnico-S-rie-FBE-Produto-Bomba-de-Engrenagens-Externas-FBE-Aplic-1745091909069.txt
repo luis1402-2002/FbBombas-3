@@ -1,0 +1,131 @@
+1. Capa e Dados Iniciais
+Manual Técnico – Série FBE
+Produto: Bomba de Engrenagens Externas FBE
+Aplicação: Desenvolvida para bombear fluidos viscosos em indústrias químicas, petroquímicas, papel, polpa, siderúrgica, mineração, alimentícia, têxtil, farmacêutica e saneamento ​
+.
+Descrição Geral: Construção com corpo e pés de fixação, eixos apoiados em mancais, engrenagens helicoidais motriz e acionada montadas em série; vedação frontal conforme aplicação do fluido ​
+.
+Dados de Operação:
+
+Tamanhos nominais: DN 1/8” até DN 6”
+
+Vazões: até 390 m³/h
+
+Altura manométrica: até 220 m
+
+Temperaturas: até 350 °C
+
+Rotação: 1 750 rpm ​
+.
+Denominação:
+
+Código: MTEC‑01/01
+
+Exemplo de modelo: FBE 2”
+
+Campos para preenchimento: Marca | Modelo (Engrenagens Externas) | Diâmetro nominal do bocal de sucção e recalque (polegadas) ​
+.
+
+2. Índice
+Tabela de Seleção Rápida (pág. 3)
+
+Dados Técnicos (pág. 5)
+
+Acessórios (pág. 7)
+
+Desenho de Corte e Lista de Peças (pág. 8)
+
+Conexões Auxiliares (pág. 16)
+
+Dimensional (pág. 17) ​
+.
+
+3. Tabela de Seleção Rápida
+3.1 Viscosidade inferior a 1000 SSU – 60 Hz
+Tabela 1 – Informações técnicas (dados de seleção por modelo)
+
+Tabela 2 – Informações técnicas (aplica a modelos “A”, “CA”, “CA‑A”)
+
+Tabela 3 – Informações técnicas (complementar)
+
+Tabela 4 – Informações técnicas – Reserva de Potência:
+
+
+Potência da Bomba (cv)	Reserva de Potência no Motor
+até 2 cv	50%
+3 a 5 cv	30%
+6 a 10 cv	25%
+11 a 25 cv	15%
+acima de 25 cv	10%
+3.2 Nomenclaturas
+A: Engrenagem diâmetro maior
+
+CA: Câmara de Aquecimento
+
+D: Comprimento maior
+
+DA: Comprimento e módulo maior
+
+M6, M8, M9, M12: módulo das engrenagens ​
+.
+
+4. Dados Técnicos
+Tabela 5 – Informações técnicas (especificações construtivas por modelo) ​
+.
+Tabela 6 – Lista padrão de Materiais: materiais de corpo, eixo, engrenagens, mancais, etc.; opção SAE 8620/8640 por aplicação ​
+.
+
+2.1 Corpo da Bomba: peça única fundida, pés de fixação, bocais opostos a 180°.
+2.2 Engrenagens: dentes helicoidais, montadas motriz + acionada.
+2.3 Eixo: apoiado em mancais; vedação por gaxeta, selo mecânico, retentor ou acoplamento magnético; sem luva na vedação; para fluidos com sólidos, consultar fabricante.
+2.4 Gaxeta: prensa‑gaxeta e porca sextavada reguladora.
+2.5 Selo Mecânico: tipo 21 em cerâmica × grafite × Viton, mola AISI 304.
+2.6 Retentor: alojado em tampa ou carcaça especial.
+2.7 Acoplamento Magnético: vedação sem vazamentos, copos interpostos bomba–motor.
+2.8 Mancais: buchas ou rolamentos selecionados por tamanho/aplicação.
+2.9 Bocais de Sucção e Recalque: rosca interna BSP para 1/8”–1”; flanges ASME B16.1 125 lbs para 1¼”–6” (ferro fundido), outras conforme material/app .
+
+5. Acessórios
+Acionamento: motor elétrico ou a combustível.
+
+Acoplamento: flexível, com/sem espaçador padrão FB ou similares.
+
+Protetor de Acoplamento: aço carbono ou anti‑centelhante.
+
+Base: aço estrutural soldado ou perfil “U”.
+
+Placa de Identificação: alumínio ou inox. .
+
+6. Desenho de Corte e Lista de Peças
+Para cada versão da bomba há um corte e lista de peças correspondente:
+
+
+Figura	Versão da Bomba	Tabela de Peças
+1	FBE 1/8” – 1/4” com gaxeta	7
+2	FBE 3/8” – 1/2” – 3/4” – 1” com gaxeta	8
+3	FBE 1”D – 1”DA com gaxeta	9
+4	FBE 1½” – 2” – 3” com gaxeta	10
+5	FBE 4” M6–M8–M12 com gaxeta	11
+6	FBE com selo mecânico	12
+7	FBE com retentor	13
+8	FBE com Câmara de Aquecimento	14
+9	FBE com Mancal Externo	15
+10	Válvula de Alívio	16
+Cada Tabela 7 a 16 lista, para a respectiva variante, o número de peça, descrição e quantidade .
+
+7. Conexões Auxiliares
+Figuras 11, 12 e 13 mostram as posições das conexões e o sentido de fluxo da câmara de aquecimento.
+Tabela 17 – Diâmetros das Roscas para conexões D1, D2, D3, M1, M2, C1, C2, F1, Q1 em cada tamanho (3/8”–4”) ​
+.
+
+8. Dimensional
+Figuras 14, 15 e 16 apresentam desenhos dimensionais completos.
+Tabela 18 – Dimensões (mm): lista todas as cotas para cada modelo nominal (FBE ¾” A 1” DA) ​
+.
+
+9. Dados da Fabricante
+FABRICADORA DE BOMBAS IND. E COM. LTDA.
+Av. Pedro Celestino Leite Penteado, 305 – Cajamar, SP, Brasil.
+CEP 07760‑000 | Tel.: +55 (11) 4898‑9200 | Fax: +55 (11) 4898‑9215
+Junho 2017 ​
+.

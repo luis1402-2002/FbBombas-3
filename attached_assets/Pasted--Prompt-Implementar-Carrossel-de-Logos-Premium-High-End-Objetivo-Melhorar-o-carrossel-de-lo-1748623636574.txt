@@ -1,0 +1,265 @@
+# Prompt: Implementar Carrossel de Logos Premium High-End
+
+## Objetivo
+Melhorar o carrossel de logos atual para uma experiência premium e polida, com física de momentum realista ao arrastar e soltar, mantendo o branding consistente com o site.
+
+## Especificações Técnicas Essenciais
+
+### 1. **Física de Momentum Realista**
+```javascript
+// Sistema de momentum com desaceleração natural:
+- Rastrear velocidade do arrasto usando últimas 5-10 posições
+- Calcular velocidade média: deltaX / deltaTime
+- Aplicar momentum ao soltar:
+  * Distância = velocidade * fator de fricção (0.3 a 0.5)
+  * Duração = 2 a 3 segundos
+  * Easing = "power2.out" ou "power3.out" para desaceleração natural
+  
+// Exemplo de implementação:
+onDragEnd: function() {
+  const velocity = calculateAverageVelocity();
+  const momentum = velocity * 0.4;
+  
+  gsap.to(track, {
+    x: currentX + momentum,
+    duration: 2.5,
+    ease: "power3.out",
+    onUpdate: resetTrackPosition
+  });
+}
+```
+
+### 2. **Visual Premium Polido**
+```css
+/* Logo items com glassmorphism refinado */
+.logo-item {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 215, 0, 0.2);
+  box-shadow: 
+    0 4px 30px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.logo-item:hover {
+  transform: translateY(-2px) scale(1.05);
+  border-color: rgba(255, 215, 0, 0.4);
+  background: rgba(255, 255, 255, 0.05);
+  box-shadow: 
+    0 8px 40px rgba(255, 215, 0, 0.15),
+    0 0 20px rgba(255, 215, 0, 0.1);
+}
+
+/* Gradientes de fade laterais aprimorados */
+.fade-gradient {
+  background: linear-gradient(
+    90deg,
+    rgba(0, 0, 0, 1) 0%,
+    rgba(0, 0, 0, 0.8) 30%,
+    rgba(0, 0, 0, 0) 100%
+  );
+}
+```
+
+### 3. **Estrutura da Sessão de Clientes**
+```jsx
+<section className="clients-section relative py-16 md:py-24 overflow-hidden bg-black">
+  {/* Background sutil */}
+  <div className="absolute inset-0 bg-gradient-to-b from-gray-950 to-black opacity-50" />
+  
+  <div className="container mx-auto px-4 relative z-10">
+    {/* Header elegante */}
+    <div className="text-center mb-12 md:mb-16">
+      <h2 className="text-3xl md:text-5xl font-bold text-white mb-4">
+        <span className="text-transparent bg-clip-text bg-gradient-to-r from-gold to-gold-light">
+          Empresas que Confiam
+        </span>
+        <span className="text-white"> em Nós</span>
+      </h2>
+      <p className="text-gray-400 text-lg max-w-2xl mx-auto">
+        Automatizando processos para líderes do mercado
+      </p>
+    </div>
+    
+    {/* Indicador de interação minimalista */}
+    <div className="text-center mb-6">
+      <motion.div 
+        className="inline-flex items-center gap-2 text-sm text-gray-400"
+        animate={{ opacity: isDragging ? 0.9 : 0.6 }}
+      >
+        <ChevronLeft className="w-4 h-4" />
+        <span>{isDragging ? 'Explorando...' : 'Arraste para explorar'}</span>
+        <ChevronRight className="w-4 h-4" />
+      </motion.div>
+    </div>
+    
+    {/* Container do carrossel */}
+    <div className="relative max-w-6xl mx-auto">
+      <div className="overflow-hidden rounded-xl">
+        <div ref={trackRef} className="carousel-track flex">
+          {/* Logos renderizados aqui */}
+        </div>
+      </div>
+      
+      {/* Gradientes laterais */}
+      <div className="fade-left absolute left-0 top-0 w-32 h-full pointer-events-none" />
+      <div className="fade-right absolute right-0 top-0 w-32 h-full pointer-events-none" />
+    </div>
+  </div>
+</section>
+```
+
+### 4. **Interação Ultra Suave**
+```javascript
+// Configuração do Draggable com física premium
+Draggable.create(track, {
+  type: "x",
+  inertia: {
+    resistance: 50,      // Resistência natural
+    velocityScale: 1.2,  // Amplificar velocidade para sensação responsiva
+    minDuration: 0.5,    // Duração mínima do momentum
+    maxDuration: 3       // Duração máxima do momentum
+  },
+  
+  onDragStart: function() {
+    // Pausar animação automática suavemente
+    gsap.to(animation, { timeScale: 0, duration: 0.3 });
+    
+    // Feedback visual sutil
+    track.style.cursor = 'grabbing';
+  },
+  
+  onDrag: function() {
+    // Aplicar constraints suaves nas bordas
+    const x = this.x;
+    const min = -singleSetWidth * 2;
+    const max = 0;
+    
+    if (x > max || x < min) {
+      // Resistência elástica nas bordas
+      const resistance = 0.5;
+      this.x = x > max ? max + (x - max) * resistance : min + (x - min) * resistance;
+    }
+  },
+  
+  onDragEnd: function() {
+    // Retornar cursor
+    track.style.cursor = 'grab';
+    
+    // Retomar animação após delay
+    gsap.to(animation, { 
+      timeScale: 1, 
+      duration: 0.5, 
+      delay: 3,
+      ease: "power2.inOut" 
+    });
+  }
+});
+```
+
+### 5. **Performance Otimizada**
+```javascript
+// GPU acceleration e otimizações
+.carousel-track {
+  will-change: transform;
+  transform: translateZ(0);
+  -webkit-backface-visibility: hidden;
+}
+
+// Throttle para eventos de alta frequência
+const throttledUpdate = throttle((x) => {
+  updateVisualFeedback(x);
+}, 16); // 60fps
+
+// Lazy loading inteligente
+const imageObserver = new IntersectionObserver(
+  (entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const img = entry.target;
+        img.src = img.dataset.src;
+        img.classList.add('loaded');
+      }
+    });
+  },
+  { rootMargin: '50px' }
+);
+```
+
+### 6. **Estados Visuais Refinados**
+```javascript
+// Feedback visual baseado em velocidade
+const updateVelocityFeedback = (velocity) => {
+  const speed = Math.abs(velocity);
+  
+  if (speed > 800) {
+    track.dataset.speed = 'fast';
+    // Aplicar blur sutil durante movimento rápido
+    track.style.filter = 'blur(0.5px)';
+  } else {
+    track.dataset.speed = 'normal';
+    track.style.filter = 'none';
+  }
+};
+
+// Transições suaves entre estados
+.carousel-track {
+  transition: filter 0.3s ease-out;
+}
+
+.carousel-track[data-speed="fast"] .logo-item {
+  opacity: 0.95;
+}
+```
+
+### 7. **Detalhes de Polish Final**
+```css
+/* Sombras e profundidade */
+.clients-section {
+  position: relative;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 800px;
+    height: 1px;
+    background: linear-gradient(90deg, 
+      transparent 0%, 
+      rgba(255, 215, 0, 0.3) 50%, 
+      transparent 100%
+    );
+  }
+}
+
+/* Hover states com timing premium */
+.logo-item img {
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.logo-item:hover img {
+  transform: scale(1.1);
+}
+
+/* Focus states para acessibilidade */
+.logo-item:focus-visible {
+  outline: 2px solid rgba(255, 215, 0, 0.5);
+  outline-offset: 4px;
+}
+```
+
+## Instruções de Implementação
+
+1. **Física primeiro**: Implementar o sistema de momentum com desaceleração natural
+2. **Visual premium**: Aplicar glassmorphism sutil e transições suaves
+3. **Integração**: Adaptar à estrutura da sessão de clientes existente
+4. **Performance**: Garantir 60fps com GPU acceleration
+5. **Polish**: Adicionar todos os micro-detalhes de hover, focus e transições
+6. **Teste**: Verificar smoothness em desktop e mobile
+
+## Resultado Esperado
+Um carrossel que se sinta premium e natural, onde arrastar e soltar resulta em movimento fluido com desaceleração realista. Visual limpo, minimalista mas sofisticado, perfeitamente integrado ao branding do site.

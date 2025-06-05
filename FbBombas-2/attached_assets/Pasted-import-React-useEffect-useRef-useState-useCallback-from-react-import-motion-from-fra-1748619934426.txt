@@ -1,0 +1,651 @@
+import React, { useEffect, useRef, useState, useCallback } from 'react';
+import { motion } from 'framer-motion';
+import { Zap, ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
+import gsap from 'gsap';
+import { Draggable } from "gsap/Draggable";
+import { useInView } from 'react-intersection-observer';
+import { useTranslation } from 'react-i18next';
+import AnimatedWordCycle from './ui/animated-word-cycle';
+
+// Registrar o plugin Draggable
+if (typeof window !== 'undefined') {
+  gsap.registerPlugin(Draggable);
+}
+
+// Lista de logos com URLs corretas
+const automationLogos = [
+  { name: "Gmail", url: "https://upload.wikimedia.org/wikipedia/commons/7/7e/Gmail_icon_%282020%29.svg" },
+  { name: "Outlook", url: "https://upload.wikimedia.org/wikipedia/commons/d/df/Microsoft_Office_Outlook_%282018%E2%80%93present%29.svg" },
+  { name: "WhatsApp", url: "https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" },
+  { name: "OpenAI", url: "https://www.dropbox.com/scl/fi/dovu99dhg4h192qowluof/Design-sem-nome-13.svg?rlkey=zwhjgoivoiqlqdg3fz0rfx0qm&st=hbzgyeta&raw=1" },
+  { name: "Anthropic", url: "https://www.dropbox.com/scl/fi/ivtz6cmi7ufh8ypf75uaz/Design-sem-nome-21.svg?rlkey=gxrg0lz4w5iib8h4z4v8yidne&st=6z0npx46&raw=1" },
+  { name: "Gemini", url: "https://www.dropbox.com/scl/fi/qbi47a4k82vgdm17fq16g/Design-sem-nome-17.svg?rlkey=m72zpkuigb2sv6lppq989qf6t&st=kof46y51&raw=1" },
+  { name: "Supabase", url: "https://supabase.com/dashboard/img/supabase-logo.svg" },
+  { name: "Redis", url: "https://cdn.worldvectorlogo.com/logos/redis.svg" },
+  { name: "Make.com", url: "https://logosandtypes.com/wp-content/uploads/2022/04/make.svg" },
+  { name: "n8n", url: "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/dark/n8n-color.png" },
+  { name: "LangChain", url: "https://www.dropbox.com/scl/fi/t5gdg0tvcnikdyg97xa2p/Design-sem-nome-18.svg?rlkey=xl9u03vvhezxcnxnrj7w8qwlx&st=1ekginvk&raw=1" },
+  { name: "Perplexity AI", url: "https://www.dropbox.com/scl/fi/a23us9wma1d1263r18r5y/Design-sem-nome-26.svg?rlkey=sr2bisox5r52lb5u3cakc06mk&st=dm81bbe5&raw=1" },
+  { name: "Active Campaign", url: "https://www.dropbox.com/scl/fi/apwhp6raizkj48hkwni8d/Design-sem-nome-23.svg?rlkey=y0ufpi3esk9uy1h2bn536q0l1&st=ipgek819&raw=1" },
+  { name: "Salesforce", url: "https://upload.wikimedia.org/wikipedia/commons/f/f9/Salesforce.com_logo.svg" },
+  { name: "Meta", url: "https://www.dropbox.com/scl/fi/6wlcwao7oxby8xkyokp3u/Design-sem-nome-19.svg?rlkey=xj94xjxi399aolks67xu2ihqd&st=2p85ghpf&raw=1" },
+  { name: "LinkedIn", url: "https://upload.wikimedia.org/wikipedia/commons/c/ca/LinkedIn_logo_initials.png" },
+  { name: "Llama", url: "https://www.dropbox.com/scl/fi/og8xkp1gjjp966jsnl3yr/Design-sem-nome-22.svg?rlkey=34ciwd3p95i64dkp4w4w81see&st=mo88x8v1&raw=1" },
+  { name: "Slack", url: "https://upload.wikimedia.org/wikipedia/commons/d/d5/Slack_icon_2019.svg" },
+  { name: "Google Sheets", url: "https://upload.wikimedia.org/wikipedia/commons/3/30/Google_Sheets_logo_%282014-2020%29.svg" },
+  { name: "Google Drive", url: "https://upload.wikimedia.org/wikipedia/commons/1/12/Google_Drive_icon_%282020%29.svg" },
+  { name: "Trello", url: "https://www.dropbox.com/scl/fi/aq4yx5tw5ikb5l3msz8ze/Design-sem-nome-27.svg?rlkey=q5ewo7zje4g06te41dvn9lsa8&st=3titjnkr&raw=1" },
+  { name: "Microsoft Teams", url: "https://upload.wikimedia.org/wikipedia/commons/c/c9/Microsoft_Office_Teams_%282018%E2%80%93present%29.svg" },
+  { name: "Excel", url: "https://upload.wikimedia.org/wikipedia/commons/3/34/Microsoft_Office_Excel_%282019%E2%80%93present%29.svg" },
+  { name: "Facebook Ads", url: "https://upload.wikimedia.org/wikipedia/commons/5/51/Facebook_f_logo_%282019%29.svg" },
+  { name: "Instagram", url: "https://upload.wikimedia.org/wikipedia/commons/e/e7/Instagram_logo_2016.svg" },
+  { name: "Mercado Livre", url: "https://www.dropbox.com/scl/fi/6yu2d67f2rrhcia1rzyil/Design-sem-nome-24.svg?rlkey=isi6oliaiqjoo7rckmhz84v3l&st=fulfz2hw&raw=1" },
+  { name: "Shopee", url: "https://www.dropbox.com/scl/fi/odj5y12f8j4ws391y4xed/Design-sem-nome-25.svg?rlkey=67fezocezlmypp05d6n3yuvcl&st=vz584lzi&raw=1" },
+  { name: "Canva", url: "https://www.dropbox.com/scl/fi/b08dcg58361d4x1ub0sl7/Design-sem-nome-29.svg?rlkey=3ti8ix9qmlguvvbsw9ltlbj7m&st=ntb82euc&raw=1" },
+  { name: "Vertex AI", url: "https://www.dropbox.com/scl/fi/5c95wfv54aml7vhlvqgul/Design-sem-nome-30.svg?rlkey=ndwl39nfa40yl294nvmnugsqc&st=e9db9ukn&raw=1" },
+  { name: "Grok", url: "https://www.dropbox.com/scl/fi/aja8tg2jmv7uttn5lvup8/Design-sem-nome-31.svg?rlkey=3pnetda02snwd8hctyck2zg3x&st=9xlnbh3q&raw=1" },
+  { name: "Shopify", url: "https://www.dropbox.com/scl/fi/t4dj4qo4x439v4sfa653y/Design-sem-nome-32.svg?rlkey=4j2t5m59m5othr0axx1jxuhm2&st=3nsdyijl&raw=1" },
+  { name: "Notion", url: "https://upload.wikimedia.org/wikipedia/commons/4/45/Notion_app_logo.png" },
+  { name: "SharePoint", url: "https://upload.wikimedia.org/wikipedia/commons/e/e1/Microsoft_Office_SharePoint_%282019%E2%80%93present%29.svg" },
+];
+
+// Cache de imagens para otimizar performance
+const preloadedImages = new Map<string, boolean>();
+
+// Memoized logo batches
+const createLogoBatches = (windowWidth: number) => {
+  const batchesCount = 5;
+  const batchArray = Array(batchesCount).fill(automationLogos);
+  return batchArray;
+};
+
+const HeroSection: React.FC = () => {
+  // Translation
+  const { t } = useTranslation();
+
+  // InView hook to trigger animations when visible
+  const { ref: heroRef, inView } = useInView({
+    threshold: 0.1,
+    triggerOnce: true
+  });
+  
+  // Refs 
+  const logosContainerRef = useRef<HTMLDivElement>(null);
+  const logoTrackRef = useRef<HTMLDivElement>(null);
+  const mousePositionRef = useRef({ x: 0, y: 0 });
+  
+  // Estado de UI
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragDirection, setDragDirection] = useState<'left' | 'right' | null>(null);
+  const [renderedLogos, setRenderedLogos] = useState<Array<typeof automationLogos>>([]);
+  const [isMobile, setIsMobile] = useState(false);
+  const [screenWidth, setScreenWidth] = useState(0);
+  const [imagesLoaded, setImagesLoaded] = useState(false);
+  
+  // Refs para controle
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const animationRef = useRef<gsap.core.Timeline | null>(null);
+  const draggableRef = useRef<any>(null);
+  const dragPositionsRef = useRef<{time: number, x: number}[]>([]);
+  const lastDragXRef = useRef(0);
+  const singleSetWidthRef = useRef(0);
+  const isDraggingRef = useRef(false);
+  
+  // Detectar tamanho da tela para responsividade
+  useEffect(() => {
+    const handleResize = () => {
+      const width = window.innerWidth;
+      setScreenWidth(width);
+      setIsMobile(width < 768);
+    };
+    
+    // Set initial values
+    handleResize();
+    
+    // Add resize listener
+    window.addEventListener('resize', handleResize, { passive: true });
+    
+    // Cleanup on unmount
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+  
+  // Criar múltiplas cópias dos logos para loop infinito - otimizado com memoização
+  useEffect(() => {
+    if (screenWidth > 0) {
+      setRenderedLogos(createLogoBatches(screenWidth));
+    }
+  }, [screenWidth]);
+
+  // Pre-loading images for smoother experience
+  useEffect(() => {
+    const preloadImages = async () => {
+      const promises = automationLogos.map(logo => {
+        if (preloadedImages.has(logo.url)) {
+          return Promise.resolve();
+        }
+
+        return new Promise<void>((resolve) => {
+          const img = new Image();
+          
+          img.onload = () => {
+            preloadedImages.set(logo.url, true);
+            resolve();
+          };
+          
+          img.onerror = () => {
+            console.warn(`Failed to preload: ${logo.url}`);
+            resolve();
+          };
+          
+          img.src = logo.url;
+        });
+      });
+
+      // Limit loading time to maximum 3 seconds
+      await Promise.race([
+        Promise.all(promises),
+        new Promise(resolve => setTimeout(resolve, 3000))
+      ]);
+      
+      setImagesLoaded(true);
+    };
+
+    preloadImages();
+  }, []);
+
+  // Função para manter loop infinito em ambas direções - optimized
+  const resetTrackPosition = useCallback(() => {
+    if (!logoTrackRef.current || singleSetWidthRef.current === 0) return;
+    
+    const track = logoTrackRef.current;
+    const currentX = gsap.getProperty(track, "x") as number;
+    const singleWidth = singleSetWidthRef.current;
+    
+    // Edge case handling
+    if (currentX > 0) {
+      // Too far right
+      const modulo = currentX % singleWidth;
+      gsap.set(track, { x: -singleWidth + modulo });
+    } else if (currentX < -singleWidth * 2) {
+      // Too far left
+      const modulo = currentX % singleWidth;
+      const adjustedX = modulo === 0 ? -singleWidth : -singleWidth + modulo;
+      gsap.set(track, { x: adjustedX });
+    }
+  }, []);
+
+  // Efficient optimized carousel setup and animation
+  useEffect(() => {
+    if (!logoTrackRef.current || typeof window === 'undefined' || renderedLogos.length === 0) return;
+    
+    const logoTrack = logoTrackRef.current;
+    
+    // Calculate widths once for performance
+    const initializeCarousel = () => {
+      if (!logoTrack) return;
+      
+      const totalWidth = logoTrack.scrollWidth;
+      singleSetWidthRef.current = totalWidth / renderedLogos.length;
+      
+      // Position initially at first copy to allow infinite scrolling in both directions
+      gsap.set(logoTrack, { x: -singleSetWidthRef.current });
+    };
+    
+    // Small delay to ensure accurate measurements after render
+    const initTimer = setTimeout(initializeCarousel, 100);
+    
+    // Create animation with optimized performance
+    const createAnimation = () => {
+      if (animationRef.current) {
+        animationRef.current.kill();
+      }
+      
+      // Adjusted animation speed based on screen size
+      let duration = isMobile ? 40 : 60;  // Slower animation for better performance and readability
+      
+      const timeline = gsap.timeline({
+        repeat: -1,
+        repeatRefresh: true,
+        onRepeat: resetTrackPosition
+      });
+      
+      timeline.to(logoTrack, {
+        x: `-=${singleSetWidthRef.current}`, // Always moves left for consistency
+        duration: duration,
+        ease: "none",
+        onUpdate: resetTrackPosition
+      });
+      
+      animationRef.current = timeline;
+      return timeline;
+    };
+    
+    // Delayed animation start for better perceived performance
+    const autoAnimationTimeout = setTimeout(() => {
+      if (!isDraggingRef.current) {
+        createAnimation();
+      }
+    }, 800);
+    
+    // Draggable implementation with optimized momentum and inertia
+    if (draggableRef.current) {
+      draggableRef.current.kill();
+    }
+    
+    const draggable = Draggable.create(logoTrack, {
+      type: "x",
+      inertia: true,
+      zIndexBoost: false,
+      allowNativeTouchScrolling: true, // Better mobile compatibility
+      edgeResistance: 0.75, // Smoother edge behavior
+      onDragStart: function() {
+        isDraggingRef.current = true;
+        setIsDragging(true);
+        
+        // Armazenar a posição inicial de X para determinar a direção
+        lastDragXRef.current = gsap.getProperty(logoTrack, "x") as number;
+        
+        // Pause automatic animation when user interacts
+        if (animationRef.current) {
+          animationRef.current.pause();
+        }
+        
+        // Clear any pending timeouts
+        if (timeoutRef.current) {
+          clearTimeout(timeoutRef.current);
+          timeoutRef.current = null;
+        }
+        
+        // Start tracking for velocity calculation
+        dragPositionsRef.current = [{
+          time: Date.now(),
+          x: gsap.getProperty(logoTrack, "x") as number
+        }];
+      },
+      onDrag: function() {
+        // Apply position constraints for infinite loop
+        resetTrackPosition();
+        
+        // Determinar a direção do arrastar
+        const currentX = gsap.getProperty(logoTrack, "x") as number;
+        const previousX = lastDragXRef.current;
+        
+        // Definir direção apenas se houver movimento significativo (evita oscilações)
+        if (Math.abs(currentX - previousX) > 2) {
+          setDragDirection(currentX > previousX ? 'right' : 'left');
+          lastDragXRef.current = currentX;
+        }
+        
+        // Track position for velocity calculation
+        dragPositionsRef.current.push({
+          time: Date.now(),
+          x: gsap.getProperty(logoTrack, "x") as number
+        });
+        
+        // Only keep recent positions for accurate velocity
+        if (dragPositionsRef.current.length > 5) {
+          dragPositionsRef.current = dragPositionsRef.current.slice(-5);
+        }
+      },
+      onDragEnd: function() {
+        resetTrackPosition();
+        
+        // Calculate velocity from tracked positions
+        let dragVelocity = 0;
+        let dragDirection = 0;
+        
+        const positions = dragPositionsRef.current;
+        if (positions.length >= 2) {
+          const first = positions[0];
+          const last = positions[positions.length - 1];
+          const deltaTime = (last.time - first.time) / 1000; // seconds
+          const deltaX = last.x - first.x;
+          
+          if (deltaTime > 0) {
+            dragVelocity = deltaX / deltaTime;
+            dragDirection = Math.sign(deltaX);
+          }
+        }
+        
+        // Limit velocity to reasonable range
+        const velocity = Math.min(Math.max(Math.abs(dragVelocity) / 100, 0.5), 5);
+        
+        // Calculate momentum distance
+        const currentX = gsap.getProperty(logoTrack, "x") as number;
+        const momentumDistance = velocity * 100 * dragDirection;
+        
+        // Apply momentum
+        gsap.to(logoTrack, {
+          x: currentX + momentumDistance,
+          duration: 2, // smooth deceleration 
+          ease: "power2.out",
+          onUpdate: resetTrackPosition,
+          onComplete: function() {
+            // Transition back to automatic animation
+            timeoutRef.current = setTimeout(() => {
+              isDraggingRef.current = false;
+              setIsDragging(false);
+              setDragDirection(null);
+              
+              // Start animation with a seamless transition
+              createAnimation();
+            }, 2000); 
+          }
+        });
+      }
+    })[0];
+    
+    draggableRef.current = draggable;
+    
+    // Better touch behavior on mobile
+    if (logoTrack) {
+      logoTrack.style.touchAction = "pan-y";
+    }
+    
+    // Handle resize for responsive behavior
+    const handleResize = () => {
+      // Kill existing animations
+      if (animationRef.current) {
+        animationRef.current.pause();
+      }
+      
+      // Recalculate dimensions
+      initializeCarousel();
+      
+      // Restart animation if not being dragged
+      if (!isDraggingRef.current) {
+        createAnimation();
+      }
+    };
+    
+    window.addEventListener('resize', handleResize);
+    
+    // Cleanup all event listeners and animations on unmount
+    return () => {
+      if (initTimer) {
+        clearTimeout(initTimer);
+      }
+      
+      if (autoAnimationTimeout) {
+        clearTimeout(autoAnimationTimeout);
+      }
+      
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+      
+      if (animationRef.current) {
+        animationRef.current.kill();
+      }
+      
+      if (draggableRef.current) {
+        draggableRef.current.kill();
+      }
+      
+      window.removeEventListener('resize', handleResize);
+    };
+  }, [renderedLogos, screenWidth, resetTrackPosition, isMobile]);
+
+  // Mouse position tracking for optimized performance
+  useEffect(() => {
+    const trackMousePosition = (e: MouseEvent) => {
+      mousePositionRef.current = { x: e.clientX, y: e.clientY };
+    };
+
+    window.addEventListener('mousemove', trackMousePosition, { passive: true });
+    return () => window.removeEventListener('mousemove', trackMousePosition);
+  }, []);
+
+  // Optimized image error handler
+  const handleImageError = useCallback((e: React.SyntheticEvent<HTMLImageElement, Event>, name: string) => {
+    if (e.currentTarget.src.includes('placeholder')) return;
+    e.currentTarget.src = `https://via.placeholder.com/40/303030/FFFFFF?text=${name.charAt(0)}`;
+    e.currentTarget.alt = `${name} icon`;
+  }, []);
+
+  // Função que renderiza texto de arrastar com direção correta
+  const renderDragPrompt = useCallback(() => {
+    if (!isDragging) {
+      return (
+        <div className="flex items-center justify-center gap-1">
+          <ChevronLeft className="h-3 w-3 opacity-70" />
+          <span>{t('hero.dragPrompt')}</span>
+          <ChevronRight className="h-3 w-3 opacity-70" />
+        </div>
+      );
+    }
+    
+    // Se está arrastando, mostrar a direção
+    if (dragDirection === 'left') {
+      return (
+        <div className="flex items-center justify-center">
+          <span className="opacity-80">Explorando</span>
+          <ChevronRight className="h-3 w-3 ml-1 text-gold animate-pulse" />
+          <ChevronRight className="h-3 w-3 text-gold animate-pulse" />
+          <ChevronRight className="h-3 w-3 text-gold animate-pulse" />
+        </div>
+      );
+    } else if (dragDirection === 'right') {
+      return (
+        <div className="flex items-center justify-center">
+          <ChevronLeft className="h-3 w-3 mr-1 text-gold animate-pulse" />
+          <ChevronLeft className="h-3 w-3 text-gold animate-pulse" />
+          <ChevronLeft className="h-3 w-3 text-gold animate-pulse" />
+          <span className="opacity-80">Explorando</span>
+        </div>
+      );
+    }
+    
+    // Caso de estado intermediário
+    return (
+      <div className="flex items-center justify-center gap-1">
+        <span>Explorando...</span>
+      </div>
+    );
+  }, [isDragging, dragDirection, t]);
+
+  return (
+    <section 
+      ref={heroRef} 
+      className="relative min-h-screen flex items-center justify-center overflow-hidden"
+      style={{
+        paddingTop: isMobile ? '20vh' : '25vh', // Increased padding for better spacing on both mobile and desktop
+        paddingBottom: isMobile ? '8vh' : '16vh'
+      }}
+      aria-labelledby="hero-heading"
+    >
+      {/* Background with conditional loading */}
+      <div 
+        className="absolute inset-0 z-0 bg-black"
+        style={{
+          backgroundImage: `url('${isMobile 
+            ? "https://www.dropbox.com/scl/fi/s3zlsq4l6ooxwvikuu9mm/Design-sem-nome-37-1.svg?rlkey=jrsd5ftbcrbjfng36pwxcxq50&st=le51o5zw&raw=1"
+            : "https://www.dropbox.com/scl/fi/t7g19l28ii8nhmtgglelt/Design-sem-nome-34.svg?rlkey=ds01ak8ub74jhhrvupoj8sq9p&st=rh1irwjb&raw=1"}')`,
+          backgroundSize: 'cover',
+          backgroundPosition: isMobile ? 'center top' : 'center',
+          backgroundRepeat: 'no-repeat',
+          opacity: 0.75,
+        }}
+        aria-hidden="true"
+      ></div>
+      
+      {/* Light overlay for contrast */}
+      <div className="absolute inset-0 bg-black/20 z-1" aria-hidden="true"></div>
+      
+      {/* Bottom gradient fade */}
+      <div 
+        className="absolute bottom-0 left-0 right-0 h-32 sm:h-40 md:h-48 lg:h-56 z-1"
+        style={{
+          background: 'linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0.8) 30%, rgba(0,0,0,0.4) 60%, rgba(0,0,0,0) 100%)',
+        }}
+        aria-hidden="true"
+      ></div>
+      
+      {/* Top light beam effect */}
+      <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-[50%] h-[2px] bg-gradient-to-r from-transparent via-gold/40 to-transparent blur-[1px] z-2" aria-hidden="true"></div>
+      
+      <div className="container mx-auto px-4 sm:px-6 md:px-8 z-10">
+        <motion.div 
+          className="max-w-4xl mx-auto text-center"
+          initial={{ opacity: 0 }}
+          animate={inView ? { opacity: 1 } : {}}
+          transition={{ duration: 0.8 }}
+        >
+          {/* Main heading with proper spacing for both mobile and desktop */}
+          <motion.h1 
+            id="hero-heading"
+            className="text-3xl xs:text-4xl sm:text-5xl md:text-6xl lg:text-6xl font-bold text-white leading-tight mb-6 sm:mb-8 md:mb-10 relative max-w-3xl mx-auto px-1 xs:px-2 sm:px-3"
+            initial={{ opacity: 0, y: 20 }}
+            animate={inView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.6, delay: 0.2 }}
+          >
+            {/* Corner borders */}
+            <div className="absolute -top-2 xs:-top-3 sm:-top-4 -left-1 xs:-left-2 sm:-left-3 w-6 xs:w-8 sm:w-10 md:w-12 h-6 xs:h-8 sm:h-10 md:h-12 border-t-2 border-l-2 border-gold/30 rounded-tl-xl" aria-hidden="true"></div>
+            
+            <div className="flex flex-col md:px-4">
+              {/* First line - smaller on mobile */}
+              <span className="block mb-2 sm:mb-3 md:mb-4">{t('hero.title.first')}</span>
+              
+              {/* Second line - optimized for mobile */}
+              <div className="flex flex-wrap justify-center items-center">
+                <span className="relative inline-block mr-2">
+                  <span className="relative z-10">{t('hero.title.second')}</span>
+                  <span className="absolute -inset-1 bg-gradient-to-r from-gold-dark/20 via-gold/20 to-gold-dark/20 blur-md rounded-lg -z-0" aria-hidden="true"></span>
+                </span>
+                <AnimatedWordCycle 
+                  words={t('hero.title.cycling', { returnObjects: true }) as string[]}
+                  interval={3000}
+                  className="gold-text-3d"
+                />
+              </div>
+            </div>
+            
+            {/* Bottom right corner border */}
+            <div className="absolute -bottom-2 xs:-bottom-3 sm:-bottom-4 -right-1 xs:-right-2 sm:-right-3 w-6 xs:w-8 sm:w-10 md:w-12 h-6 xs:h-8 sm:h-10 md:h-12 border-b-2 border-r-2 border-gold/30 rounded-br-xl" aria-hidden="true"></div>
+          </motion.h1>
+          
+          {/* Subtitle - optimized for readability */}
+          <motion.p 
+            className="text-base sm:text-lg md:text-xl lg:text-2xl text-gray-200 max-w-3xl mx-auto mb-8 sm:mb-10 md:mb-12 px-2 xs:px-3 sm:px-4 leading-relaxed"
+            initial={{ opacity: 0, y: 20 }}
+            animate={inView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.6, delay: 0.3 }}
+          >
+            {t('hero.subtitle')}
+          </motion.p>
+          
+          {/* CTA buttons - optimized for mobile */}
+          <motion.div 
+            className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center mb-10 sm:mb-12 md:mb-14"
+            initial={{ opacity: 0, y: 20 }}
+            animate={inView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.6, delay: 0.4 }}
+          >
+            <motion.a 
+              href="https://wa.me/5519996659295?text=Olá!%20Gostaria%20de%20saber%20como%20a%20AxnexLabs%20pode%20automatizar%20processos%20na%20minha%20empresa." 
+              target="_blank"
+              rel="noopener noreferrer"
+              className="premium-gold-button flex items-center justify-center space-x-2 group text-sm xs:text-base w-full sm:w-auto"
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.97 }}
+            >
+              <Zap className="h-4 w-4 xs:h-5 xs:w-5 mr-2" />
+              <span>{t('hero.cta.primary')}</span>
+            </motion.a>
+            
+            <motion.a 
+              href="#soluções" 
+              className="flex items-center justify-center border border-gold/30 bg-black/40 hover:bg-black/50 text-white rounded-lg px-4 py-2 group text-sm xs:text-base w-full sm:w-auto"
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.97 }}
+            >
+              <span>{t('hero.cta.secondary')}</span>
+              <ArrowRight className="h-4 w-4 xs:h-5 xs:w-5 ml-2 text-gold" />
+            </motion.a>
+          </motion.div>
+          
+          {/* Optimized logos carousel */}
+          <motion.div 
+            className="relative mx-auto max-w-5xl"
+            initial={{ opacity: 0, y: 20 }}
+            animate={inView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.6, delay: 0.5 }}
+          >
+            <div className="relative w-full">
+              {/* Introduction text */}
+              <h3 className="text-center text-xs xs:text-sm text-white/90 uppercase tracking-wider mb-3 sm:mb-4 md:mb-5 font-medium mx-auto max-w-[90%] px-2">
+                {t('hero.platformsText')}
+              </h3>
+              
+              {/* Interaction prompt - ATUALIZADO */}
+              <div className="text-center text-xs text-white/70 mb-3 sm:mb-4 select-none">
+                <motion.div
+                  initial={{ opacity: 0.7 }}
+                  animate={{ 
+                    opacity: isDragging ? 0.9 : [0.7, 0.9, 0.7], 
+                    scale: isDragging ? 1 : [1, 1.02, 1]
+                  }}
+                  transition={{ 
+                    repeat: isDragging ? 0 : Infinity, 
+                    duration: 1.5
+                  }}
+                  className="bg-black/30 py-1 px-2 rounded-full backdrop-blur-sm border border-gray-800/50 inline-block"
+                >
+                  {renderDragPrompt()}
+                </motion.div>
+              </div>
+              
+              {/* High performance logo carousel */}
+              <div 
+                ref={logosContainerRef}
+                className="relative overflow-hidden mx-auto cursor-grab active:cursor-grabbing"
+                style={{ touchAction: 'pan-y' }}
+                aria-label={t('hero.platformsText')}
+              >
+                <div className="relative px-4 overflow-hidden py-2">
+                  {/* Logo track with enhanced performance */}
+                  <div 
+                    ref={logoTrackRef}
+                    className="flex items-center justify-start will-change-transform"
+                    style={{ 
+                      width: 'fit-content',
+                      transform: 'translate3d(0,0,0)', // Hardware acceleration
+                      backfaceVisibility: 'hidden'
+                    }}
+                  >
+                    {/* Optimized logo rendering with proper image loading */}
+                    {renderedLogos.flat().map((logo, index) => (
+                      <div 
+                        key={`logo-${index}`} 
+                        className="logo-item flex-shrink-0 w-14 h-14 xs:w-16 xs:h-16 sm:w-18 sm:h-18 md:w-20 md:h-20 bg-gray-800/20 backdrop-blur-sm rounded-lg border border-gold/30 flex items-center justify-center mx-1.5 xs:mx-2 sm:mx-3 lg:mx-4 hover:border-gold/50 hover:bg-gray-800/30 transition-all duration-300"
+                        aria-label={logo.name}
+                      >
+                        <img 
+                          src={logo.url} 
+                          alt={`${logo.name} logo`} 
+                          className="w-8 h-8 xs:w-9 xs:h-9 sm:w-11 sm:h-11 md:w-12 md:h-12 object-contain"
+                          onError={(e) => handleImageError(e, logo.name)}
+                          loading="lazy"
+                          width="48"
+                          height="48" 
+                          decoding="async"
+                          draggable="false"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                  
+                  {/* Optimized fade gradients */}
+                  <div className="absolute top-0 left-0 w-16 xs:w-20 sm:w-24 md:w-32 lg:w-40 h-full bg-gradient-to-r from-black to-transparent z-10 pointer-events-none" aria-hidden="true"></div>
+                  <div className="absolute top-0 right-0 w-16 xs:w-20 sm:w-24 md:w-32 lg:w-40 h-full bg-gradient-to-l from-black to-transparent z-10 pointer-events-none" aria-hidden="true"></div>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        </motion.div>
+      </div>
+    </section>
+  );
+};
+
+export default React.memo(HeroSection);

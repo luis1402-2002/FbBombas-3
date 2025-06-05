@@ -1,0 +1,596 @@
+Abaixo está um guia técnico‑funcional completo para construir, no seu site, uma calculadora de seleção de bombas que replique (e melhore) a planilha‑Excel que você já utiliza.
+Ele cobre, com base integral nos três catálogos (FBCN, FBOT e FBE), todos os cálculos necessários, a estrutura de dados, o fluxo de decisão e as margens de segurança exigidas pelo fabricante.
+
+1. Visão geral do algoritmo
+
+Etapa	Descrição	Fórmulas / Regras principais
+1. Entrada do usuário	Vazão 
+𝑄
+Q, altura manométrica 
+𝐻
+𝑇
+H 
+T
+​
+ , fluido, temperatura, viscosidade 
+𝜇
+μ, densidade 
+𝜌
+ρ.	Conversão para SI: 
+𝑄
+_
+m³/s
+Q_m³/s=
+𝑄
+/
+3600
+Q/3600 etc.
+2. Correções de processo	Centrífugas (FBCN/FBOT):
+• Correção de altura para densidade: 
+𝐻
+=
+𝐻
+𝑇
+⋅
+(
+𝜌
+/
+1000
+)
+H=H 
+T
+​
+ ⋅(ρ/1000).
+• Correção por viscosidade (curvas Hydraulic Institute) → 
+𝐶
+𝑄
+,
+𝐶
+𝐻
+,
+𝐶
+𝜂
+C 
+Q
+​
+ ,C 
+H
+​
+ ,C 
+η
+​
+ .
+• Altura corrigida 
+𝐻
+𝑐
+=
+𝐻
+/
+𝐶
+𝐻
+H 
+c
+​
+ =H/C 
+H
+​
+ , vazão 
+𝑄
+𝑐
+=
+𝑄
+/
+𝐶
+𝑄
+Q 
+c
+​
+ =Q/C 
+Q
+​
+ .
+Engrenagens (FBE):
+• Vazão real 
+𝑄
+𝑟
+=
+(
+𝑉
+𝑑
+ 
+𝑁
+)
+/
+60
+−
+𝑆
+Q 
+r
+​
+ =(V 
+d
+​
+  N)/60−S.
+• Deslizamento 
+𝑆
+=
+𝐾
+_
+𝑠
+ 
+Δ
+𝑃
+/
+𝜇
+S=K_sΔP/μ (K_s calibrado por modelo).	
+3. Busca nas curvas	Para cada tamanho/modelo:
+1. Interpolar curva H–Q (1750 ou 3500 rpm).
+2. Selecionar se 
+𝐻
+disp
+≥
+𝐻
+𝑐
+H 
+disp
+​
+ ≥H 
+c
+​
+  e 
+𝑄
+disp
+≥
+𝑄
+𝑐
+Q 
+disp
+​
+ ≥Q 
+c
+​
+ .	Curvas estão nas Tabelas de Seleção Rápida ​
+ ​
+ ​
+.
+4. Eficiência & potência	Centrífugas (FBCN/FBOT):
+𝑃
+hid
+=
+𝜌
+𝑔
+𝑄
+𝐻
+/
+ ⁣
+ ⁣
+ 
+𝜂
+pump
+P 
+hid
+​
+ =ρgQH/η 
+pump
+​
+ .
+𝑃
+BHP
+=
+𝑃
+hid
+/
+𝜂
+mec
+P 
+BHP
+​
+ =P 
+hid
+​
+ /η 
+mec
+​
+ .
+Engrenagens (FBE):
+𝑃
+BHP
+=
+(
+𝑄
+𝑟
+ 
+Δ
+𝑃
+ 
+𝜌
+)
+/
+(
+𝜂
+𝑣
+ 
+𝜂
+𝑚
+)
+P 
+BHP
+​
+ =(Q 
+r
+​
+  ΔP ρ)/(η 
+v
+​
+  η 
+m
+​
+ ).	Se catálogo não traz 
+𝜂
+pump
+η 
+pump
+​
+ , usar valor típico (55–75 %) ou vetorizar após calibração.
+5. Margem de segurança	Adicionar reserva de potência conforme catálogo (20 % ≤ 2 cv; 15 % até 20 cv; 10 % > 20 cv) ​
+.	
+6. Saída ordenada	Gerar lista “Bom / Melhor / Alternativo” com: modelo, tamanho, rpm, ∆P disponível, eficiência, BHP, motor sugerido e NPSHr se disponível.	
+2. Estrutura de dados recomendada
+2.1. Base de curvas (JSON)
+json
+Copiar
+Editar
+{
+  "FBCN": {
+    "25-150": {
+      "rpm": 1750,
+      "curve": [ [0,32], [40,30], [80,27.5], ... ],
+      "efficiency": [ [40,0.48], [80,0.63], ... ],
+      "npsh": [ [40,2.3], ... ]
+    },
+    "25-150@3500": { ... }
+  },
+  "FBOT": { "32-160": { ... } },
+  "FBE": {
+    "1in": {
+      "displacement_cm3_rev": 12.8,
+      "rpm_nom": 1750,
+      "slip_coeff": 1.2e‑4,      // K_s
+      "efficiency": 0.75
+    }
+  }
+}
+Preencher as “curves” extraindo ponto‑a‑ponto das Tabelas de Seleção Rápida ou digitalizando os gráficos originais.
+
+2.2. Constantes
+ts
+Copiar
+Editar
+const g = 9.81;                     // m s‑2
+const reserve = [
+  { bhp: 2,   margin: 0.20 },
+  { bhp: 20,  margin: 0.15 },
+  { bhp: 999, margin: 0.10 }
+];
+2.3. Tabelas de correção de viscosidade (centrífugas)
+
+R_e (ρQD/μ)	C<sub>Q</sub>	C<sub>H</sub>	C<sub>η</sub>
+>2 × 10<sup>6</sup>	1.00	1.00	1.00
+10<sup>6</sup>	0.98	0.97	0.95
+10<sup>5</sup>	0.91	0.85	0.75
+10<sup>4</sup>	0.80	0.60	0.45
+Interpolar log‑log.
+
+3. Fórmulas detalhadas
+3.1. Correção de densidade
+Se fluido ≠ água:
+𝐻
+=
+𝐻
+𝑇
+𝜌
+1000
+H=H 
+T
+​
+  
+1000
+ρ
+​
+  (m)
+
+3.2. Correção de viscosidade (centrífuga)
+Reynolds: 
+𝑅
+𝑒
+=
+𝜌
+𝑄
+𝐷
+𝜇
+R 
+e
+​
+ = 
+μ
+ρQD
+​
+   (D ≈ diâmetro de sucção)
+
+Obter 
+𝐶
+𝑄
+,
+𝐶
+𝐻
+,
+𝐶
+𝜂
+C 
+Q
+​
+ ,C 
+H
+​
+ ,C 
+η
+​
+  e aplicar:
+
+𝑄
+𝑐
+=
+𝑄
+𝐶
+𝑄
+,
+𝐻
+𝑐
+=
+𝐻
+𝐶
+𝐻
+,
+𝜂
+𝑐
+=
+𝜂
+0
+ 
+𝐶
+𝜂
+Q 
+c
+​
+ = 
+C 
+Q
+​
+ 
+Q
+​
+ ,H 
+c
+​
+ = 
+C 
+H
+​
+ 
+H
+​
+ ,η 
+c
+​
+ =η 
+0
+​
+ C 
+η
+​
+ 
+3.3. Potência hidráulica
+𝑃
+hid
+=
+𝜌
+ 
+𝑔
+ 
+𝑄
+ 
+𝐻
+(
+W
+)
+P 
+hid
+​
+ =ρgQH(W)
+3.4. Brake horsepower (cv)
+BHP
+=
+𝑃
+hid
+𝜂
+𝑐
+ 
+𝜂
+mec
+×
+0.0013596
+BHP= 
+η 
+c
+​
+ η 
+mec
+​
+ 
+P 
+hid
+​
+ 
+​
+ ×0.0013596
+3.5. Margem de motor
+Motor
+cv
+=
+BHP
+×
+(
+1
++
+Reserva
+(
+BHP
+)
+)
+Motor 
+cv
+​
+ =BHP×(1+Reserva(BHP))
+3.6. Vazão real (bomba de engrenagens)
+𝑄
+𝑟
+=
+𝑉
+𝑑
+ 
+𝑁
+60
+−
+𝐾
+𝑠
+ 
+Δ
+𝑃
+𝜇
+Q 
+r
+​
+ = 
+60
+V 
+d
+​
+ N
+​
+ − 
+μ
+K 
+s
+​
+ ΔP
+​
+ 
+BHP
+=
+𝑄
+𝑟
+ 
+Δ
+𝑃
+𝜂
+𝑣
+ 
+𝜂
+𝑚
+BHP= 
+η 
+v
+​
+ η 
+m
+​
+ 
+Q 
+r
+​
+ ΔP
+​
+ 
+4. Fluxo de implementação (JavaScript/TypeScript)
+ts
+Copiar
+Editar
+interface UserInput {
+  Q: number;       // m3/h
+  H: number;       // m
+  fluid: string;
+  rho: number;     // kg/m3
+  mu: number;      // cP
+  T: number;       // °C
+}
+
+function selectPump(input: UserInput): Selection[] {
+  const Q = input.Q / 3600;                 // m3/s
+  const H = input.H * input.rho / 1000;     // densidade
+  const candidates: Selection[] = [];
+
+  for (const family in curves) {
+    for (const model in curves[family]) {
+      const data = curves[family][model];
+
+      if (family !== 'FBE') {      // centrífugas
+        const k = viscosityCorr(input, data);
+        const Qc = Q / k.CQ;
+        const Hc = H / k.CH;
+        const Hdisp = interp(data.curve, Qc);
+
+        if (Hdisp >= Hc) {
+          const eta = interp(data.efficiency, Qc) * k.Ceta;
+          const bhp = hydraulicPower(Q, H) / eta / 0.746;
+          candidates.push(genOutput(model, family, bhp, eta));
+        }
+      } else {                     // engrenagens
+        const Qr = displacement(model)*data.rpm/60 - slip(input.mu,input.H);
+        if (Qr >= Q) {
+          const bhp = (Qr*input.H*input.rho*9.81)/(data.efficiency*0.746);
+          candidates.push(genOutput(model, family, bhp, data.efficiency));
+        }
+      }
+    }
+  }
+  return rank(candidates);
+}
+Detalhes de viscosityCorr, interp, slip, rank, etc. conforme seção de fórmulas.
+
+5. Interface Web recomendada
+Formulário (React/Vue):
+
+Vazão (slider ou input numérico).
+
+Altura manométrica.
+
+Drop‑down “Tipo de fluido” → pré‑carrega ρ e μ típicos, editáveis.
+
+Campos avançados: NPAS, pressão de sucção, altitude.
+
+Botão Calcular → chama função selectPump() no back‑end (Node or serverless).
+
+Tabela Resultado (ordenada por BHP ou melhor η):
+
+| Família | Modelo | rpm | H disponível | η (%) | Motor (cv) | ΔH margem | PDF Link |
+
+Gráfico dinâmico (Chart.js / Recharts): sobrepõe ponto de operação na curva H–Q do modelo escolhido.
+
+6. Ajustes finos
+
+Item	Como calibrar	Referência
+K<sub>s</sub> (slip) em FBE	Ensaios de bancada ou curva “Tabela 1” do catálogo	​
+Eficiências	Digitalizar coluna η das curvas ou aplicar 70 % se ausente, depois corrigir com histórico de testes	​
+Viscosidade	Usar corrig. HI até 3 000 cP; para μ›3000 cP migrar para FBE automaticamente	–
+Reserva de potência	20 % (≤ 2 cv); 15 % (≤ 20 cv); 10 % (> 20 cv)	​
+7. Validação
+Cross‑check os resultados com o Excel (mesmas entradas ⇒ mesmo modelo e motor).
+
+Teste de fronteira (mín./máx. vazão de cada bomba).
+
+Monte log de auditoria (input + saída + timestamp) para refinar curvas e eficiência pelo feedback de campo.
+
+Conclusão
+Com essa arquitetura – base JSON de curvas, módulo de correções (densidade, viscosidade), algoritmo de triagem e motor de cálculo de potência – você terá um sistema online robusto, rastreável e tão preciso quanto o Excel original, mas agora escalável e integrado ao site.
+
+Se precisar dos scripts de scrap ↔ JSON ou de exemplos de código completos em JavaScript/Python, é só pedir e eu envio na próxima mensagem.

@@ -1,0 +1,466 @@
+{
+  "common": {
+    "back": "Voltar"
+  },
+  "nav": {
+    "home": "Início",
+    "history": "Nossa História",
+    "products": "Produtos",
+    "calculator": "Calculadora",
+    "downloads": "Downloads",
+    "careers": "Trabalhe Conosco",
+    "contact": "Contato",
+    "menu": "Menu",
+    "close_menu": "Fechar menu",
+    "settings": "Configurações"
+  },
+  "hero": {
+    "since": "Desde 1944",
+    "title": "Há mais de 80 anos bombeando soluções.",
+    "title_line1": "Há mais de 80 anos",
+    "title_line2": "bombeando soluções.",
+    "subtitle": "Tecnologia de bombeamento e soluções para indústrias que não podem parar. Qualidade e alta performance para os mais exigentes processos industriais.",
+    "get_quote": "Solicitar Orçamento",
+    "explore_products": "Explorar Produtos",
+    "scroll_down": "Role para explorar",
+    "years": "Anos de Experiência",
+    "certified": "Padrão Internacional",
+    "guarantee": "Garantia nos produtos"
+  },
+  "company": {
+    "title": "Nossa História",
+    "subtitle": "Há mais de 80 anos bombeando soluções",
+    "history": "Fundada em 1944, a FB Bombas é uma fabricante brasileira de bombas industriais que há mais de 80 anos atua em diversos segmentos industriais.",
+    "precision_title": "Engenharia de Precisão",
+    "precision_desc": "Equipamentos de alta performance projetados para aplicações exigentes e específicas com qualidade e tradição.",
+    "durability_title": "Durabilidade Superior",
+    "durability_desc": "Materiais especificados de acordo com a demanda da aplicação e processos produtivos otimizados.",
+    "tradition_title": "Tradição e Excelência",
+    "tradition_desc": "Mais de 80 anos de experiência no mercado brasileiro, consolidando nossa posição como referência em bombeamento industrial.",
+    "support_title": "Suporte Especializado",
+    "support_desc": "Equipe técnica altamente qualificada oferece suporte completo durante todo o atendimento e ciclo de vida do produto.",
+    "materials_title": "Materiais Especializados",
+    "materials_desc": "Materiais especificados de acordo com a demanda da aplicação e processos produtivos otimizados para máxima eficiência.",
+    "history_text": "Nossa engenharia de precisão garante equipamentos de alta performance mesmo nas aplicações mais exigentes.",
+    "history_title": "História e Tradição",
+    "history_p1": "Fundada em 1944, a FB Bombas nasceu da visão pioneira de fornecer soluções de bombeamento de alta qualidade para a indústria brasileira em plena expansão. Ao longo de mais de 80 anos, crescemos constantemente, mantendo nosso compromisso com a excelência e inovação.",
+    "history_p2": "Nossa trajetória é marcada por importantes conquistas tecnológicas e pelo desenvolvimento de produtos cada vez mais eficientes e duráveis, consolidando nossa posição como referência no setor.",
+    "history": {
+      "today": "Hoje",
+      "caption": "Pioneirismo Industrial",
+      "main_title": "Tradição e Excelência",
+      "caption_desc": "Tradição em bombeamento industrial",
+      "timeline_desc": "Mais de 80 anos de tradição e inovação"
+    },
+    "certifications": {
+      "title": "Certificações e Normas",
+      "subtitle": "Qualidade Certificada",
+      "description": "Nossos produtos e processos são certificados pelos mais rigorosos padrões internacionais, garantindo a excelência em todos os nossos produtos.",
+      "crcc": {
+        "desc": "Cadastro de Fornecedores para projetos de grande escala e aplicações críticas no Brasil.",
+        "badge": "Registro Oficial"
+      },
+      "api": {
+        "desc": "Conformidade com os rigorosos padrões internacionais para bombas centrífugas em aplicações petroquímicas.",
+        "badge": "Padrão Internacional"
+      }
+    },
+    "factory": {
+      "title": "Infraestrutura",
+      "subtitle": "Parque Fabril de Alta Tecnologia",
+      "caption": "Estrutura Fabril",
+      "f1": "10.900 m² de área total",
+      "f1_title": "Área Total",
+      "f2": "5.545 m² de área construída", 
+      "f2_title": "Área Construída",
+      "f3": "Maquinário de precisão CNC",
+      "f3_title": "Tecnologia",
+      "f4": "Laboratórios de teste e controle de qualidade",
+      "f4_title": "Qualidade",
+      "p1": "Nossa unidade fabril possui 10.900 m² de área total, sendo 5.545 m² de área construída, equipada com tecnologia de ponta para garantir a fabricação de produtos de alta qualidade.",
+      "p2": "Contamos com equipamentos CNC de última geração, células de usinagem especializadas e laboratórios de teste que permitem o controle preciso de todos os processos produtivos."
+    }
+  },
+  "benefits": {
+    "title": "Por que escolher a FB Bombas?",
+    "subtitle": "Tradição em engenharia de precisão para soluções industriais duradouras"
+  },
+  "downloads": {
+    "title": "Manuais Técnicos",
+    "subtitle": "Documentação técnica completa para instalação, operação e manutenção",
+    "download_manual": "Baixar Manual",
+    "file_size": "Tamanho do arquivo",
+    "format": "Formato",
+    "fbcn_manual": {
+      "title": "Manual Técnico FBCN",
+      "subtitle": "Bombas Centrífugas Normalizadas",
+      "description": "Manual técnico completo da linha FBCN com especificações, instalação, operação e manutenção detalhadas."
+    },
+    "fbot_manual": {
+      "title": "Manual Técnico FBOT",
+      "subtitle": "Bombas de Óleo Térmico",
+      "description": "Manual técnico completo da linha FBOT para aplicações de óleo térmico com especificações de alta temperatura."
+    },
+    "fbe_manual": {
+      "title": "Manual Técnico FBE",
+      "subtitle": "Bombas de Engrenagem Externa",
+      "description": "Manual técnico completo da linha FBE para fluidos viscosos com especificações de deslocamento positivo."
+    }
+  },
+  "contact": {
+    "title": "Entre em Contato",
+    "subtitle": "Estamos prontos para atender suas necessidades",
+    "form": {
+      "request_quote": "Solicitar Orçamento",
+      "name": "Nome",
+      "company": "Empresa",
+      "email": "E-mail",
+      "phone": "Telefone",
+      "pump_model": "Modelo da Bomba",
+      "select_model": "Selecione um modelo",
+      "model_fbcn": "Série FBCN Normalizada",
+      "model_fbot": "Série FBOT Óleo Térmico",
+      "model_fbe": "Engrenagem Externa FBE",
+      "flow_rate": "Vazão (m³/h)",
+      "head": "Altura (m)",
+      "fluid": "Fluido Bombeado",
+      "temperature": "Temperatura (°C)",
+      "additional_info": "Informações Adicionais",
+      "privacy_consent": "Aceito a",
+      "privacy_policy": "Política de Privacidade",
+      "data_consent": "e autorizo o tratamento dos meus dados pessoais para contato comercial.",
+      "sending": "Enviando...",
+      "submit": "Enviar Solicitação",
+      "success_title": "Formulário enviado com sucesso!",
+      "success_message": "Entraremos em contato em breve.",
+      "send": "Enviar Mensagem",
+      "subtitle": "Preencha o formulário e entraremos em contato",
+      "technical_specs": "Especificações Técnicas"
+    },
+    "info": {
+      "title": "Informações de Contato",
+      "address": "Endereço",
+      "phone": "Telefone",
+      "email": "E-mail",
+      "hours": "Horário de Atendimento",
+      "cta": "Entre em contato conosco para soluções personalizadas em bombeamento industrial"
+    }
+  },
+  "footer": {
+    "products": "Produtos",
+    "information": "Informações",
+    "history": "Nossa História",
+    "services": "Serviços",
+    "catalogs": "Catálogos",
+    "contact": "Contato",
+    "careers": "Trabalhe Conosco",
+    "rights_reserved": "Todos os direitos reservados",
+    "developed_by": "Desenvolvido por",
+    "gear_pumps": "Bombas de Engrenagem",
+    "company_description": "Há mais de 80 anos fabricando bombas de alta qualidade para as mais diversas aplicações industriais."
+  },
+  "clients": {
+    "title": "Nossos Clientes",
+    "subtitle": "Parceiros das maiores indústrias nacionais e multinacionais"
+  },
+  "services": {
+    "title": "Nossos Serviços",
+    "subtitle": "Suporte completo durante todo o ciclo de vida do produto"
+  },
+  "cases": {
+    "title": "Casos de Sucesso",
+    "subtitle": "Projetos reais que demonstram nossa experiência"
+  },
+  "products": {
+    "title": "Nossa Linha de Produtos",
+    "subtitle": "Soluções de alta performance para aplicações industriais",
+    "hero_title": "Soluções Premium em Bombeamento",
+    "hero_subtitle": "Tecnologia de ponta para indústrias que exigem excelência",
+    "search_placeholder": "Buscar produtos...",
+    "filters": "Filtros",
+    "clear_filters": "Limpar filtros",
+    "filter_by_category": "Filtrar por categoria",
+    "filter_by_flow": "Filtrar por vazão",
+    "filter_by_pressure": "Filtrar por pressão",
+    "filter_by_temperature": "Filtrar por temperatura",
+    "showing_results": "Mostrando {count} produtos",
+    "no_results": "Nenhum produto encontrado",
+    "all_models": "Todos os Modelos",
+    "see_all_models": "Ver Todos os Modelos",
+    "view_details": "Ver Detalhes",
+    "max_flow": "Vazão Máx.",
+    "max_height": "Altura Máx.",
+    "max_temp": "Temp. Máx.",
+    "main_features": "Características Principais",
+    "technical_description": "Descrição Técnica",
+    "standards": "Normas",
+    "specifications": "Especificações",
+    "product_code": "Código do Produto",
+    "fbcn": "Bombas Centrífugas Normalizadas",
+    "fbot": "Bombas de Óleo Térmico",
+    "fbe": "Bombas de Engrenagens Externas",
+    "gear_pumps": "Bombas de Engrenagem",
+    "centrifugal_pumps": "Bombas Centrífugas",
+    "catalog_title": "Catálogo de Produtos",
+    "catalog_description": "Conheça nossa linha completa de bombas industriais de alta performance",
+    "gear_pumps_series": "Bombas de Engrenagem - Série FBE",
+    "gear_pumps_hero_title": "Bombas de Engrenagem Externa FBE",
+    "gear_pumps_hero_subtitle": "Precisão e confiabilidade para fluidos viscosos",
+    "gear_pumps_description": "Nossa linha de bombas de engrenagens externas FBE é ideal para transferência e dosagem precisa de fluidos viscosos. Com ampla variedade de tamanhos, materiais e configurações, as bombas FBE oferecem solução robusta e confiável para aplicações industriais exigentes.",
+    "centrifugal_pumps_title": "Bombas Centrífugas Industriais",
+    "centrifugal_pumps_description": "Nossa linha de bombas centrífugas é projetada para oferecer alto desempenho e confiabilidade em aplicações industriais. Com construção robusta em ferro fundido e aço inox, nossos modelos atendem a diversos requisitos de vazão e pressão, proporcionando soluções eficientes para sistemas de bombeamento.",
+    "download_manual": "Baixar Manual Técnico",
+    "contact_consultant": "Fale com um Consultor",
+    "whatsapp_message": "Olá! Gostaria de mais informações sobre a bomba {model}.",
+    "whatsapp_generic_message": "Olá! Gostaria de mais informações sobre as bombas FB.",
+    "filter_by_size": "Filtrar por tamanho",
+    "all_sizes": "Todos os tamanhos",
+    "size_micro": "Micro (até 3/8\")",
+    "size_small": "Pequenas (1/2\" - 3/4\")",
+    "size_medium": "Médias (1\" - 1 1/2\")",
+    "size_large": "Grandes (2\")",
+    "size_xlarge": "Extra grandes (3\" - 4\")",
+    "flow_range": "Faixa de Vazão",
+    "head_range": "Altura Manométrica",
+    "temperature_range": "Temperatura",
+    "materials": "Materiais",
+    "applications": "Aplicações Típicas",
+    "download_curves": "Curvas de Desempenho",
+    "specific_models_notice": "Para informações sobre modelos específicos de bombas centrífugas, por favor entre em contato com nossa equipe técnica para análise personalizada de sua aplicação.",
+    "back_to_all": "Voltar para todos os modelos",
+    "back_to_products": "Voltar para produtos",
+    "gear_pump_desc": "Bomba de Engrenagens Externas",
+    "request_quote": "Solicitar Orçamento",
+    "download_datasheet": "Baixar Ficha Técnica",
+    "quick_contact": "Contato Rápido",
+    "categories": {
+      "all": "Todos",
+      "fbe": "Bombas de Engrenagem",
+      "fbcn": "Bombas Centrífugas",
+      "fbot": "Bombas Óleo Térmico",
+      "gearPumps": "Bombas de Engrenagem",
+      "centrifugalPumps": "Bombas Centrífugas",
+      "thermalOilPumps": "Bombas Óleo Térmico"
+    },
+    "hero": {
+      "badge": "Linha Completa de Bombas Industriais",
+      "title": "Soluções de Bombeamento de Alta Performance",
+      "subtitle": "Tecnologia avançada e engenharia de precisão para os processos industriais mais exigentes. Qualidade e confiabilidade há mais de 80 anos."
+    },
+    "metrics": {
+      "pressure": "Pressão Máxima",
+      "flow": "Vazão Máxima",
+      "temperature": "Temperatura Máxima"
+    },
+    "search": {
+      "placeholder": "Buscar produtos por nome ou especificação..."
+    },
+    "sort": {
+      "label": "Ordenar por",
+      "name": "Nome",
+      "flow": "Vazão"
+    },
+    "specs": {
+      "maxFlow": "Vazão Máx",
+      "maxHeight": "Altura Máx",
+      "maxTemp": "Temp. Máx"
+    },
+    "viewDetails": "Ver Detalhes",
+    "consultant": "Consultor",
+    "noResults": "Nenhum produto encontrado com os filtros aplicados.",
+    "clearFilters": "Limpar Filtros",
+    "cta": {
+      "title": "Não encontrou o que procura?",
+      "subtitle": "Nossa equipe técnica está pronta para ajudar você a encontrar a solução ideal para sua aplicação.",
+      "consultant": "Falar com Consultor",
+      "catalogs": "Baixar Catálogos"
+    },
+    "whatsapp": {
+      "consultMessage": "Olá! Gostaria de saber mais sobre as bombas FB Bombas.",
+      "gearPumpMessage": "Olá! Gostaria de saber mais sobre as bombas de engrenagem série FBE."
+    },
+    "gearPumps": {
+      "badge": "Série FBE",
+      "title": "Bombas de Engrenagem Externa",
+      "subtitle": "Soluções robustas e confiáveis para transferência e dosagem precisa de fluidos viscosos em aplicações industriais exigentes.",
+      "downloadManual": "Manual Técnico FBE",
+      "talkToConsultant": "Falar com Consultor",
+      "features": {
+        "flow": "Vazão Máxima",
+        "pressure": "Pressão Máxima",
+        "viscosity": "Viscosidade Máxima",
+        "sizes": "Diâmetros Disponíveis"
+      },
+      "searchPlaceholder": "Buscar por diâmetro ou modelo...",
+      "clearSearch": "Limpar Busca",
+      "selectDiameter": "Selecione o Diâmetro da Bomba",
+      "selectDiameterDesc": "Escolha o diâmetro desejado para visualizar os modelos disponíveis e suas especificações técnicas completas.",
+      "singleModel": "1 modelo disponível",
+      "multipleModels": "{{count}} modelos disponíveis",
+      "maxFlow": "Vazão Máxima",
+      "maxRPM": "Rotação Máxima",
+      "maxPressure": "Pressão Máxima",
+      "maxViscosity": "Viscosidade Máxima",
+      "viewVariations": "Ver Variações",
+      "backToDiameters": "Voltar aos Diâmetros",
+      "variationsFor": "Variações para {{diameter}}",
+      "viewSpecs": "Ver Especificações",
+      "completeSpecs": "Especificações técnicas completas e tabela de vazão",
+      "technicalData": "Dados Técnicos",
+      "specifications": "Especificações Técnicas",
+      "suction": "Sucção e Recalque",
+      "gears": "Engrenagens",
+      "sealing": "Vedação",
+      "bearings": "Mancais",
+      "construction": "Construção",
+      "optionals": "Opcionais",
+      "flowTable": "Tabela de Vazão e Pressão",
+      "pressure": "Pressão",
+      "flow": "Vazão",
+      "power": "Potência",
+      "requestQuote": "Solicitar Orçamento"
+    },
+    "product_description": "Descrição do Produto",
+    "technical_specs": "Especificações Técnicas",
+    "parameter": "Parâmetro",
+    "specification": "Especificação",
+    "rotation_speeds": "Rotações",
+    "connection_diameter": "Diâmetro da Conexão",
+    "body_material": "Material do Corpo",
+    "gear_material": "Material das Engrenagens",
+    "seal_type": "Tipo de Vedação",
+    "drive_options": "Opções de Acionamento",
+    "typical_applications": "Aplicações Típicas",
+    "other_models": "Outros modelos desta série",
+    "view_all": "Ver todos",
+    "need_custom_quote": "Precisa de uma solução personalizada?",
+    "custom_quote_desc": "Entre em contato com nossa equipe técnica para discutir especificações especiais, configurações personalizadas ou qualquer outra necessidade específica do seu projeto.",
+    "max_pressure": "Pressão",
+    "view_all_specs": "Ver todas as especificações",
+    "technical_data": "Dados Técnicos",
+    "performance_curves": "Curvas de Performance",
+    "dimensions": "Dimensões",
+    "construction_materials": "Materiais de Construção",
+    "available_sizes": "Tamanhos Disponíveis",
+    "download_3d_model": "Baixar Modelo 3D",
+    "download_curve_pdf": "Baixar Curvas em PDF",
+    "request_cad_files": "Solicitar Arquivos CAD",
+    "operating_limits": "Limites de Operação",
+    "viscosity_range": "Faixa de Viscosidade",
+    "npsh_required": "NPSH Requerido",
+    "efficiency": "Eficiência",
+    "contact_technical_support": "Falar com Suporte Técnico",
+    "schedule_visit": "Agendar Visita Técnica",
+    "request_sample": "Solicitar Amostra",
+    "warranty_info": "Informações de Garantia",
+    "spare_parts": "Peças de Reposição",
+    "maintenance_guide": "Guia de Manutenção",
+    "mainTitle": "Nossos Produtos",
+    "mainSubtitle": "Soluções completas em bombeamento industrial",
+    "explore": "Explorar",
+    "needHelp": "Precisa de ajuda para escolher?",
+    "ctaDescription": "Nossa equipe técnica está pronta para ajudar você a encontrar a solução ideal.",
+    "talkToConsultant": "Falar com Consultor",
+    "viewModels": "Ver Modelos",
+    "rotation": "Rotação"
+  },
+  "products_description": {
+    "fbcn_title": "Bombas Centrífugas Normalizadas FBCN",
+    "fbcn_desc": "Nossas bombas centrífugas normalizadas FBCN seguem as normas DIN 24255/ISO 2858, com alta eficiência e durabilidade para aplicações industriais diversas. Ideal para água, óleos leves e transferência de líquidos limpos.",
+    "fbcn_app": "Indústria em geral",
+    "fbcn_feature": "Alta eficiência",
+    "fbot_title": "Bombas para Óleo Térmico FBOT",
+    "fbot_desc": "Bombas FBOT são especialmente projetadas para aplicações com fluidos térmicos em altas temperaturas. Fabricadas com materiais especiais e vedações adaptadas para suportar até 350°C em operação contínua.",
+    "fbot_app": "Sistemas térmicos",
+    "fbot_feature": "Alta temperatura",
+    "fbe_title": "Bombas de Engrenagens Externas FBE",
+    "fbe.subtitle": "Série FBE",
+    "fbe_desc": "Bombas de engrenagens FBE são ideais para fluidos viscosos, oferecendo deslocamento positivo e fluxo preciso independente da pressão. Perfeitas para óleos lubrificantes, resinas, polímeros e outras aplicações com alta viscosidade.",
+    "fbe_app": "Fluidos viscosos",
+    "fbe_feature": "Precisão de dosagem"
+  },
+  "product_details": {
+    "specifications": "Especificações",
+    "flow": "Vazão",
+    "head": "Altura",
+    "temperature": "Temperatura",
+    "viscosity": "Viscosidade",
+    "materials": "Materiais",
+    "applications": "Aplicações",
+    "features": "Características",
+    "available_rotations": "Rotações disponíveis",
+    "selection_help": "Precisa de ajuda para selecionar o modelo ideal?",
+    "selection_help_desc": "Utilize nossa calculadora de seleção para encontrar a bomba perfeita para sua aplicação, com base em parâmetros técnicos específicos.",
+    "use_calculator": "Usar Calculadora de Seleção"
+  },
+  "fluid_options": {
+    "water": "Água",
+    "sea_water": "Água do Mar",
+    "thermal_oil": "Óleo Térmico",
+    "hydraulic_oil": "Óleo Hidráulico",
+    "glycol": "Solução de Glicol",
+    "custom": "Personalizado"
+  },
+  "calculator": {
+    "title": "Calculadora de Seleção de Bombas",
+    "tabs": {
+      "parameters": "Parâmetros",
+      "results": "Resultados"
+    },
+    "pump_type_selection": "Seleção do Tipo de Bomba",
+    "pump_type_fbcn_desc": "Bomba Centrífuga Normalizada",
+    "pump_type_fbot_desc": "Bomba de Óleo Térmico",
+    "pump_type_fbe_desc": "Bomba de Engrenagens Externas",
+    "select_rotation": "Selecione a Rotação",
+    "fluid_parameters": "Parâmetros do Fluido",
+    "fluid_type": "Tipo de Fluido",
+    "viscosity_tooltip": "A viscosidade do fluido afeta diretamente o desempenho da bomba. Valores mais altos de viscosidade aumentam a resistência ao fluxo e reduzem a eficiência.",
+    "calculating": "Calculando...",
+    "calculate": "Calcular Bomba Ideal",
+    "model_description": "Modelo recomendado para os parâmetros informados",
+    "generating_pdf": "Gerando PDF...",
+    "download_result": "Exportar Resultado PDF",
+    "calculation_error": "Erro ao calcular a bomba ideal. Por favor, verifique os parâmetros e tente novamente."
+  },
+  "pump_type": {
+    "fbcn": "Bomba Centrífuga Normalizada",
+    "fbot": "Bomba de Óleo Térmico",
+    "fbe": "Bomba de Engrenagens Externas"
+  },
+  "chart": {
+    "flow_axis": "Vazão (m³/h)",
+    "head_axis": "Altura (m)",
+    "pump_curve": "Curva da Bomba",
+    "system_curve": "Curva do Sistema",
+    "efficiency": "Eficiência",
+    "flow": "Vazão",
+    "required_flow": "Vazão Req.",
+    "required_head": "Altura Req."
+  },
+  "pdf": {
+    "generation_error": "Erro ao gerar o PDF. Por favor, tente novamente."
+  },
+  "recommendations": {
+    "high_viscosity": "Viscosidade extremamente alta. Considere usar um sistema de aquecimento para reduzir a viscosidade.",
+    "medium_viscosity": "Viscosidade muito alta. A eficiência será reduzida.",
+    "high_temperature": "Temperatura elevada. Recomendamos o uso de bombas específicas para óleo térmico (FBOT).",
+    "high_npsh": "NPSH requerido elevado. Verifique a instalação para evitar cavitação."
+  },
+  "careers": {
+    "title": "Trabalhe Conosco",
+    "subtitle": "Faça parte de uma equipe que constrói o futuro da Indústria Brasileira",
+    "team": {
+      "title": "Equipe Especializada",
+      "desc": "Trabalhe com profissionais altamente qualificados e apaixonados por tecnologia"
+    },
+    "growth": {
+      "title": "Crescimento Profissional",
+      "desc": "Oportunidades de desenvolvimento e capacitação contínua"
+    },
+    "cta": {
+      "title": "Pronto para fazer a diferença?",
+      "description": "Envie seu currículo e faça parte da nossa equipe de excelência",
+      "button": "Entre em Contato"
+    }
+  }
+}

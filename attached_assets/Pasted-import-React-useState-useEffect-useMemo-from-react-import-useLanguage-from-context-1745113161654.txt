@@ -1,0 +1,2587 @@
+import React, { useState, useEffect, useMemo } from 'react';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Slider } from '@/components/ui/slider';
+import { Badge } from '@/components/ui/badge';
+import { 
+  InfoIcon, 
+  HelpCircleIcon, 
+  ChevronRight, 
+  Shield, 
+  Clock, 
+  Award, 
+  CheckCircle2, 
+  AlertTriangle, 
+  Zap, 
+  Droplets, 
+  Thermometer, 
+  ArrowRight,
+  BarChart,
+  Settings,
+  Download
+} from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Area, AreaChart, CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip as RechartsTooltip, XAxis, YAxis } from 'recharts';
+
+// Tipo para curvas do sistema
+type SystemCurvePoint = {
+  flow: number;
+  systemHead: number;
+  head: null;
+  efficiency: null;
+};
+
+// Tipo para pontos da curva da bomba
+type PumpCurvePoint = {
+  flow: number;
+  head: number;
+  efficiency: number;
+  npsh: number;
+  power: number;
+};
+
+// Tipo para os resultados de cálculo
+interface CalculationResult {
+  pumpModel: string;
+  pumpType: string;
+  efficiency: number;
+  power: number;
+  npsh: number;
+  flowRate: number;
+  head: number;
+  points: { x: number; y: number }[];
+  curvePoints: PumpCurvePoint[];
+  rotationSpeed: number;
+  specificRecommendations?: string[];
+}
+
+// Enumeração para os tipos de bombas
+enum PumpType {
+  FBCN = 'FBCN',  // Bomba Centrífuga Normalizada
+  FBOT = 'FBOT',  // Bomba de Óleo Térmico
+  FBE = 'FBE'     // Bomba de Engrenagens Externas
+}
+
+// Interface para informações de rotação
+interface RotationOption {
+  value: number;
+  label: string;
+}
+
+// Dados das curvas de bombas
+// 1. FBCN - Bomba Centrífuga Normalizada - 3500 RPM
+const fbcnPumpCurves3500: Record<string, PumpCurvePoint[]> = {
+  // FBCN 32-125 - 3500 RPM
+  'FBCN-32-125': [
+    { flow: 0, head: 52.8, efficiency: 0, npsh: 0.5, power: 0 },
+    { flow: 3, head: 52.5, efficiency: 21, npsh: 0.6, power: 0.8 },
+    { flow: 6, head: 51.3, efficiency: 38, npsh: 0.9, power: 1.5 },
+    { flow: 9, head: 49.2, efficiency: 53, npsh: 1.4, power: 2.2 },
+    { flow: 12, head: 46.2, efficiency: 59, npsh: 2.1, power: 3.0 },
+    { flow: 15, head: 42.3, efficiency: 60, npsh: 3.0, power: 3.7 },
+    { flow: 18, head: 37.5, efficiency: 58, npsh: 4.2, power: 4.3 },
+    { flow: 21, head: 31.8, efficiency: 51, npsh: 5.6, power: 4.8 },
+    { flow: 24, head: 25.2, efficiency: 42, npsh: 7.2, power: 5.3 },
+  ],
+  // FBCN 32-160 - 3500 RPM
+  'FBCN-32-160': [
+    { flow: 0, head: 68.8, efficiency: 0, npsh: 0.5, power: 0 },
+    { flow: 3, head: 68.4, efficiency: 18, npsh: 0.6, power: 1.0 },
+    { flow: 6, head: 67.2, efficiency: 33, npsh: 0.9, power: 2.0 },
+    { flow: 9, head: 65.1, efficiency: 48, npsh: 1.4, power: 3.0 },
+    { flow: 12, head: 62.1, efficiency: 55, npsh: 2.1, power: 4.0 },
+    { flow: 15, head: 58.2, efficiency: 60, npsh: 3.0, power: 5.0 },
+    { flow: 18, head: 53.4, efficiency: 62, npsh: 4.1, power: 5.9 },
+    { flow: 21, head: 47.7, efficiency: 61, npsh: 5.5, power: 6.7 },
+    { flow: 24, head: 41.1, efficiency: 57, npsh: 7.0, power: 7.3 },
+    { flow: 27, head: 33.6, efficiency: 49, npsh: 8.7, power: 7.9 },
+    { flow: 30, head: 25.2, efficiency: 38, npsh: 10.6, power: 8.3 },
+  ],
+  // FBCN 32-200 - 3500 RPM
+  'FBCN-32-200': [
+    { flow: 0, head: 105.8, efficiency: 0, npsh: 0.8, power: 0 },
+    { flow: 3, head: 105.3, efficiency: 15, npsh: 0.9, power: 1.5 },
+    { flow: 6, head: 103.8, efficiency: 28, npsh: 1.2, power: 3.0 },
+    { flow: 9, head: 101.3, efficiency: 40, npsh: 1.7, power: 4.5 },
+    { flow: 12, head: 97.8, efficiency: 52, npsh: 2.5, power: 6.0 },
+    { flow: 15, head: 93.3, efficiency: 59, npsh: 3.5, power: 7.3 },
+    { flow: 18, head: 87.8, efficiency: 64, npsh: 4.7, power: 8.5 },
+    { flow: 21, head: 81.3, efficiency: 67, npsh: 6.2, power: 9.5 },
+    { flow: 24, head: 73.8, efficiency: 65, npsh: 7.9, power: 10.5 },
+    { flow: 27, head: 65.3, efficiency: 61, npsh: 9.8, power: 11.2 },
+    { flow: 30, head: 55.8, efficiency: 55, npsh: 12.0, power: 11.9 },
+    { flow: 33, head: 45.3, efficiency: 45, npsh: 14.5, power: 12.5 },
+  ],
+  // FBCN 40-125 - 3500 RPM
+  'FBCN-40-125': [
+    { flow: 0, head: 54.2, efficiency: 0, npsh: 0.6, power: 0 },
+    { flow: 6, head: 53.2, efficiency: 30, npsh: 0.9, power: 2.0 },
+    { flow: 12, head: 50.2, efficiency: 50, npsh: 1.5, power: 3.5 },
+    { flow: 18, head: 45.2, efficiency: 63, npsh: 2.5, power: 4.8 },
+    { flow: 24, head: 38.1, efficiency: 67, npsh: 3.8, power: 5.7 },
+    { flow: 30, head: 29.0, efficiency: 63, npsh: 5.5, power: 6.5 },
+    { flow: 36, head: 18.0, efficiency: 50, npsh: 7.6, power: 7.0 },
+  ],
+  // FBCN 40-160 - 3500 RPM
+  'FBCN-40-160': [
+    { flow: 0, head: 70.0, efficiency: 0, npsh: 0.8, power: 0 },
+    { flow: 6, head: 69.1, efficiency: 27, npsh: 1.0, power: 2.6 },
+    { flow: 12, head: 66.5, efficiency: 47, npsh: 1.6, power: 4.7 },
+    { flow: 18, head: 62.1, efficiency: 60, npsh: 2.6, power: 6.5 },
+    { flow: 24, head: 55.9, efficiency: 65, npsh: 3.9, power: 8.0 },
+    { flow: 30, head: 47.9, efficiency: 64, npsh: 5.6, power: 9.3 },
+    { flow: 36, head: 38.2, efficiency: 59, npsh: 7.7, power: 10.2 },
+    { flow: 42, head: 26.7, efficiency: 47, npsh: 10.2, power: 10.9 },
+  ],
+  // FBCN 40-200 - 3500 RPM 
+  'FBCN-40-200': [
+    { flow: 0, head: 108.0, efficiency: 0, npsh: 1.0, power: 0 },
+    { flow: 6, head: 106.8, efficiency: 22, npsh: 1.2, power: 3.9 },
+    { flow: 12, head: 103.2, efficiency: 40, npsh: 1.8, power: 7.2 },
+    { flow: 18, head: 97.2, efficiency: 54, npsh: 2.8, power: 10.0 },
+    { flow: 24, head: 88.8, efficiency: 62, npsh: 4.2, power: 12.3 },
+    { flow: 30, head: 78.0, efficiency: 65, npsh: 6.0, power: 14.2 },
+    { flow: 36, head: 64.8, efficiency: 63, npsh: 8.2, power: 15.6 },
+    { flow: 42, head: 49.2, efficiency: 56, npsh: 10.8, power: 16.8 },
+    { flow: 48, head: 31.2, efficiency: 42, npsh: 13.9, power: 17.5 },
+  ],
+  // FBCN 50-125 - 3500 RPM
+  'FBCN-50-125': [
+    { flow: 0, head: 55.0, efficiency: 0, npsh: 0.8, power: 0 },
+    { flow: 9, head: 53.5, efficiency: 38, npsh: 1.1, power: 3.5 },
+    { flow: 18, head: 49.0, efficiency: 58, npsh: 2.0, power: 6.2 },
+    { flow: 27, head: 41.5, efficiency: 68, npsh: 3.5, power: 8.3 },
+    { flow: 36, head: 31.0, efficiency: 67, npsh: 5.5, power: 9.8 },
+    { flow: 45, head: 17.5, efficiency: 51, npsh: 8.2, power: 10.7 },
+  ],
+  // FBCN 50-160 - 3500 RPM
+  'FBCN-50-160': [
+    { flow: 0, head: 72.0, efficiency: 0, npsh: 1.0, power: 0 },
+    { flow: 9, head: 70.5, efficiency: 35, npsh: 1.3, power: 4.6 },
+    { flow: 18, head: 66.0, efficiency: 55, npsh: 2.2, power: 8.3 },
+    { flow: 27, head: 58.5, efficiency: 65, npsh: 3.7, power: 11.2 },
+    { flow: 36, head: 48.0, efficiency: 68, npsh: 5.8, power: 13.5 },
+    { flow: 45, head: 34.5, efficiency: 62, npsh: 8.5, power: 15.1 },
+    { flow: 54, head: 18.0, efficiency: 47, npsh: 11.9, power: 16.0 },
+  ],
+};
+
+// FBCN - Bomba Centrífuga Normalizada - 1750 RPM
+const fbcnPumpCurves1750: Record<string, PumpCurvePoint[]> = {
+  // FBCN 32-125 - 1750 RPM
+  'FBCN-32-125': [
+    { flow: 0, head: 13.2, efficiency: 0, npsh: 0.3, power: 0 },
+    { flow: 1.5, head: 13.1, efficiency: 19, npsh: 0.4, power: 0.3 },
+    { flow: 3, head: 12.8, efficiency: 35, npsh: 0.6, power: 0.4 },
+    { flow: 4.5, head: 12.3, efficiency: 48, npsh: 0.8, power: 0.6 },
+    { flow: 6, head: 11.6, efficiency: 55, npsh: 1.1, power: 0.8 },
+    { flow: 7.5, head: 10.6, efficiency: 57, npsh: 1.5, power: 1.0 },
+    { flow: 9, head: 9.4, efficiency: 55, npsh: 2.1, power: 1.2 },
+    { flow: 10.5, head: 8.0, efficiency: 48, npsh: 2.8, power: 1.3 },
+    { flow: 12, head: 6.3, efficiency: 38, npsh: 3.6, power: 1.4 },
+  ],
+  // FBCN 32-160 - 1750 RPM
+  'FBCN-32-160': [
+    { flow: 0, head: 17.2, efficiency: 0, npsh: 0.3, power: 0 },
+    { flow: 1.5, head: 17.1, efficiency: 16, npsh: 0.4, power: 0.3 },
+    { flow: 3, head: 16.8, efficiency: 30, npsh: 0.5, power: 0.5 },
+    { flow: 4.5, head: 16.3, efficiency: 43, npsh: 0.8, power: 0.8 },
+    { flow: 6, head: 15.5, efficiency: 51, npsh: 1.1, power: 1.0 },
+    { flow: 7.5, head: 14.6, efficiency: 57, npsh: 1.6, power: 1.3 },
+    { flow: 9, head: 13.4, efficiency: 58, npsh: 2.1, power: 1.5 },
+    { flow: 10.5, head: 11.9, efficiency: 57, npsh: 2.8, power: 1.7 },
+    { flow: 12, head: 10.3, efficiency: 52, npsh: 3.6, power: 1.9 },
+    { flow: 13.5, head: 8.4, efficiency: 45, npsh: 4.5, power: 2.0 },
+    { flow: 15, head: 6.3, efficiency: 34, npsh: 5.5, power: 2.1 },
+  ],
+  // FBCN 32-200 - 1750 RPM
+  'FBCN-32-200': [
+    { flow: 0, head: 26.5, efficiency: 0, npsh: 0.4, power: 0 },
+    { flow: 1.5, head: 26.3, efficiency: 13, npsh: 0.5, power: 0.4 },
+    { flow: 3, head: 26.0, efficiency: 25, npsh: 0.6, power: 0.8 },
+    { flow: 4.5, head: 25.3, efficiency: 36, npsh: 0.9, power: 1.2 },
+    { flow: 6, head: 24.5, efficiency: 47, npsh: 1.3, power: 1.6 },
+    { flow: 7.5, head: 23.3, efficiency: 55, npsh: 1.8, power: 1.9 },
+    { flow: 9, head: 22.0, efficiency: 60, npsh: 2.4, power: 2.2 },
+    { flow: 10.5, head: 20.3, efficiency: 63, npsh: 3.1, power: 2.5 },
+    { flow: 12, head: 18.5, efficiency: 61, npsh: 4.0, power: 2.7 },
+    { flow: 13.5, head: 16.3, efficiency: 57, npsh: 5.0, power: 2.9 },
+    { flow: 15, head: 14.0, efficiency: 50, npsh: 6.1, power: 3.1 },
+    { flow: 16.5, head: 11.3, efficiency: 40, npsh: 7.3, power: 3.2 },
+  ],
+  // FBCN 32-250 - 1750 RPM (baseado na imagem 4)
+  'FBCN-32-250': [
+    { flow: 0, head: 32.5, efficiency: 0, npsh: 0.5, power: 0 },
+    { flow: 1.5, head: 32.3, efficiency: 12, npsh: 0.6, power: 0.5 },
+    { flow: 3, head: 31.7, efficiency: 23, npsh: 0.7, power: 0.9 },
+    { flow: 4.5, head: 31.0, efficiency: 34, npsh: 1.0, power: 1.5 },
+    { flow: 6, head: 30.0, efficiency: 44, npsh: 1.4, power: 2.0 },
+    { flow: 7.5, head: 28.7, efficiency: 52, npsh: 1.9, power: 2.5 },
+    { flow: 9, head: 27.0, efficiency: 57, npsh: 2.5, power: 2.9 },
+    { flow: 10.5, head: 25.0, efficiency: 60, npsh: 3.2, power: 3.3 },
+    { flow: 12, head: 22.5, efficiency: 58, npsh: 4.1, power: 3.6 },
+    { flow: 13.5, head: 19.5, efficiency: 52, npsh: 5.0, power: 3.8 },
+    { flow: 15, head: 16.2, efficiency: 42, npsh: 6.1, power: 3.9 },
+  ],
+  // FBCN 32-250.1 - 1750 RPM (baseado na imagem 4)
+  'FBCN-32-250.1': [
+    { flow: 0, head: 33.0, efficiency: 0, npsh: 0.5, power: 0 },
+    { flow: 1.5, head: 32.8, efficiency: 12, npsh: 0.6, power: 0.5 },
+    { flow: 3, head: 32.2, efficiency: 23, npsh: 0.7, power: 0.9 },
+    { flow: 4.5, head: 31.5, efficiency: 34, npsh: 1.0, power: 1.5 },
+    { flow: 6, head: 30.5, efficiency: 44, npsh: 1.4, power: 2.0 },
+    { flow: 7.5, head: 29.2, efficiency: 52, npsh: 1.9, power: 2.5 },
+    { flow: 9, head: 27.5, efficiency: 57, npsh: 2.5, power: 3.0 },
+    { flow: 10.5, head: 25.5, efficiency: 60, npsh: 3.2, power: 3.4 },
+    { flow: 12, head: 23.0, efficiency: 58, npsh: 4.1, power: 3.7 },
+    { flow: 13.5, head: 20.0, efficiency: 52, npsh: 5.0, power: 3.9 },
+    { flow: 15, head: 16.5, efficiency: 42, npsh: 6.1, power: 4.0 },
+  ],
+  // FBCN 40-125 - 1750 RPM
+  'FBCN-40-125': [
+    { flow: 0, head: 13.6, efficiency: 0, npsh: 0.3, power: 0 },
+    { flow: 3, head: 13.3, efficiency: 28, npsh: 0.5, power: 0.5 },
+    { flow: 6, head: 12.6, efficiency: 46, npsh: 0.8, power: 0.9 },
+    { flow: 9, head: 11.3, efficiency: 57, npsh: 1.3, power: 1.2 },
+    { flow: 12, head: 9.5, efficiency: 63, npsh: 1.9, power: 1.5 },
+    { flow: 15, head: 7.3, efficiency: 59, npsh: 2.8, power: 1.7 },
+    { flow: 18, head: 4.5, efficiency: 45, npsh: 3.9, power: 1.8 },
+  ],
+  // FBCN 40-160 - 1750 RPM
+  'FBCN-40-160': [
+    { flow: 0, head: 17.5, efficiency: 0, npsh: 0.4, power: 0 },
+    { flow: 3, head: 17.3, efficiency: 25, npsh: 0.5, power: 0.7 },
+    { flow: 6, head: 16.6, efficiency: 43, npsh: 0.8, power: 1.2 },
+    { flow: 9, head: 15.5, efficiency: 55, npsh: 1.3, power: 1.7 },
+    { flow: 12, head: 14.0, efficiency: 60, npsh: 2.0, power: 2.1 },
+    { flow: 15, head: 12.0, efficiency: 59, npsh: 2.9, power: 2.4 },
+    { flow: 18, head: 9.6, efficiency: 55, npsh: 3.9, power: 2.7 },
+    { flow: 21, head: 6.7, efficiency: 43, npsh: 5.2, power: 2.9 },
+  ],
+  // FBCN 40-200 - 1750 RPM
+  'FBCN-40-200': [
+    { flow: 0, head: 27.0, efficiency: 0, npsh: 0.5, power: 0 },
+    { flow: 3, head: 26.7, efficiency: 20, npsh: 0.6, power: 1.0 },
+    { flow: 6, head: 25.8, efficiency: 36, npsh: 0.9, power: 1.9 },
+    { flow: 9, head: 24.3, efficiency: 48, npsh: 1.5, power: 2.6 },
+    { flow: 12, head: 22.2, efficiency: 57, npsh: 2.2, power: 3.2 },
+    { flow: 15, head: 19.5, efficiency: 60, npsh: 3.1, power: 3.7 },
+    { flow: 18, head: 16.2, efficiency: 58, npsh: 4.2, power: 4.1 },
+    { flow: 21, head: 12.3, efficiency: 51, npsh: 5.5, power: 4.4 },
+    { flow: 24, head: 7.8, efficiency: 38, npsh: 7.0, power: 4.6 },
+  ],
+  // FBCN 40-250 - 1750 RPM (baseado na imagem 4)
+  'FBCN-40-250': [
+    { flow: 0, head: 33.0, efficiency: 0, npsh: 0.6, power: 0 },
+    { flow: 3, head: 32.6, efficiency: 18, npsh: 0.7, power: 1.2 },
+    { flow: 6, head: 31.7, efficiency: 34, npsh: 1.0, power: 2.2 },
+    { flow: 9, head: 30.2, efficiency: 46, npsh: 1.5, power: 3.1 },
+    { flow: 12, head: 28.2, efficiency: 54, npsh: 2.2, power: 3.9 },
+    { flow: 15, head: 25.5, efficiency: 58, npsh: 3.1, power: 4.6 },
+    { flow: 18, head: 22.2, efficiency: 60, npsh: 4.2, power: 5.2 },
+    { flow: 21, head: 18.5, efficiency: 56, npsh: 5.5, power: 5.6 },
+    { flow: 24, head: 14.2, efficiency: 50, npsh: 7.0, power: 5.9 },
+    { flow: 27, head: 9.5, efficiency: 38, npsh: 8.7, power: 6.0 },
+  ],
+  // FBCN 50-125 - 1750 RPM
+  'FBCN-50-125': [
+    { flow: 0, head: 13.8, efficiency: 0, npsh: 0.4, power: 0 },
+    { flow: 4.5, head: 13.4, efficiency: 34, npsh: 0.6, power: 0.9 },
+    { flow: 9, head: 12.3, efficiency: 52, npsh: 1.0, power: 1.6 },
+    { flow: 13.5, head: 10.4, efficiency: 62, npsh: 1.8, power: 2.1 },
+    { flow: 18, head: 7.8, efficiency: 61, npsh: 2.8, power: 2.5 },
+    { flow: 22.5, head: 4.4, efficiency: 46, npsh: 4.2, power: 2.7 },
+  ],
+  // FBCN 50-160 - 1750 RPM
+  'FBCN-50-160': [
+    { flow: 0, head: 18.0, efficiency: 0, npsh: 0.5, power: 0 },
+    { flow: 4.5, head: 17.6, efficiency: 32, npsh: 0.7, power: 1.2 },
+    { flow: 9, head: 16.5, efficiency: 50, npsh: 1.1, power: 2.1 },
+    { flow: 13.5, head: 14.6, efficiency: 60, npsh: 1.9, power: 2.9 },
+    { flow: 18, head: 12.0, efficiency: 63, npsh: 3.0, power: 3.5 },
+    { flow: 22.5, head: 8.6, efficiency: 57, npsh: 4.3, power: 3.9 },
+    { flow: 27, head: 4.5, efficiency: 42, npsh: 6.1, power: 4.1 },
+  ],
+  // FBCN 50-200 - 1750 RPM (baseado na imagem 4)
+  'FBCN-50-200': [
+    { flow: 0, head: 27.5, efficiency: 0, npsh: 0.6, power: 0 },
+    { flow: 4.5, head: 27.0, efficiency: 30, npsh: 0.8, power: 1.6 },
+    { flow: 9, head: 26.0, efficiency: 48, npsh: 1.2, power: 3.0 },
+    { flow: 13.5, head: 24.2, efficiency: 58, npsh: 1.9, power: 4.2 },
+    { flow: 18, head: 21.7, efficiency: 64, npsh: 2.9, power: 5.2 },
+    { flow: 22.5, head: 18.5, efficiency: 63, npsh: 4.2, power: 6.0 },
+    { flow: 27, head: 14.5, efficiency: 58, npsh: 5.8, power: 6.5 },
+    { flow: 31.5, head: 9.7, efficiency: 46, npsh: 7.6, power: 6.8 },
+  ],
+  // FBCN 50-250 - 1750 RPM (baseado na imagem 4)
+  'FBCN-50-250': [
+    { flow: 0, head: 33.5, efficiency: 0, npsh: 0.7, power: 0 },
+    { flow: 4.5, head: 33.2, efficiency: 26, npsh: 0.9, power: 1.9 },
+    { flow: 9, head: 32.2, efficiency: 45, npsh: 1.4, power: 3.7 },
+    { flow: 13.5, head: 30.7, efficiency: 55, npsh: 2.0, power: 5.2 },
+    { flow: 18, head: 28.5, efficiency: 62, npsh: 3.0, power: 6.5 },
+    { flow: 22.5, head: 25.5, efficiency: 63, npsh: 4.2, power: 7.5 },
+    { flow: 27, head: 21.7, efficiency: 62, npsh: 5.7, power: 8.3 },
+    { flow: 31.5, head: 17.5, efficiency: 56, npsh: 7.5, power: 8.9 },
+    { flow: 36, head: 12.5, efficiency: 47, npsh: 9.5, power: 9.2 },
+  ],
+  // FBCN 65-125 - 1750 RPM (baseado na imagem 4)
+  'FBCN-65-125': [
+    { flow: 0, head: 14.0, efficiency: 0, npsh: 0.5, power: 0 },
+    { flow: 6, head: 13.7, efficiency: 37, npsh: 0.7, power: 1.3 },
+    { flow: 12, head: 12.7, efficiency: 55, npsh: 1.2, power: 2.4 },
+    { flow: 18, head: 11.2, efficiency: 65, npsh: 1.9, power: 3.3 },
+    { flow: 24, head: 9.0, efficiency: 67, npsh: 3.0, power: 3.9 },
+    { flow: 30, head: 6.2, efficiency: 60, npsh: 4.4, power: 4.4 },
+    { flow: 36, head: 3.0, efficiency: 40, npsh: 6.0, power: 4.5 },
+  ],
+  // FBCN 65-160 - 1750 RPM (baseado na imagem 4)
+  'FBCN-65-160': [
+    { flow: 0, head: 18.5, efficiency: 0, npsh: 0.6, power: 0 },
+    { flow: 6, head: 18.1, efficiency: 35, npsh: 0.8, power: 1.7 },
+    { flow: 12, head: 17.0, efficiency: 53, npsh: 1.3, power: 3.2 },
+    { flow: 18, head: 15.2, efficiency: 63, npsh: 2.1, power: 4.3 },
+    { flow: 24, head: 12.7, efficiency: 67, npsh: 3.2, power: 5.2 },
+    { flow: 30, head: 9.7, efficiency: 65, npsh: 4.7, power: 6.0 },
+    { flow: 36, head: 6.0, efficiency: 50, npsh: 6.5, power: 6.4 },
+  ],
+  // FBCN 65-200 - 1750 RPM (baseado na imagem 4)
+  'FBCN-65-200': [
+    { flow: 0, head: 28.0, efficiency: 0, npsh: 0.7, power: 0 },
+    { flow: 6, head: 27.5, efficiency: 32, npsh: 0.9, power: 2.4 },
+    { flow: 12, head: 26.5, efficiency: 50, npsh: 1.5, power: 4.5 },
+    { flow: 18, head: 24.5, efficiency: 60, npsh: 2.3, power: 6.2 },
+    { flow: 24, head: 22.0, efficiency: 66, npsh: 3.4, power: 7.6 },
+    { flow: 30, head: 18.7, efficiency: 67, npsh: 4.9, power: 8.8 },
+    { flow: 36, head: 15.0, efficiency: 63, npsh: 6.7, power: 9.6 },
+    { flow: 42, head: 10.5, efficiency: 53, npsh: 8.7, power: 10.2 },
+  ],
+  // FBCN 65-250 - 1750 RPM (baseado na imagem 4)
+  'FBCN-65-250': [
+    { flow: 0, head: 34.5, efficiency: 0, npsh: 0.9, power: 0 },
+    { flow: 6, head: 34.0, efficiency: 28, npsh: 1.1, power: 3.0 },
+    { flow: 12, head: 33.0, efficiency: 46, npsh: 1.6, power: 5.6 },
+    { flow: 18, head: 31.2, efficiency: 57, npsh: 2.4, power: 7.8 },
+    { flow: 24, head: 28.7, efficiency: 64, npsh: 3.5, power: 9.6 },
+    { flow: 30, head: 25.5, efficiency: 67, npsh: 5.0, power: 11.2 },
+    { flow: 36, head: 21.7, efficiency: 65, npsh: 6.7, power: 12.4 },
+    { flow: 42, head: 17.2, efficiency: 60, npsh: 8.7, power: 13.2 },
+    { flow: 48, head: 12.0, efficiency: 49, npsh: 11.0, power: 13.7 },
+  ],
+  // FBCN 80-160 - 1750 RPM (baseado na imagem 4)
+  'FBCN-80-160': [
+    { flow: 0, head: 19.0, efficiency: 0, npsh: 0.7, power: 0 },
+    { flow: 7.5, head: 18.6, efficiency: 38, npsh: 1.0, power: 2.2 },
+    { flow: 15, head: 17.5, efficiency: 56, npsh: 1.5, power: 4.0 },
+    { flow: 22.5, head: 15.7, efficiency: 65, npsh: 2.4, power: 5.6 },
+    { flow: 30, head: 13.5, efficiency: 69, npsh: 3.6, power: 6.9 },
+    { flow: 37.5, head: 10.5, efficiency: 68, npsh: 5.2, power: 7.8 },
+    { flow: 45, head: 7.0, efficiency: 57, npsh: 7.2, power: 8.4 },
+  ],
+  // FBCN 80-200 - 1750 RPM (baseado na imagem 4)
+  'FBCN-80-200': [
+    { flow: 0, head: 28.5, efficiency: 0, npsh: 0.9, power: 0 },
+    { flow: 7.5, head: 28.0, efficiency: 35, npsh: 1.2, power: 3.2 },
+    { flow: 15, head: 27.0, efficiency: 53, npsh: 1.7, power: 6.0 },
+    { flow: 22.5, head: 25.2, efficiency: 63, npsh: 2.6, power: 8.5 },
+    { flow: 30, head: 22.7, efficiency: 69, npsh: 3.9, power: 10.4 },
+    { flow: 37.5, head: 19.5, efficiency: 70, npsh: 5.5, power: 12.0 },
+    { flow: 45, head: 15.7, efficiency: 67, npsh: 7.5, power: 13.2 },
+    { flow: 52.5, head: 11.2, efficiency: 57, npsh: 9.7, power: 14.0 },
+  ],
+  // FBCN 80-250 - 1750 RPM (baseado na imagem 4)
+  'FBCN-80-250': [
+    { flow: 0, head: 35.0, efficiency: 0, npsh: 1.0, power: 0 },
+    { flow: 7.5, head: 34.5, efficiency: 32, npsh: 1.2, power: 4.0 },
+    { flow: 15, head: 33.5, efficiency: 50, npsh: 1.8, power: 7.6 },
+    { flow: 22.5, head: 32.0, efficiency: 61, npsh: 2.7, power: 10.8 },
+    { flow: 30, head: 29.5, efficiency: 67, npsh: 4.0, power: 13.5 },
+    { flow: 37.5, head: 26.2, efficiency: 70, npsh: 5.7, power: 15.6 },
+    { flow: 45, head: 22.5, efficiency: 69, npsh: 7.7, power: 17.2 },
+    { flow: 52.5, head: 18.0, efficiency: 63, npsh: 10.0, power: 18.4 },
+    { flow: 60, head: 13.0, efficiency: 53, npsh: 12.5, power: 19.0 },
+  ],
+  // FBCN 100-160 - 1750 RPM (baseado na imagem 4)
+  'FBCN-100-160': [
+    { flow: 0, head: 19.5, efficiency: 0, npsh: 1.0, power: 0 },
+    { flow: 10, head: 19.0, efficiency: 42, npsh: 1.2, power: 3.0 },
+    { flow: 20, head: 18.0, efficiency: 60, npsh: 1.9, power: 5.5 },
+    { flow: 30, head: 16.2, efficiency: 70, npsh: 2.9, power: 7.8 },
+    { flow: 40, head: 14.0, efficiency: 75, npsh: 4.2, power: 9.6 },
+    { flow: 50, head: 11.0, efficiency: 73, npsh: 6.0, power: 11.0 },
+    { flow: 60, head: 7.5, efficiency: 60, npsh: 8.2, power: 11.8 },
+  ],
+  // FBCN 100-200 - 1750 RPM (baseado na imagem 4)
+  'FBCN-100-200': [
+    { flow: 0, head: 29.0, efficiency: 0, npsh: 1.1, power: 0 },
+    { flow: 10, head: 28.5, efficiency: 40, npsh: 1.4, power: 4.2 },
+    { flow: 20, head: 27.5, efficiency: 57, npsh: 2.1, power: 8.0 },
+    { flow: 30, head: 25.5, efficiency: 69, npsh: 3.1, power: 11.5 },
+    { flow: 40, head: 23.0, efficiency: 75, npsh: 4.5, power: 14.3 },
+    { flow: 50, head: 20.0, efficiency: 76, npsh: 6.2, power: 16.7 },
+    { flow: 60, head: 16.2, efficiency: 72, npsh: 8.5, power: 18.6 },
+    { flow: 70, head: 12.0, efficiency: 60, npsh: 11.0, power: 19.8 },
+  ],
+  // FBCN 100-250 - 1750 RPM (baseado na imagem 4)
+  'FBCN-100-250': [
+    { flow: 0, head: 35.5, efficiency: 0, npsh: 1.2, power: 0 },
+    { flow: 10, head: 35.0, efficiency: 38, npsh: 1.5, power: 5.0 },
+    { flow: 20, head: 34.0, efficiency: 54, npsh: 2.2, power: 9.5 },
+    { flow: 30, head: 32.2, efficiency: 66, npsh: 3.2, power: 13.6 },
+    { flow: 40, head: 30.0, efficiency: 73, npsh: 4.7, power: 17.4 },
+    { flow: 50, head: 27.0, efficiency: 76, npsh: 6.5, power: 20.5 },
+    { flow: 60, head: 23.5, efficiency: 74, npsh: 8.7, power: 23.0 },
+    { flow: 70, head: 19.5, efficiency: 69, npsh: 11.2, power: 25.0 },
+    { flow: 80, head: 15.0, efficiency: 59, npsh: 14.0, power: 26.2 },
+  ],
+  // FBCN 125-200 - 1750 RPM (baseado na imagem 4)
+  'FBCN-125-200': [
+    { flow: 0, head: 29.5, efficiency: 0, npsh: 1.2, power: 0 },
+    { flow: 12.5, head: 29.0, efficiency: 42, npsh: 1.6, power: 5.5 },
+    { flow: 25, head: 28.0, efficiency: 60, npsh: 2.4, power: 10.5 },
+    { flow: 37.5, head: 26.0, efficiency: 71, npsh: 3.5, power: 15.0 },
+    { flow: 50, head: 23.5, efficiency: 77, npsh: 5.0, power: 19.0 },
+    { flow: 62.5, head: 20.5, efficiency: 78, npsh: 7.0, power: 22.0 },
+    { flow: 75, head: 16.7, efficiency: 73, npsh: 9.5, power: 24.5 },
+    { flow: 87.5, head: 12.5, efficiency: 60, npsh: 12.5, power: 26.0 },
+  ],
+  // FBCN 125-250 - 1750 RPM (baseado na imagem 4)
+  'FBCN-125-250': [
+    { flow: 0, head: 36.0, efficiency: 0, npsh: 1.5, power: 0 },
+    { flow: 12.5, head: 35.5, efficiency: 39, npsh: 1.7, power: 7.0 },
+    { flow: 25, head: 34.5, efficiency: 58, npsh: 2.5, power: 13.0 },
+    { flow: 37.5, head: 32.7, efficiency: 69, npsh: 3.7, power: 18.5 },
+    { flow: 50, head: 30.5, efficiency: 75, npsh: 5.2, power: 23.2 },
+    { flow: 62.5, head: 27.5, efficiency: 78, npsh: 7.2, power: 27.5 },
+    { flow: 75, head: 24.0, efficiency: 76, npsh: 9.7, power: 31.0 },
+    { flow: 87.5, head: 20.0, efficiency: 70, npsh: 12.5, power: 33.5 },
+    { flow: 100, head: 15.5, efficiency: 60, npsh: 15.5, power: 35.0 },
+  ],
+  // FBCN 150-250 - 1750 RPM (baseado na imagem 4)
+  'FBCN-150-250': [
+    { flow: 0, head: 36.5, efficiency: 0, npsh: 1.7, power: 0 },
+    { flow: 15, head: 36.0, efficiency: 41, npsh: 2.0, power: 8.5 },
+    { flow: 30, head: 35.0, efficiency: 60, npsh: 2.7, power: 16.0 },
+    { flow: 45, head: 33.0, efficiency: 71, npsh: 4.0, power: 23.0 },
+    { flow: 60, head: 30.7, efficiency: 77, npsh: 6.0, power: 29.5 },
+    { flow: 75, head: 28.0, efficiency: 79, npsh: 8.0, power: 35.0 },
+    { flow: 90, head: 24.5, efficiency: 78, npsh: 10.5, power: 39.5 },
+    { flow: 105, head: 20.5, efficiency: 72, npsh: 13.5, power: 43.0 },
+    { flow: 120, head: 15.7, efficiency: 60, npsh: 17.0, power: 45.0 },
+  ],
+  // FBCN 150-400 - 1750 RPM (baseado na imagem 1 - modelos grandes)
+  'FBCN-150-400': [
+    { flow: 0, head: 55.0, efficiency: 0, npsh: 2.2, power: 0 },
+    { flow: 15, head: 54.5, efficiency: 38, npsh: 2.5, power: 12.0 },
+    { flow: 30, head: 53.2, efficiency: 54, npsh: 3.2, power: 23.0 },
+    { flow: 45, head: 51.2, efficiency: 65, npsh: 4.5, power: 33.0 },
+    { flow: 60, head: 48.2, efficiency: 73, npsh: 6.5, power: 42.0 },
+    { flow: 75, head: 44.5, efficiency: 77, npsh: 8.7, power: 50.0 },
+    { flow: 90, head: 40.0, efficiency: 78, npsh: 11.5, power: 57.0 },
+    { flow: 105, head: 35.0, efficiency: 75, npsh: 14.5, power: 62.0 },
+    { flow: 120, head: 29.2, efficiency: 69, npsh: 18.0, power: 66.0 },
+    { flow: 135, head: 23.0, efficiency: 59, npsh: 22.0, power: 69.0 },
+  ],
+  // FBCN 200-400 - 1750 RPM (baseado na imagem 1 - modelos grandes)
+  'FBCN-200-400': [
+    { flow: 0, head: 55.5, efficiency: 0, npsh: 2.5, power: 0 },
+    { flow: 20, head: 55.0, efficiency: 40, npsh: 2.7, power: 16.0 },
+    { flow: 40, head: 53.7, efficiency: 55, npsh: 3.5, power: 30.0 },
+    { flow: 60, head: 51.7, efficiency: 67, npsh: 5.0, power: 43.0 },
+    { flow: 80, head: 48.7, efficiency: 75, npsh: 7.0, power: 55.0 },
+    { flow: 100, head: 45.0, efficiency: 79, npsh: 9.2, power: 66.0 },
+    { flow: 120, head: 40.5, efficiency: 80, npsh: 12.0, power: 75.0 },
+    { flow: 140, head: 35.5, efficiency: 77, npsh: 15.0, power: 83.0 },
+    { flow: 160, head: 29.5, efficiency: 71, npsh: 18.5, power: 88.0 },
+    { flow: 180, head: 23.0, efficiency: 61, npsh: 22.5, power: 92.0 },
+  ],
+  // FBCN 250-500 - 1750 RPM (baseado na imagem 1 - modelos grandes)
+  'FBCN-250-500': [
+    { flow: 0, head: 62.5, efficiency: 0, npsh: 3.0, power: 0 },
+    { flow: 25, head: 61.7, efficiency: 38, npsh: 3.2, power: 22.0 },
+    { flow: 50, head: 60.5, efficiency: 54, npsh: 4.2, power: 42.0 },
+    { flow: 75, head: 58.2, efficiency: 65, npsh: 6.0, power: 60.0 },
+    { flow: 100, head: 55.0, efficiency: 73, npsh: 8.0, power: 77.0 },
+    { flow: 125, head: 51.0, efficiency: 78, npsh: 10.5, power: 92.0 },
+    { flow: 150, head: 46.2, efficiency: 80, npsh: 13.5, power: 104.0 },
+    { flow: 175, head: 40.7, efficiency: 78, npsh: 17.0, power: 115.0 },
+    { flow: 200, head: 34.5, efficiency: 72, npsh: 21.0, power: 122.0 },
+    { flow: 225, head: 27.5, efficiency: 63, npsh: 25.5, power: 127.0 },
+  ],
+};
+
+// 2. FBOT - Bomba de Óleo Térmico - 3500 RPM
+const fbotPumpCurves3500: Record<string, PumpCurvePoint[]> = {
+  // FBOT 32-200
+  'FBOT-32-200': [
+    { flow: 0, head: 105.0, efficiency: 0, npsh: 0.8, power: 0 },
+    { flow: 3, head: 104.0, efficiency: 18, npsh: 0.9, power: 1.7 },
+    { flow: 6, head: 102.0, efficiency: 32, npsh: 1.2, power: 3.3 },
+    { flow: 9, head: 98.0, efficiency: 44, npsh: 1.8, power: 4.8 },
+    { flow: 12, head: 93.0, efficiency: 54, npsh: 2.6, power: 6.2 },
+    { flow: 15, head: 86.0, efficiency: 60, npsh: 3.6, power: 7.5 },
+    { flow: 18, head: 77.0, efficiency: 62, npsh: 4.8, power: 8.6 },
+    { flow: 21, head: 66.0, efficiency: 60, npsh: 6.2, power: 9.5 },
+    { flow: 24, head: 53.0, efficiency: 54, npsh: 7.8, power: 10.2 },
+    { flow: 27, head: 38.0, efficiency: 44, npsh: 9.6, power: 10.8 },
+  ],
+  // FBOT 32-250
+  'FBOT-32-250': [
+    { flow: 0, head: 130.0, efficiency: 0, npsh: 1.0, power: 0 },
+    { flow: 3, head: 129.0, efficiency: 16, npsh: 1.1, power: 2.0 },
+    { flow: 6, head: 127.0, efficiency: 29, npsh: 1.4, power: 3.8 },
+    { flow: 9, head: 123.0, efficiency: 41, npsh: 2.0, power: 5.6 },
+    { flow: 12, head: 118.0, efficiency: 50, npsh: 2.8, power: 7.4 },
+    { flow: 15, head: 112.0, efficiency: 56, npsh: 3.8, power: 9.0 },
+    { flow: 18, head: 104.0, efficiency: 60, npsh: 5.0, power: 10.5 },
+    { flow: 21, head: 94.0, efficiency: 61, npsh: 6.5, power: 11.8 },
+    { flow: 24, head: 82.0, efficiency: 59, npsh: 8.2, power: 13.0 },
+    { flow: 27, head: 68.0, efficiency: 53, npsh: 10.1, power: 13.8 },
+    { flow: 30, head: 52.0, efficiency: 44, npsh: 12.2, power: 14.5 },
+  ],
+  // FBOT 32-250.1
+  'FBOT-32-250.1': [
+    { flow: 0, head: 132.0, efficiency: 0, npsh: 1.0, power: 0 },
+    { flow: 3, head: 131.0, efficiency: 16, npsh: 1.1, power: 2.0 },
+    { flow: 6, head: 129.0, efficiency: 29, npsh: 1.4, power: 3.9 },
+    { flow: 9, head: 125.0, efficiency: 41, npsh: 2.0, power: 5.7 },
+    { flow: 12, head: 120.0, efficiency: 50, npsh: 2.8, power: 7.5 },
+    { flow: 15, head: 114.0, efficiency: 56, npsh: 3.8, power: 9.2 },
+    { flow: 18, head: 106.0, efficiency: 60, npsh: 5.0, power: 10.7 },
+    { flow: 21, head: 96.0, efficiency: 61, npsh: 6.5, power: 12.0 },
+    { flow: 24, head: 84.0, efficiency: 59, npsh: 8.2, power: 13.2 },
+    { flow: 27, head: 70.0, efficiency: 53, npsh: 10.1, power: 14.0 },
+    { flow: 30, head: 54.0, efficiency: 44, npsh: 12.2, power: 14.7 },
+  ],
+  // FBOT 40-160
+  'FBOT-40-160': [
+    { flow: 0, head: 72.0, efficiency: 0, npsh: 0.8, power: 0 },
+    { flow: 5, head: 70.5, efficiency: 25, npsh: 1.0, power: 2.5 },
+    { flow: 10, head: 67.0, efficiency: 45, npsh: 1.5, power: 4.5 },
+    { flow: 15, head: 61.5, efficiency: 58, npsh: 2.3, power: 6.2 },
+    { flow: 20, head: 54.0, efficiency: 63, npsh: 3.4, power: 7.7 },
+    { flow: 25, head: 44.5, efficiency: 62, npsh: 4.8, power: 8.9 },
+    { flow: 30, head: 33.0, efficiency: 55, npsh: 6.5, power: 9.8 },
+    { flow: 35, head: 19.5, efficiency: 42, npsh: 8.5, power: 10.4 },
+  ],
+  // FBOT 40-200
+  'FBOT-40-200': [
+    { flow: 0, head: 108.0, efficiency: 0, npsh: 1.0, power: 0 },
+    { flow: 5, head: 106.0, efficiency: 23, npsh: 1.2, power: 3.5 },
+    { flow: 10, head: 102.0, efficiency: 42, npsh: 1.8, power: 6.5 },
+    { flow: 15, head: 95.0, efficiency: 55, npsh: 2.7, power: 9.2 },
+    { flow: 20, head: 86.0, efficiency: 62, npsh: 4.0, power: 11.6 },
+    { flow: 25, head: 74.0, efficiency: 64, npsh: 5.6, power: 13.5 },
+    { flow: 30, head: 60.0, efficiency: 62, npsh: 7.6, power: 15.0 },
+    { flow: 35, head: 44.0, efficiency: 55, npsh: 9.8, power: 16.0 },
+    { flow: 40, head: 26.0, efficiency: 42, npsh: 12.4, power: 16.7 },
+  ],
+  // FBOT 40-250
+  'FBOT-40-250': [
+    { flow: 0, head: 132.0, efficiency: 0, npsh: 1.2, power: 0 },
+    { flow: 5, head: 130.0, efficiency: 21, npsh: 1.4, power: 4.3 },
+    { flow: 10, head: 126.0, efficiency: 38, npsh: 2.0, power: 8.0 },
+    { flow: 15, head: 120.0, efficiency: 51, npsh: 3.0, power: 11.5 },
+    { flow: 20, head: 110.0, efficiency: 59, npsh: 4.4, power: 14.5 },
+    { flow: 25, head: 98.0, efficiency: 62, npsh: 6.2, power: 17.0 },
+    { flow: 30, head: 84.0, efficiency: 61, npsh: 8.4, power: 19.0 },
+    { flow: 35, head: 68.0, efficiency: 56, npsh: 11.0, power: 20.5 },
+    { flow: 40, head: 50.0, efficiency: 48, npsh: 14.0, power: 21.5 },
+    { flow: 45, head: 30.0, efficiency: 35, npsh: 17.5, power: 22.0 },
+  ],
+  // FBOT 40-25
+  'FBOT-40-25': [
+    { flow: 0, head: 45, efficiency: 0, npsh: 0.8, power: 0 },
+    { flow: 5, head: 44, efficiency: 18, npsh: 1.0, power: 1.2 },
+    { flow: 10, head: 42, efficiency: 35, npsh: 1.3, power: 2.4 },
+    { flow: 15, head: 38, efficiency: 50, npsh: 1.8, power: 3.5 },
+    { flow: 20, head: 33, efficiency: 60, npsh: 2.5, power: 4.3 },
+    { flow: 25, head: 27, efficiency: 58, npsh: 3.3, power: 5.1 },
+    { flow: 30, head: 20, efficiency: 50, npsh: 4.2, power: 5.8 },
+  ],
+  // FBOT 50-160
+  'FBOT-50-160': [
+    { flow: 0, head: 75.0, efficiency: 0, npsh: 1.0, power: 0 },
+    { flow: 10, head: 73.0, efficiency: 30, npsh: 1.4, power: 4.8 },
+    { flow: 20, head: 68.0, efficiency: 50, npsh: 2.2, power: 8.5 },
+    { flow: 30, head: 60.0, efficiency: 62, npsh: 3.5, power: 11.5 },
+    { flow: 40, head: 49.0, efficiency: 65, npsh: 5.3, power: 13.8 },
+    { flow: 50, head: 35.0, efficiency: 60, npsh: 7.5, power: 15.5 },
+    { flow: 60, head: 18.0, efficiency: 45, npsh: 10.0, power: 16.5 },
+  ],
+  // FBOT 50-200
+  'FBOT-50-200': [
+    { flow: 0, head: 110.0, efficiency: 0, npsh: 1.2, power: 0 },
+    { flow: 10, head: 108.0, efficiency: 28, npsh: 1.6, power: 6.0 },
+    { flow: 20, head: 102.0, efficiency: 47, npsh: 2.4, power: 11.5 },
+    { flow: 30, head: 93.0, efficiency: 58, npsh: 3.8, power: 16.0 },
+    { flow: 40, head: 82.0, efficiency: 64, npsh: 5.8, power: 20.0 },
+    { flow: 50, head: 68.0, efficiency: 65, npsh: 8.4, power: 23.0 },
+    { flow: 60, head: 50.0, efficiency: 62, npsh: 11.6, power: 25.5 },
+    { flow: 70, head: 30.0, efficiency: 48, npsh: 15.2, power: 27.0 },
+  ],
+  // FBOT 50-250
+  'FBOT-50-250': [
+    { flow: 0, head: 135.0, efficiency: 0, npsh: 1.5, power: 0 },
+    { flow: 10, head: 133.0, efficiency: 26, npsh: 1.8, power: 7.5 },
+    { flow: 20, head: 128.0, efficiency: 45, npsh: 2.7, power: 14.0 },
+    { flow: 30, head: 120.0, efficiency: 56, npsh: 4.0, power: 19.5 },
+    { flow: 40, head: 110.0, efficiency: 62, npsh: 6.0, power: 24.5 },
+    { flow: 50, head: 96.0, efficiency: 64, npsh: 8.5, power: 28.5 },
+    { flow: 60, head: 80.0, efficiency: 63, npsh: 11.5, power: 32.0 },
+    { flow: 70, head: 60.0, efficiency: 58, npsh: 15.0, power: 34.5 },
+    { flow: 80, head: 38.0, efficiency: 45, npsh: 19.0, power: 36.0 },
+  ],
+  // FBOT 65-125
+  'FBOT-65-125': [
+    { flow: 0, head: 58.0, efficiency: 0, npsh: 1.2, power: 0 },
+    { flow: 15, head: 56.0, efficiency: 38, npsh: 1.6, power: 5.5 },
+    { flow: 30, head: 51.0, efficiency: 56, npsh: 2.5, power: 9.5 },
+    { flow: 45, head: 43.0, efficiency: 65, npsh: 4.0, power: 12.5 },
+    { flow: 60, head: 32.0, efficiency: 64, npsh: 6.0, power: 14.8 },
+    { flow: 75, head: 18.0, efficiency: 52, npsh: 8.5, power: 16.2 },
+  ],
+  // FBOT 65-160
+  'FBOT-65-160': [
+    { flow: 0, head: 76.0, efficiency: 0, npsh: 1.5, power: 0 },
+    { flow: 15, head: 74.0, efficiency: 36, npsh: 1.9, power: 7.0 },
+    { flow: 30, head: 69.0, efficiency: 54, npsh: 2.9, power: 12.5 },
+    { flow: 45, head: 60.0, efficiency: 64, npsh: 4.5, power: 17.0 },
+    { flow: 60, head: 48.0, efficiency: 67, npsh: 6.8, power: 20.5 },
+    { flow: 75, head: 33.0, efficiency: 62, npsh: 9.8, power: 23.0 },
+    { flow: 90, head: 15.0, efficiency: 45, npsh: 13.5, power: 24.5 },
+  ],
+  // FBOT 65-200
+  'FBOT-65-200': [
+    { flow: 0, head: 112.0, efficiency: 0, npsh: 1.8, power: 0 },
+    { flow: 15, head: 110.0, efficiency: 33, npsh: 2.2, power: 9.5 },
+    { flow: 30, head: 105.0, efficiency: 51, npsh: 3.2, power: 17.0 },
+    { flow: 45, head: 96.0, efficiency: 62, npsh: 4.8, power: 23.5 },
+    { flow: 60, head: 84.0, efficiency: 67, npsh: 7.0, power: 28.5 },
+    { flow: 75, head: 68.0, efficiency: 66, npsh: 10.0, power: 32.5 },
+    { flow: 90, head: 50.0, efficiency: 60, npsh: 13.5, power: 35.5 },
+    { flow: 105, head: 28.0, efficiency: 45, npsh: 17.5, power: 37.0 },
+  ],
+  // FBOT 65-250
+  'FBOT-65-250': [
+    { flow: 0, head: 138.0, efficiency: 0, npsh: 2.2, power: 0 },
+    { flow: 15, head: 136.0, efficiency: 30, npsh: 2.6, power: 11.5 },
+    { flow: 30, head: 130.0, efficiency: 48, npsh: 3.5, power: 21.0 },
+    { flow: 45, head: 122.0, efficiency: 59, npsh: 5.0, power: 29.0 },
+    { flow: 60, head: 110.0, efficiency: 65, npsh: 7.2, power: 35.5 },
+    { flow: 75, head: 94.0, efficiency: 66, npsh: 10.2, power: 40.5 },
+    { flow: 90, head: 76.0, efficiency: 63, npsh: 13.5, power: 44.5 },
+    { flow: 105, head: 56.0, efficiency: 56, npsh: 17.5, power: 47.0 },
+    { flow: 120, head: 32.0, efficiency: 42, npsh: 22.0, power: 48.5 },
+  ],
+  // FBOT 80-160
+  'FBOT-80-160': [
+    { flow: 0, head: 78.0, efficiency: 0, npsh: 1.5, power: 0 },
+    { flow: 20, head: 76.0, efficiency: 35, npsh: 2.0, power: 8.5 },
+    { flow: 40, head: 70.0, efficiency: 53, npsh: 3.0, power: 15.0 },
+    { flow: 60, head: 62.0, efficiency: 65, npsh: 4.5, power: 20.5 },
+    { flow: 80, head: 50.0, efficiency: 68, npsh: 6.5, power: 25.0 },
+    { flow: 100, head: 35.0, efficiency: 62, npsh: 9.0, power: 28.0 },
+    { flow: 120, head: 18.0, efficiency: 45, npsh: 12.0, power: 30.0 },
+  ],
+  // FBOT 80-200
+  'FBOT-80-200': [
+    { flow: 0, head: 114.0, efficiency: 0, npsh: 2.0, power: 0 },
+    { flow: 20, head: 112.0, efficiency: 33, npsh: 2.5, power: 12.5 },
+    { flow: 40, head: 106.0, efficiency: 52, npsh: 3.6, power: 22.5 },
+    { flow: 60, head: 96.0, efficiency: 63, npsh: 5.2, power: 31.0 },
+    { flow: 80, head: 84.0, efficiency: 68, npsh: 7.5, power: 38.0 },
+    { flow: 100, head: 68.0, efficiency: 69, npsh: 10.5, power: 43.5 },
+    { flow: 120, head: 50.0, efficiency: 62, npsh: 14.0, power: 47.5 },
+    { flow: 140, head: 28.0, efficiency: 45, npsh: 18.0, power: 50.0 },
+  ],
+  // FBOT 80-250
+  'FBOT-80-250': [
+    { flow: 0, head: 140.0, efficiency: 0, npsh: 2.4, power: 0 },
+    { flow: 20, head: 138.0, efficiency: 32, npsh: 2.8, power: 15.0 },
+    { flow: 40, head: 132.0, efficiency: 50, npsh: 4.0, power: 27.0 },
+    { flow: 60, head: 122.0, efficiency: 61, npsh: 5.8, power: 37.5 },
+    { flow: 80, head: 110.0, efficiency: 67, npsh: 8.0, power: 46.0 },
+    { flow: 100, head: 94.0, efficiency: 69, npsh: 11.0, power: 52.5 },
+    { flow: 120, head: 76.0, efficiency: 66, npsh: 14.5, power: 57.5 },
+    { flow: 140, head: 54.0, efficiency: 57, npsh: 18.5, power: 61.0 },
+    { flow: 160, head: 30.0, efficiency: 40, npsh: 23.0, power: 63.0 },
+  ],
+  // FBOT 100-200
+  'FBOT-100-200': [
+    { flow: 0, head: 116.0, efficiency: 0, npsh: 2.5, power: 0 },
+    { flow: 25, head: 114.0, efficiency: 36, npsh: 3.0, power: 16.5 },
+    { flow: 50, head: 108.0, efficiency: 54, npsh: 4.2, power: 30.0 },
+    { flow: 75, head: 99.0, efficiency: 65, npsh: 6.0, power: 42.0 },
+    { flow: 100, head: 87.0, efficiency: 71, npsh: 8.5, power: 51.0 },
+    { flow: 125, head: 72.0, efficiency: 72, npsh: 11.5, power: 58.5 },
+    { flow: 150, head: 54.0, efficiency: 66, npsh: 15.0, power: 63.5 },
+    { flow: 175, head: 32.0, efficiency: 50, npsh: 19.0, power: 67.0 },
+  ],
+  // FBOT 100-250
+  'FBOT-100-250': [
+    { flow: 0, head: 142.0, efficiency: 0, npsh: 3.0, power: 0 },
+    { flow: 25, head: 140.0, efficiency: 34, npsh: 3.5, power: 20.0 },
+    { flow: 50, head: 134.0, efficiency: 52, npsh: 4.8, power: 37.0 },
+    { flow: 75, head: 125.0, efficiency: 63, npsh: 6.8, power: 52.0 },
+    { flow: 100, head: 113.0, efficiency: 69, npsh: 9.5, power: 64.0 },
+    { flow: 125, head: 98.0, efficiency: 72, npsh: 12.5, power: 73.5 },
+    { flow: 150, head: 80.0, efficiency: 70, npsh: 16.0, power: 81.0 },
+    { flow: 175, head: 58.0, efficiency: 62, npsh: 20.0, power: 86.0 },
+    { flow: 200, head: 33.0, efficiency: 45, npsh: 24.5, power: 89.0 },
+  ],
+  // FBOT 125-250
+  'FBOT-125-250': [
+    { flow: 0, head: 144.0, efficiency: 0, npsh: 3.2, power: 0 },
+    { flow: 30, head: 142.0, efficiency: 35, npsh: 3.8, power: 25.0 },
+    { flow: 60, head: 136.0, efficiency: 53, npsh: 5.2, power: 45.5 },
+    { flow: 90, head: 127.0, efficiency: 64, npsh: 7.5, power: 64.5 },
+    { flow: 120, head: 114.0, efficiency: 71, npsh: 10.5, power: 80.0 },
+    { flow: 150, head: 98.0, efficiency: 73, npsh: 14.0, power: 91.5 },
+    { flow: 180, head: 80.0, efficiency: 71, npsh: 18.0, power: 100.5 },
+    { flow: 210, head: 58.0, efficiency: 61, npsh: 22.5, power: 106.5 },
+    { flow: 240, head: 33.0, efficiency: 45, npsh: 27.5, power: 110.0 },
+  ],
+  // FBOT 150-400 (baseado na imagem 1 e 2)
+  'FBOT-150-400': [
+    { flow: 0, head: 220.0, efficiency: 0, npsh: 4.5, power: 0 },
+    { flow: 30, head: 218.0, efficiency: 35, npsh: 5.0, power: 48.0 },
+    { flow: 60, head: 213.0, efficiency: 52, npsh: 6.5, power: 90.0 },
+    { flow: 90, head: 205.0, efficiency: 63, npsh: 9.0, power: 130.0 },
+    { flow: 120, head: 193.0, efficiency: 70, npsh: 12.0, power: 165.0 },
+    { flow: 150, head: 178.0, efficiency: 73, npsh: 16.0, power: 195.0 },
+    { flow: 180, head: 160.0, efficiency: 72, npsh: 20.5, power: 220.0 },
+    { flow: 210, head: 140.0, efficiency: 68, npsh: 25.5, power: 240.0 },
+    { flow: 240, head: 117.0, efficiency: 60, npsh: 31.0, power: 255.0 },
+    { flow: 270, head: 92.0, efficiency: 49, npsh: 37.0, power: 265.0 },
+  ],
+  // FBOT 150-500 (baseado na imagem 1)
+  'FBOT-150-500': [
+    { flow: 0, head: 245.0, efficiency: 0, npsh: 5.0, power: 0 },
+    { flow: 30, head: 243.0, efficiency: 33, npsh: 5.5, power: 54.0 },
+    { flow: 60, head: 238.0, efficiency: 50, npsh: 7.0, power: 100.0 },
+    { flow: 90, head: 230.0, efficiency: 62, npsh: 9.5, power: 145.0 },
+    { flow: 120, head: 218.0, efficiency: 68, npsh: 13.0, power: 185.0 },
+    { flow: 150, head: 204.0, efficiency: 72, npsh: 17.0, power: 220.0 },
+    { flow: 180, head: 187.0, efficiency: 71, npsh: 21.5, power: 250.0 },
+    { flow: 210, head: 167.0, efficiency: 68, npsh: 26.5, power: 275.0 },
+    { flow: 240, head: 144.0, efficiency: 62, npsh: 32.0, power: 295.0 },
+    { flow: 270, head: 120.0, efficiency: 54, npsh: 38.0, power: 310.0 },
+    { flow: 300, head: 92.0, efficiency: 43, npsh: 44.5, power: 320.0 },
+  ],
+  // FBOT 200-500 (baseado na imagem 1)
+  'FBOT-200-500': [
+    { flow: 0, head: 248.0, efficiency: 0, npsh: 5.5, power: 0 },
+    { flow: 40, head: 245.0, efficiency: 35, npsh: 6.0, power: 75.0 },
+    { flow: 80, head: 239.0, efficiency: 52, npsh: 8.0, power: 140.0 },
+    { flow: 120, head: 228.0, efficiency: 63, npsh: 11.0, power: 200.0 },
+    { flow: 160, head: 214.0, efficiency: 70, npsh: 15.0, power: 255.0 },
+    { flow: 200, head: 196.0, efficiency: 74, npsh: 19.5, power: 300.0 },
+    { flow: 240, head: 176.0, efficiency: 73, npsh: 24.5, power: 340.0 },
+    { flow: 280, head: 152.0, efficiency: 69, npsh: 30.0, power: 370.0 },
+    { flow: 320, head: 126.0, efficiency: 62, npsh: 36.0, power: 395.0 },
+    { flow: 360, head: 98.0, efficiency: 52, npsh: 43.0, power: 415.0 },
+    { flow: 400, head: 68.0, efficiency: 38, npsh: 50.0, power: 425.0 },
+  ],
+  // FBOT 250-500 (baseado na imagem 1)
+  'FBOT-250-500': [
+    { flow: 0, head: 250.0, efficiency: 0, npsh: 6.0, power: 0 },
+    { flow: 50, head: 247.0, efficiency: 36, npsh: 6.5, power: 90.0 },
+    { flow: 100, head: 240.0, efficiency: 53, npsh: 8.5, power: 165.0 },
+    { flow: 150, head: 230.0, efficiency: 64, npsh: 12.0, power: 235.0 },
+    { flow: 200, head: 215.0, efficiency: 72, npsh: 16.0, power: 300.0 },
+    { flow: 250, head: 198.0, efficiency: 75, npsh: 21.0, power: 350.0 },
+    { flow: 300, head: 178.0, efficiency: 74, npsh: 26.0, power: 395.0 },
+    { flow: 350, head: 154.0, efficiency: 70, npsh: 32.0, power: 435.0 },
+    { flow: 400, head: 128.0, efficiency: 64, npsh: 38.0, power: 465.0 },
+    { flow: 450, head: 100.0, efficiency: 55, npsh: 45.0, power: 490.0 },
+    { flow: 500, head: 70.0, efficiency: 40, npsh: 52.0, power: 505.0 },
+  ],
+  // FBOT 200-400 (baseado na imagem 1)
+  'FBOT-200-400': [
+    { flow: 0, head: 222.0, efficiency: 0, npsh: 5.0, power: 0 },
+    { flow: 40, head: 220.0, efficiency: 37, npsh: 5.5, power: 65.0 },
+    { flow: 80, head: 215.0, efficiency: 54, npsh: 7.0, power: 125.0 },
+    { flow: 120, head: 207.0, efficiency: 65, npsh: 10.0, power: 180.0 },
+    { flow: 160, head: 195.0, efficiency: 72, npsh: 14.0, power: 230.0 },
+    { flow: 200, head: 180.0, efficiency: 75, npsh: 18.5, power: 275.0 },
+    { flow: 240, head: 162.0, efficiency: 74, npsh: 24.0, power: 310.0 },
+    { flow: 280, head: 142.0, efficiency: 70, npsh: 30.0, power: 340.0 },
+    { flow: 320, head: 118.0, efficiency: 62, npsh: 37.0, power: 365.0 },
+    { flow: 360, head: 92.0, efficiency: 52, npsh: 45.0, power: 380.0 },
+  ],
+  // FBOT 250-400 (baseado na imagem 1)
+  'FBOT-250-400': [
+    { flow: 0, head: 224.0, efficiency: 0, npsh: 5.5, power: 0 },
+    { flow: 50, head: 221.0, efficiency: 38, npsh: 6.0, power: 75.0 },
+    { flow: 100, head: 215.0, efficiency: 55, npsh: 8.0, power: 145.0 },
+    { flow: 150, head: 205.0, efficiency: 66, npsh: 11.0, power: 205.0 },
+    { flow: 200, head: 192.0, efficiency: 73, npsh: 15.0, power: 260.0 },
+    { flow: 250, head: 176.0, efficiency: 76, npsh: 19.5, power: 310.0 },
+    { flow: 300, head: 156.0, efficiency: 75, npsh: 25.0, power: 345.0 },
+    { flow: 350, head: 134.0, efficiency: 70, npsh: 31.0, power: 375.0 },
+    { flow: 400, head: 110.0, efficiency: 62, npsh: 38.0, power: 400.0 },
+    { flow: 450, head: 84.0, efficiency: 50, npsh: 46.0, power: 415.0 },
+  ],
+  // FBOT 200-315 (baseado na imagem 1)
+  'FBOT-200-315': [
+    { flow: 0, head: 185.0, efficiency: 0, npsh: 4.5, power: 0 },
+    { flow: 40, head: 183.0, efficiency: 38, npsh: 5.0, power: 55.0 },
+    { flow: 80, head: 178.0, efficiency: 55, npsh: 7.0, power: 105.0 },
+    { flow: 120, head: 170.0, efficiency: 66, npsh: 9.5, power: 150.0 },
+    { flow: 160, head: 160.0, efficiency: 72, npsh: 13.0, power: 190.0 },
+    { flow: 200, head: 147.0, efficiency: 75, npsh: 17.0, power: 225.0 },
+    { flow: 240, head: 131.0, efficiency: 74, npsh: 22.0, power: 255.0 },
+    { flow: 280, head: 112.0, efficiency: 70, npsh: 27.5, power: 280.0 },
+    { flow: 320, head: 90.0, efficiency: 60, npsh: 34.0, power: 295.0 },
+    { flow: 360, head: 65.0, efficiency: 47, npsh: 41.0, power: 305.0 },
+  ],
+  // FBOT 250-315 (baseado na imagem 1)
+  'FBOT-250-315': [
+    { flow: 0, head: 187.0, efficiency: 0, npsh: 5.0, power: 0 },
+    { flow: 50, head: 184.0, efficiency: 39, npsh: 5.5, power: 65.0 },
+    { flow: 100, head: 178.0, efficiency: 56, npsh: 7.5, power: 120.0 },
+    { flow: 150, head: 169.0, efficiency: 67, npsh: 10.5, power: 170.0 },
+    { flow: 200, head: 157.0, efficiency: 74, npsh: 14.0, power: 215.0 },
+    { flow: 250, head: 143.0, efficiency: 76, npsh: 18.5, power: 255.0 },
+    { flow: 300, head: 125.0, efficiency: 75, npsh: 23.5, power: 285.0 },
+    { flow: 350, head: 105.0, efficiency: 69, npsh: 29.0, power: 310.0 },
+    { flow: 400, head: 83.0, efficiency: 60, npsh: 36.0, power: 325.0 },
+    { flow: 450, head: 58.0, efficiency: 46, npsh: 43.0, power: 335.0 },
+  ],
+  // FBOT 200-250 (baseado na imagem 1)
+  'FBOT-200-250': [
+    { flow: 0, head: 150.0, efficiency: 0, npsh: 4.0, power: 0 },
+    { flow: 40, head: 148.0, efficiency: 39, npsh: 4.5, power: 45.0 },
+    { flow: 80, head: 143.0, efficiency: 56, npsh: 6.5, power: 85.0 },
+    { flow: 120, head: 135.0, efficiency: 67, npsh: 9.0, power: 120.0 },
+    { flow: 160, head: 125.0, efficiency: 74, npsh: 12.0, power: 150.0 },
+    { flow: 200, head: 112.0, efficiency: 76, npsh: 16.0, power: 175.0 },
+    { flow: 240, head: 97.0, efficiency: 74, npsh: 20.5, power: 195.0 },
+    { flow: 280, head: 80.0, efficiency: 69, npsh: 25.5, power: 215.0 },
+    { flow: 320, head: 60.0, efficiency: 58, npsh: 31.0, power: 225.0 },
+    { flow: 360, head: 38.0, efficiency: 42, npsh: 37.0, power: 235.0 },
+  ],
+  // FBOT 250-300 (baseado na imagem 1)
+  'FBOT-250-300': [
+    { flow: 0, head: 152.0, efficiency: 0, npsh: 4.5, power: 0 },
+    { flow: 50, head: 149.0, efficiency: 40, npsh: 5.0, power: 55.0 },
+    { flow: 100, head: 143.0, efficiency: 57, npsh: 7.0, power: 100.0 },
+    { flow: 150, head: 134.0, efficiency: 68, npsh: 9.5, power: 140.0 },
+    { flow: 200, head: 122.0, efficiency: 75, npsh: 13.0, power: 175.0 },
+    { flow: 250, head: 108.0, efficiency: 77, npsh: 17.0, power: 205.0 },
+    { flow: 300, head: 92.0, efficiency: 75, npsh: 22.0, power: 230.0 },
+    { flow: 350, head: 74.0, efficiency: 69, npsh: 27.5, power: 250.0 },
+    { flow: 400, head: 54.0, efficiency: 59, npsh: 33.5, power: 260.0 },
+    { flow: 450, head: 32.0, efficiency: 43, npsh: 40.0, power: 270.0 },
+  ],
+  // FBOT 300-340 (baseado na imagem 1)
+  'FBOT-300-340': [
+    { flow: 0, head: 155.0, efficiency: 0, npsh: 5.0, power: 0 },
+    { flow: 60, head: 152.0, efficiency: 41, npsh: 5.5, power: 65.0 },
+    { flow: 120, head: 146.0, efficiency: 58, npsh: 7.5, power: 120.0 },
+    { flow: 180, head: 137.0, efficiency: 69, npsh: 10.5, power: 170.0 },
+    { flow: 240, head: 125.0, efficiency: 76, npsh: 14.0, power: 215.0 },
+    { flow: 300, head: 111.0, efficiency: 78, npsh: 18.5, power: 255.0 },
+    { flow: 360, head: 95.0, efficiency: 76, npsh: 23.5, power: 285.0 },
+    { flow: 420, head: 77.0, efficiency: 71, npsh: 29.0, power: 310.0 },
+    { flow: 480, head: 57.0, efficiency: 62, npsh: 35.0, power: 325.0 },
+    { flow: 540, head: 35.0, efficiency: 46, npsh: 42.0, power: 335.0 },
+  ],
+};
+
+// FBOT - Bomba de Óleo Térmico - 1750 RPM
+const fbotPumpCurves1750: Record<string, PumpCurvePoint[]> = {
+  // FBOT 32-200 - 1750 RPM
+  'FBOT-32-200': [
+    { flow: 0, head: 26.3, efficiency: 0, npsh: 0.4, power: 0 },
+    { flow: 1.5, head: 26.0, efficiency: 16, npsh: 0.5, power: 0.45 },
+    { flow: 3, head: 25.5, efficiency: 28, npsh: 0.6, power: 0.85 },
+    { flow: 4.5, head: 24.5, efficiency: 40, npsh: 0.9, power: 1.25 },
+    { flow: 6, head: 23.3, efficiency: 50, npsh: 1.3, power: 1.60 },
+    { flow: 7.5, head: 21.5, efficiency: 56, npsh: 1.8, power: 1.90 },
+    { flow: 9, head: 19.3, efficiency: 58, npsh: 2.4, power: 2.20 },
+    { flow: 10.5, head: 16.5, efficiency: 56, npsh: 3.1, power: 2.45 },
+    { flow: 12, head: 13.3, efficiency: 50, npsh: 3.9, power: 2.65 },
+    { flow: 13.5, head: 9.5, efficiency: 40, npsh: 4.8, power: 2.80 },
+  ],
+  // FBOT 32-250 - 1750 RPM (baseado na imagem 1 e 2)
+  'FBOT-32-250': [
+    { flow: 0, head: 32.5, efficiency: 0, npsh: 0.5, power: 0 },
+    { flow: 1.5, head: 32.2, efficiency: 14, npsh: 0.6, power: 0.55 },
+    { flow: 3, head: 31.7, efficiency: 26, npsh: 0.7, power: 1.05 },
+    { flow: 4.5, head: 30.7, efficiency: 37, npsh: 1.0, power: 1.52 },
+    { flow: 6, head: 29.5, efficiency: 46, npsh: 1.4, power: 1.95 },
+    { flow: 7.5, head: 28.0, efficiency: 52, npsh: 1.9, power: 2.35 },
+    { flow: 9, head: 26.0, efficiency: 55, npsh: 2.5, power: 2.70 },
+    { flow: 10.5, head: 23.5, efficiency: 54, npsh: 3.2, power: 3.00 },
+    { flow: 12, head: 20.5, efficiency: 51, npsh: 4.1, power: 3.25 },
+    { flow: 13.5, head: 17.0, efficiency: 45, npsh: 5.0, power: 3.45 },
+    { flow: 15, head: 13.0, efficiency: 36, npsh: 6.1, power: 3.60 },
+  ],
+  // FBOT 32-250.1 - 1750 RPM (baseado na imagem 1 e 2)
+  'FBOT-32-250.1': [
+    { flow: 0, head: 33.0, efficiency: 0, npsh: 0.5, power: 0 },
+    { flow: 1.5, head: 32.7, efficiency: 14, npsh: 0.6, power: 0.55 },
+    { flow: 3, head: 32.2, efficiency: 26, npsh: 0.7, power: 1.05 },
+    { flow: 4.5, head: 31.2, efficiency: 37, npsh: 1.0, power: 1.55 },
+    { flow: 6, head: 30.0, efficiency: 46, npsh: 1.4, power: 2.00 },
+    { flow: 7.5, head: 28.5, efficiency: 52, npsh: 1.9, power: 2.40 },
+    { flow: 9, head: 26.5, efficiency: 55, npsh: 2.5, power: 2.75 },
+    { flow: 10.5, head: 24.0, efficiency: 54, npsh: 3.2, power: 3.05 },
+    { flow: 12, head: 21.0, efficiency: 51, npsh: 4.1, power: 3.30 },
+    { flow: 13.5, head: 17.5, efficiency: 45, npsh: 5.0, power: 3.50 },
+    { flow: 15, head: 13.5, efficiency: 36, npsh: 6.1, power: 3.65 },
+  ],
+  // FBOT 40-160 - 1750 RPM
+  'FBOT-40-160': [
+    { flow: 0, head: 18.0, efficiency: 0, npsh: 0.4, power: 0 },
+    { flow: 2.5, head: 17.6, efficiency: 22, npsh: 0.5, power: 0.65 },
+    { flow: 5, head: 16.8, efficiency: 40, npsh: 0.8, power: 1.15 },
+    { flow: 7.5, head: 15.4, efficiency: 52, npsh: 1.2, power: 1.60 },
+    { flow: 10, head: 13.5, efficiency: 58, npsh: 1.7, power: 2.00 },
+    { flow: 12.5, head: 11.1, efficiency: 56, npsh: 2.4, power: 2.30 },
+    { flow: 15, head: 8.3, efficiency: 50, npsh: 3.3, power: 2.55 },
+    { flow: 17.5, head: 4.9, efficiency: 38, npsh: 4.3, power: 2.70 },
+  ],
+  // FBOT 40-200 - 1750 RPM (baseado na imagem 1 e 2)
+  'FBOT-40-200': [
+    { flow: 0, head: 27.0, efficiency: 0, npsh: 0.5, power: 0 },
+    { flow: 2.5, head: 26.6, efficiency: 21, npsh: 0.6, power: 0.8 },
+    { flow: 5, head: 25.5, efficiency: 38, npsh: 0.9, power: 1.5 },
+    { flow: 7.5, head: 23.8, efficiency: 49, npsh: 1.3, power: 2.1 },
+    { flow: 10, head: 21.5, efficiency: 56, npsh: 2.0, power: 2.7 },
+    { flow: 12.5, head: 18.5, efficiency: 58, npsh: 2.8, power: 3.2 },
+    { flow: 15, head: 15.0, efficiency: 55, npsh: 3.8, power: 3.6 },
+    { flow: 17.5, head: 11.0, efficiency: 48, npsh: 4.9, power: 3.9 },
+    { flow: 20, head: 6.5, efficiency: 35, npsh: 6.2, power: 4.1 },
+  ],
+  // FBOT 40-250 - 1750 RPM (baseado na imagem 1 e 2)
+  'FBOT-40-250': [
+    { flow: 0, head: 33.0, efficiency: 0, npsh: 0.6, power: 0 },
+    { flow: 2.5, head: 32.5, efficiency: 19, npsh: 0.7, power: 1.0 },
+    { flow: 5, head: 31.5, efficiency: 35, npsh: 1.0, power: 1.9 },
+    { flow: 7.5, head: 30.0, efficiency: 46, npsh: 1.5, power: 2.7 },
+    { flow: 10, head: 27.5, efficiency: 54, npsh: 2.2, power: 3.4 },
+    { flow: 12.5, head: 24.5, efficiency: 57, npsh: 3.1, power: 4.0 },
+    { flow: 15, head: 21.0, efficiency: 56, npsh: 4.2, power: 4.5 },
+    { flow: 17.5, head: 17.0, efficiency: 51, npsh: 5.5, power: 5.0 },
+    { flow: 20, head: 12.5, efficiency: 42, npsh: 7.0, power: 5.3 },
+    { flow: 22.5, head: 7.5, efficiency: 30, npsh: 8.7, power: 5.5 },
+  ],
+  // FBOT 40-25 - 1750 RPM
+  'FBOT-40-25': [
+    { flow: 0, head: 11.3, efficiency: 0, npsh: 0.4, power: 0 },
+    { flow: 2.5, head: 11.0, efficiency: 16, npsh: 0.5, power: 0.30 },
+    { flow: 5, head: 10.5, efficiency: 32, npsh: 0.7, power: 0.60 },
+    { flow: 7.5, head: 9.5, efficiency: 45, npsh: 0.9, power: 0.90 },
+    { flow: 10, head: 8.3, efficiency: 55, npsh: 1.3, power: 1.10 },
+    { flow: 12.5, head: 6.8, efficiency: 53, npsh: 1.7, power: 1.30 },
+    { flow: 15, head: 5.0, efficiency: 45, npsh: 2.1, power: 1.45 },
+  ],
+  // FBOT 50-160 - 1750 RPM
+  'FBOT-50-160': [
+    { flow: 0, head: 18.8, efficiency: 0, npsh: 0.5, power: 0 },
+    { flow: 5, head: 18.3, efficiency: 26, npsh: 0.7, power: 1.2 },
+    { flow: 10, head: 17.0, efficiency: 45, npsh: 1.1, power: 2.2 },
+    { flow: 15, head: 15.0, efficiency: 57, npsh: 1.8, power: 3.0 },
+    { flow: 20, head: 12.3, efficiency: 60, npsh: 2.7, power: 3.6 },
+    { flow: 25, head: 8.8, efficiency: 55, npsh: 3.8, power: 4.0 },
+    { flow: 30, head: 4.5, efficiency: 40, npsh: 5.0, power: 4.3 },
+  ],
+  // FBOT 50-200 - 1750 RPM (baseado na imagem 1 e 2)
+  'FBOT-50-200': [
+    { flow: 0, head: 27.5, efficiency: 0, npsh: 0.6, power: 0 },
+    { flow: 5, head: 27.0, efficiency: 25, npsh: 0.8, power: 1.5 },
+    { flow: 10, head: 25.5, efficiency: 43, npsh: 1.2, power: 2.8 },
+    { flow: 15, head: 23.2, efficiency: 54, npsh: 1.9, power: 3.9 },
+    { flow: 20, head: 20.5, efficiency: 60, npsh: 2.9, power: 4.9 },
+    { flow: 25, head: 17.0, efficiency: 61, npsh: 4.2, power: 5.7 },
+    { flow: 30, head: 12.5, efficiency: 56, npsh: 5.8, power: 6.3 },
+    { flow: 35, head: 7.5, efficiency: 45, npsh: 7.6, power: 6.7 },
+  ],
+  // FBOT 50-250 - 1750 RPM (baseado na imagem 1 e 2)
+  'FBOT-50-250': [
+    { flow: 0, head: 33.7, efficiency: 0, npsh: 0.7, power: 0 },
+    { flow: 5, head: 33.2, efficiency: 23, npsh: 0.9, power: 1.8 },
+    { flow: 10, head: 32.0, efficiency: 41, npsh: 1.3, power: 3.5 },
+    { flow: 15, head: 30.0, efficiency: 52, npsh: 2.0, power: 5.0 },
+    { flow: 20, head: 27.5, efficiency: 59, npsh: 3.0, power: 6.3 },
+    { flow: 25, head: 24.0, efficiency: 61, npsh: 4.2, power: 7.4 },
+    { flow: 30, head: 20.0, efficiency: 59, npsh: 5.7, power: 8.3 },
+    { flow: 35, head: 15.0, efficiency: 52, npsh: 7.5, power: 8.9 },
+    { flow: 40, head: 9.5, efficiency: 40, npsh: 9.5, power: 9.3 },
+  ],
+  // FBOT 65-125 - 1750 RPM
+  'FBOT-65-125': [
+    { flow: 0, head: 14.5, efficiency: 0, npsh: 0.6, power: 0 },
+    { flow: 7.5, head: 14.0, efficiency: 34, npsh: 0.8, power: 1.4 },
+    { flow: 15, head: 12.8, efficiency: 51, npsh: 1.3, power: 2.5 },
+    { flow: 22.5, head: 10.8, efficiency: 60, npsh: 2.0, power: 3.3 },
+    { flow: 30, head: 8.0, efficiency: 59, npsh: 3.0, power: 3.9 },
+    { flow: 37.5, head: 4.5, efficiency: 47, npsh: 4.3, power: 4.3 },
+  ],
+  // FBOT 65-160 - 1750 RPM (baseado na imagem 1 e 2)
+  'FBOT-65-160': [
+    { flow: 0, head: 19.0, efficiency: 0, npsh: 0.7, power: 0 },
+    { flow: 7.5, head: 18.5, efficiency: 33, npsh: 0.9, power: 1.7 },
+    { flow: 15, head: 17.2, efficiency: 51, npsh: 1.5, power: 3.1 },
+    { flow: 22.5, head: 15.0, efficiency: 61, npsh: 2.2, power: 4.2 },
+    { flow: 30, head: 12.0, efficiency: 64, npsh: 3.4, power: 5.0 },
+    { flow: 37.5, head: 8.2, efficiency: 58, npsh: 4.9, power: 5.6 },
+    { flow: 45, head: 3.7, efficiency: 40, npsh: 6.7, power: 6.0 },
+  ],
+  // FBOT 65-200 - 1750 RPM (baseado na imagem 1 e 2)
+  'FBOT-65-200': [
+    { flow: 0, head: 28.0, efficiency: 0, npsh: 0.9, power: 0 },
+    { flow: 7.5, head: 27.5, efficiency: 31, npsh: 1.1, power: 2.4 },
+    { flow: 15, head: 26.2, efficiency: 47, npsh: 1.6, power: 4.3 },
+    { flow: 22.5, head: 24.0, efficiency: 57, npsh: 2.4, power: 5.9 },
+    { flow: 30, head: 21.0, efficiency: 62, npsh: 3.5, power: 7.1 },
+    { flow: 37.5, head: 17.0, efficiency: 61, npsh: 5.0, power: 8.0 },
+    { flow: 45, head: 12.5, efficiency: 55, npsh: 6.7, power: 8.7 },
+    { flow: 52.5, head: 7.0, efficiency: 42, npsh: 8.7, power: 9.2 },
+  ],
+  // FBOT 65-250 - 1750 RPM (baseado na imagem 1 e 2)
+  'FBOT-65-250': [
+    { flow: 0, head: 34.5, efficiency: 0, npsh: 1.1, power: 0 },
+    { flow: 7.5, head: 34.0, efficiency: 28, npsh: 1.3, power: 2.9 },
+    { flow: 15, head: 32.5, efficiency: 45, npsh: 1.8, power: 5.3 },
+    { flow: 22.5, head: 30.5, efficiency: 55, npsh: 2.5, power: 7.3 },
+    { flow: 30, head: 27.5, efficiency: 61, npsh: 3.6, power: 8.9 },
+    { flow: 37.5, head: 23.5, efficiency: 63, npsh: 5.1, power: 10.2 },
+    { flow: 45, head: 19.0, efficiency: 60, npsh: 6.7, power: 11.3 },
+    { flow: 52.5, head: 14.0, efficiency: 53, npsh: 8.7, power: 12.0 },
+    { flow: 60, head: 8.0, efficiency: 40, npsh: 11.0, power: 12.5 },
+  ],
+  // FBOT 80-160 - 1750 RPM
+  'FBOT-80-160': [
+    { flow: 0, head: 19.5, efficiency: 0, npsh: 0.8, power: 0 },
+    { flow: 10, head: 19.0, efficiency: 32, npsh: 1.0, power: 2.2 },
+    { flow: 20, head: 17.5, efficiency: 48, npsh: 1.5, power: 3.9 },
+    { flow: 30, head: 15.5, efficiency: 60, npsh: 2.3, power: 5.3 },
+    { flow: 40, head: 12.5, efficiency: 63, npsh: 3.3, power: 6.5 },
+    { flow: 50, head: 8.8, efficiency: 57, npsh: 4.5, power: 7.3 },
+    { flow: 60, head: 4.5, efficiency: 40, npsh: 6.0, power: 7.8 },
+  ],
+  // FBOT 80-200 - 1750 RPM (baseado na imagem 1 e 2)
+  'FBOT-80-200': [
+    { flow: 0, head: 28.5, efficiency: 0, npsh: 1.0, power: 0 },
+    { flow: 10, head: 28.0, efficiency: 31, npsh: 1.2, power: 3.0 },
+    { flow: 20, head: 26.5, efficiency: 47, npsh: 1.8, power: 5.6 },
+    { flow: 30, head: 24.0, efficiency: 58, npsh: 2.6, power: 7.7 },
+    { flow: 40, head: 21.0, efficiency: 64, npsh: 3.7, power: 9.5 },
+    { flow: 50, head: 17.0, efficiency: 65, npsh: 5.2, power: 10.9 },
+    { flow: 60, head: 12.5, efficiency: 57, npsh: 7.0, power: 11.8 },
+    { flow: 70, head: 7.0, efficiency: 40, npsh: 9.0, power: 12.5 },
+  ],
+  // FBOT 80-250 - 1750 RPM (baseado na imagem 1 e 2)
+  'FBOT-80-250': [
+    { flow: 0, head: 35.0, efficiency: 0, npsh: 1.2, power: 0 },
+    { flow: 10, head: 34.5, efficiency: 29, npsh: 1.4, power: 3.7 },
+    { flow: 20, head: 33.0, efficiency: 45, npsh: 2.0, power: 6.8 },
+    { flow: 30, head: 30.5, efficiency: 56, npsh: 2.8, power: 9.4 },
+    { flow: 40, head: 27.5, efficiency: 63, npsh: 4.0, power: 11.5 },
+    { flow: 50, head: 23.5, efficiency: 66, npsh: 5.5, power: 13.3 },
+    { flow: 60, head: 19.0, efficiency: 63, npsh: 7.2, power: 14.6 },
+    { flow: 70, head: 13.5, efficiency: 55, npsh: 9.2, power: 15.5 },
+    { flow: 80, head: 7.5, efficiency: 40, npsh: 11.5, power: 16.0 },
+  ],
+  // Curvas para os modelos maiores
+  // FBOT 100-200 - 1750 RPM (baseado na imagem 1)
+  'FBOT-100-200': [
+    { flow: 0, head: 29.0, efficiency: 0, npsh: 1.2, power: 0 },
+    { flow: 12.5, head: 28.5, efficiency: 33, npsh: 1.5, power: 4.0 },
+    { flow: 25, head: 27.0, efficiency: 50, npsh: 2.1, power: 7.5 },
+    { flow: 37.5, head: 24.7, efficiency: 61, npsh: 3.0, power: 10.5 },
+    { flow: 50, head: 21.7, efficiency: 67, npsh: 4.2, power: 12.8 },
+    { flow: 62.5, head: 18.0, efficiency: 68, npsh: 5.7, power: 14.6 },
+    { flow: 75, head: 13.5, efficiency: 62, npsh: 7.5, power: 15.9 },
+    { flow: 87.5, head: 8.0, efficiency: 48, npsh: 9.5, power: 16.7 },
+  ],
+  // FBOT 100-250 - 1750 RPM (baseado na imagem 1)
+  'FBOT-100-250': [
+    { flow: 0, head: 35.5, efficiency: 0, npsh: 1.5, power: 0 },
+    { flow: 12.5, head: 35.0, efficiency: 31, npsh: 1.7, power: 4.8 },
+    { flow: 25, head: 33.5, efficiency: 48, npsh: 2.4, power: 9.0 },
+    { flow: 37.5, head: 31.2, efficiency: 59, npsh: 3.4, power: 12.8 },
+    { flow: 50, head: 28.2, efficiency: 65, npsh: 4.7, power: 15.8 },
+    { flow: 62.5, head: 24.5, efficiency: 68, npsh: 6.2, power: 18.3 },
+    { flow: 75, head: 20.0, efficiency: 66, npsh: 8.0, power: 20.0 },
+    { flow: 87.5, head: 14.5, efficiency: 58, npsh: 10.0, power: 21.3 },
+    { flow: 100, head: 8.2, efficiency: 42, npsh: 12.2, power: 22.0 },
+  ],
+  // FBOT 125-250 - 1750 RPM (baseado na imagem 1)
+  'FBOT-125-250': [
+    { flow: 0, head: 36.0, efficiency: 0, npsh: 1.6, power: 0 },
+    { flow: 15, head: 35.5, efficiency: 32, npsh: 1.9, power: 6.0 },
+    { flow: 30, head: 34.0, efficiency: 49, npsh: 2.6, power: 11.3 },
+    { flow: 45, head: 31.7, efficiency: 60, npsh: 3.7, power: 16.0 },
+    { flow: 60, head: 28.5, efficiency: 67, npsh: 5.2, power: 20.0 },
+    { flow: 75, head: 24.5, efficiency: 69, npsh: 7.0, power: 23.0 },
+    { flow: 90, head: 20.0, efficiency: 67, npsh: 9.0, power: 25.3 },
+    { flow: 105, head: 14.5, efficiency: 59, npsh: 11.2, power: 26.7 },
+    { flow: 120, head: 8.2, efficiency: 43, npsh: 13.7, power: 27.5 },
+  ],
+  // FBOT 150-400 - 1750 RPM (baseado na imagem 1)
+  'FBOT-150-400': [
+    { flow: 0, head: 55.0, efficiency: 0, npsh: 2.2, power: 0 },
+    { flow: 15, head: 54.5, efficiency: 32, npsh: 2.5, power: 11.0 },
+    { flow: 30, head: 53.2, efficiency: 48, npsh: 3.2, power: 20.0 },
+    { flow: 45, head: 51.2, efficiency: 59, npsh: 4.5, power: 28.5 },
+    { flow: 60, head: 48.2, efficiency: 66, npsh: 6.5, power: 36.0 },
+    { flow: 75, head: 44.5, efficiency: 70, npsh: 8.7, power: 42.0 },
+    { flow: 90, head: 40.0, efficiency: 71, npsh: 11.5, power: 47.5 },
+    { flow: 105, head: 35.0, efficiency: 69, npsh: 14.5, power: 52.0 },
+    { flow: 120, head: 29.2, efficiency: 63, npsh: 18.0, power: 55.0 },
+    { flow: 135, head: 23.0, efficiency: 53, npsh: 22.0, power: 57.5 },
+  ],
+  // FBOT 200-400 - 1750 RPM (baseado na imagem 1)
+  'FBOT-200-400': [
+    { flow: 0, head: 55.5, efficiency: 0, npsh: 2.5, power: 0 },
+    { flow: 20, head: 55.0, efficiency: 34, npsh: 2.7, power: 14.0 },
+    { flow: 40, head: 53.7, efficiency: 50, npsh: 3.5, power: 26.5 },
+    { flow: 60, head: 51.7, efficiency: 61, npsh: 5.0, power: 37.0 },
+    { flow: 80, head: 48.7, efficiency: 68, npsh: 7.0, power: 46.5 },
+    { flow: 100, head: 45.0, efficiency: 73, npsh: 9.2, power: 54.0 },
+    { flow: 120, head: 40.5, efficiency: 75, npsh: 12.0, power: 60.5 },
+    { flow: 140, head: 35.5, efficiency: 73, npsh: 15.0, power: 66.0 },
+    { flow: 160, head: 29.5, efficiency: 67, npsh: 18.5, power: 69.5 },
+    { flow: 180, head: 23.0, efficiency: 57, npsh: 22.5, power: 72.0 },
+  ]
+};
+
+// 3. FBE - Bomba de Engrenagens Externas - 1750 RPM
+const fbePumpCurves1750: Record<string, PumpCurvePoint[]> = {
+  // FBE 1/8" - 1750 RPM
+  'FBE-1/8"': [
+    { flow: 0, head: 40, efficiency: 0, npsh: 0.6, power: 0 },
+    { flow: 0.5, head: 39, efficiency: 18, npsh: 0.7, power: 0.3 },
+    { flow: 1, head: 37, efficiency: 35, npsh: 0.9, power: 0.5 },
+    { flow: 1.5, head: 34, efficiency: 45, npsh: 1.2, power: 0.7 },
+    { flow: 2, head: 30, efficiency: 52, npsh: 1.5, power: 0.8 },
+    { flow: 2.5, head: 24, efficiency: 48, npsh: 1.9, power: 0.9 },
+    { flow: 3, head: 17, efficiency: 40, npsh: 2.4, power: 1.0 },
+  ],
+  // FBE 1/8" A - 1750 RPM (variação com engrenagem tipo A)
+  'FBE-1/8" A': [
+    { flow: 0, head: 40, efficiency: 0, npsh: 0.6, power: 0 },
+    { flow: 0.5, head: 39, efficiency: 19, npsh: 0.7, power: 0.3 },
+    { flow: 1, head: 37, efficiency: 36, npsh: 0.9, power: 0.5 },
+    { flow: 1.5, head: 34, efficiency: 47, npsh: 1.2, power: 0.7 },
+    { flow: 2, head: 31, efficiency: 53, npsh: 1.5, power: 0.8 },
+    { flow: 2.5, head: 25, efficiency: 49, npsh: 1.9, power: 0.9 },
+    { flow: 3, head: 18, efficiency: 41, npsh: 2.4, power: 1.0 },
+  ],
+  // FBE 1/4" - 1750 RPM
+  'FBE-1/4"': [
+    { flow: 0, head: 42, efficiency: 0, npsh: 0.7, power: 0 },
+    { flow: 1, head: 41, efficiency: 22, npsh: 0.8, power: 0.5 },
+    { flow: 2, head: 39, efficiency: 40, npsh: 1.1, power: 0.9 },
+    { flow: 3, head: 36, efficiency: 52, npsh: 1.5, power: 1.4 },
+    { flow: 4, head: 32, efficiency: 58, npsh: 1.9, power: 1.7 },
+    { flow: 5, head: 27, efficiency: 55, npsh: 2.4, power: 2.0 },
+    { flow: 6, head: 20, efficiency: 48, npsh: 3.0, power: 2.2 },
+    { flow: 7, head: 12, efficiency: 36, npsh: 3.7, power: 2.4 },
+  ],
+  // FBE 1/4" A - 1750 RPM (variação com engrenagem tipo A)
+  'FBE-1/4" A': [
+    { flow: 0, head: 42, efficiency: 0, npsh: 0.7, power: 0 },
+    { flow: 1, head: 41, efficiency: 23, npsh: 0.8, power: 0.5 },
+    { flow: 2, head: 39, efficiency: 41, npsh: 1.1, power: 0.9 },
+    { flow: 3, head: 36, efficiency: 53, npsh: 1.5, power: 1.4 },
+    { flow: 4, head: 33, efficiency: 59, npsh: 1.9, power: 1.7 },
+    { flow: 5, head: 28, efficiency: 56, npsh: 2.4, power: 2.0 },
+    { flow: 6, head: 21, efficiency: 49, npsh: 3.0, power: 2.2 },
+    { flow: 7, head: 13, efficiency: 37, npsh: 3.7, power: 2.4 },
+  ],
+  // FBE 3/8" - 1750 RPM
+  'FBE-3/8"': [
+    { flow: 0, head: 45, efficiency: 0, npsh: 0.8, power: 0 },
+    { flow: 2, head: 44, efficiency: 28, npsh: 1.0, power: 0.9 },
+    { flow: 4, head: 42, efficiency: 48, npsh: 1.4, power: 1.7 },
+    { flow: 6, head: 38, efficiency: 58, npsh: 1.9, power: 2.5 },
+    { flow: 8, head: 33, efficiency: 63, npsh: 2.5, power: 3.2 },
+    { flow: 10, head: 27, efficiency: 60, npsh: 3.2, power: 3.7 },
+    { flow: 12, head: 19, efficiency: 52, npsh: 4.0, power: 4.1 },
+    { flow: 14, head: 10, efficiency: 38, npsh: 4.9, power: 4.4 },
+  ],
+  // FBE 3/8" A - 1750 RPM (variação com engrenagem tipo A)
+  'FBE-3/8" A': [
+    { flow: 0, head: 45, efficiency: 0, npsh: 0.8, power: 0 },
+    { flow: 2, head: 44, efficiency: 29, npsh: 1.0, power: 0.9 },
+    { flow: 4, head: 42, efficiency: 49, npsh: 1.4, power: 1.7 },
+    { flow: 6, head: 39, efficiency: 59, npsh: 1.9, power: 2.5 },
+    { flow: 8, head: 34, efficiency: 64, npsh: 2.5, power: 3.2 },
+    { flow: 10, head: 28, efficiency: 61, npsh: 3.2, power: 3.7 },
+    { flow: 12, head: 20, efficiency: 53, npsh: 4.0, power: 4.1 },
+    { flow: 14, head: 11, efficiency: 39, npsh: 4.9, power: 4.4 },
+  ],
+  // FBE 1/2" - 1750 RPM
+  'FBE-1/2"': [
+    { flow: 0, head: 48, efficiency: 0, npsh: 0.9, power: 0 },
+    { flow: 3, head: 47, efficiency: 30, npsh: 1.2, power: 1.4 },
+    { flow: 6, head: 45, efficiency: 50, npsh: 1.6, power: 2.7 },
+    { flow: 9, head: 41, efficiency: 62, npsh: 2.2, power: 3.8 },
+    { flow: 12, head: 36, efficiency: 68, npsh: 2.9, power: 4.8 },
+    { flow: 15, head: 29, efficiency: 65, npsh: 3.7, power: 5.6 },
+    { flow: 18, head: 21, efficiency: 57, npsh: 4.7, power: 6.2 },
+    { flow: 21, head: 11, efficiency: 42, npsh: 5.8, power: 6.6 },
+  ],
+  // FBE 1/2" A - 1750 RPM (variação com engrenagem tipo A)
+  'FBE-1/2" A': [
+    { flow: 0, head: 48, efficiency: 0, npsh: 0.9, power: 0 },
+    { flow: 3, head: 47, efficiency: 31, npsh: 1.2, power: 1.4 },
+    { flow: 6, head: 45, efficiency: 51, npsh: 1.6, power: 2.7 },
+    { flow: 9, head: 42, efficiency: 63, npsh: 2.2, power: 3.8 },
+    { flow: 12, head: 37, efficiency: 69, npsh: 2.9, power: 4.8 },
+    { flow: 15, head: 30, efficiency: 66, npsh: 3.7, power: 5.6 },
+    { flow: 18, head: 22, efficiency: 58, npsh: 4.7, power: 6.2 },
+    { flow: 21, head: 12, efficiency: 43, npsh: 5.8, power: 6.6 },
+  ],
+  // FBE 1/2" CA - 1750 RPM (variação com Câmara de Aquecimento)
+  'FBE-1/2" CA': [
+    { flow: 0, head: 48, efficiency: 0, npsh: 0.9, power: 0 },
+    { flow: 3, head: 47, efficiency: 29, npsh: 1.2, power: 1.4 },
+    { flow: 6, head: 45, efficiency: 48, npsh: 1.6, power: 2.7 },
+    { flow: 9, head: 41, efficiency: 59, npsh: 2.2, power: 3.8 },
+    { flow: 12, head: 36, efficiency: 65, npsh: 2.9, power: 4.8 },
+    { flow: 15, head: 29, efficiency: 62, npsh: 3.7, power: 5.6 },
+    { flow: 18, head: 21, efficiency: 54, npsh: 4.7, power: 6.2 },
+    { flow: 21, head: 11, efficiency: 40, npsh: 5.8, power: 6.6 },
+  ],
+  // FBE 3/4" - 1750 RPM
+  'FBE-3/4"': [
+    { flow: 0, head: 50, efficiency: 0, npsh: 1.0, power: 0 },
+    { flow: 5, head: 49, efficiency: 35, npsh: 1.3, power: 2.0 },
+    { flow: 10, head: 46, efficiency: 55, npsh: 1.8, power: 3.8 },
+    { flow: 15, head: 42, efficiency: 66, npsh: 2.5, power: 5.5 },
+    { flow: 20, head: 36, efficiency: 70, npsh: 3.3, power: 7.0 },
+    { flow: 25, head: 29, efficiency: 68, npsh: 4.2, power: 8.2 },
+    { flow: 30, head: 20, efficiency: 58, npsh: 5.3, power: 9.1 },
+    { flow: 35, head: 10, efficiency: 42, npsh: 6.5, power: 9.8 },
+  ],
+  // FBE 3/4" A - 1750 RPM (variação com engrenagem tipo A)
+  'FBE-3/4" A': [
+    { flow: 0, head: 50, efficiency: 0, npsh: 1.0, power: 0 },
+    { flow: 5, head: 49, efficiency: 36, npsh: 1.3, power: 2.0 },
+    { flow: 10, head: 46, efficiency: 56, npsh: 1.8, power: 3.8 },
+    { flow: 15, head: 43, efficiency: 67, npsh: 2.5, power: 5.5 },
+    { flow: 20, head: 37, efficiency: 71, npsh: 3.3, power: 7.0 },
+    { flow: 25, head: 30, efficiency: 69, npsh: 4.2, power: 8.2 },
+    { flow: 30, head: 21, efficiency: 59, npsh: 5.3, power: 9.1 },
+    { flow: 35, head: 11, efficiency: 43, npsh: 6.5, power: 9.8 },
+  ],
+  // FBE 3/4" CA - 1750 RPM (variação com Câmara de Aquecimento)
+  'FBE-3/4" CA': [
+    { flow: 0, head: 50, efficiency: 0, npsh: 1.0, power: 0 },
+    { flow: 5, head: 49, efficiency: 33, npsh: 1.3, power: 2.0 },
+    { flow: 10, head: 46, efficiency: 52, npsh: 1.8, power: 3.8 },
+    { flow: 15, head: 42, efficiency: 62, npsh: 2.5, power: 5.5 },
+    { flow: 20, head: 36, efficiency: 66, npsh: 3.3, power: 7.0 },
+    { flow: 25, head: 29, efficiency: 64, npsh: 4.2, power: 8.2 },
+    { flow: 30, head: 20, efficiency: 54, npsh: 5.3, power: 9.1 },
+    { flow: 35, head: 10, efficiency: 40, npsh: 6.5, power: 9.8 },
+  ],
+  // FBE 1" - 1750 RPM
+  'FBE-1"': [
+    { flow: 0, head: 52, efficiency: 0, npsh: 1.1, power: 0 },
+    { flow: 7, head: 51, efficiency: 38, npsh: 1.5, power: 2.6 },
+    { flow: 14, head: 48, efficiency: 58, npsh: 2.1, power: 5.0 },
+    { flow: 21, head: 43, efficiency: 68, npsh: 2.9, power: 7.1 },
+    { flow: 28, head: 37, efficiency: 72, npsh: 3.8, power: 9.0 },
+    { flow: 35, head: 29, efficiency: 70, npsh: 4.8, power: 10.6 },
+    { flow: 42, head: 20, efficiency: 60, npsh: 6.0, power: 11.8 },
+    { flow: 49, head: 9, efficiency: 44, npsh: 7.4, power: 12.7 },
+  ],
+  // FBE 1" A - 1750 RPM (variação com engrenagem tipo A - da imagem 3)
+  'FBE-1" A': [
+    { flow: 0, head: 52, efficiency: 0, npsh: 1.1, power: 0 },
+    { flow: 7, head: 51, efficiency: 39, npsh: 1.5, power: 2.6 },
+    { flow: 14, head: 48, efficiency: 59, npsh: 2.1, power: 5.0 },
+    { flow: 21, head: 44, efficiency: 69, npsh: 2.9, power: 7.1 },
+    { flow: 28, head: 38, efficiency: 73, npsh: 3.8, power: 9.0 },
+    { flow: 35, head: 30, efficiency: 71, npsh: 4.8, power: 10.6 },
+    { flow: 42, head: 21, efficiency: 61, npsh: 6.0, power: 11.8 },
+    { flow: 49, head: 10, efficiency: 45, npsh: 7.4, power: 12.7 },
+  ],
+  // FBE 1" D - 1750 RPM (variação com engrenagem tipo D - da imagem 3)
+  'FBE-1" D': [
+    { flow: 0, head: 52, efficiency: 0, npsh: 1.1, power: 0 },
+    { flow: 7, head: 51, efficiency: 38, npsh: 1.4, power: 2.6 },
+    { flow: 14, head: 49, efficiency: 58, npsh: 2.0, power: 5.0 },
+    { flow: 21, head: 45, efficiency: 69, npsh: 2.8, power: 7.1 },
+    { flow: 28, head: 39, efficiency: 73, npsh: 3.7, power: 9.0 },
+    { flow: 35, head: 32, efficiency: 72, npsh: 4.7, power: 10.6 },
+    { flow: 42, head: 24, efficiency: 64, npsh: 5.9, power: 11.8 },
+    { flow: 49, head: 15, efficiency: 52, npsh: 7.3, power: 12.7 },
+    { flow: 56, head: 5, efficiency: 30, npsh: 8.9, power: 13.2 },
+  ],
+  // FBE 1" DA - 1750 RPM (variação com engrenagem tipo DA - da imagem 3)
+  'FBE-1" DA': [
+    { flow: 0, head: 52, efficiency: 0, npsh: 1.1, power: 0 },
+    { flow: 7, head: 51, efficiency: 38, npsh: 1.4, power: 2.6 },
+    { flow: 14, head: 49, efficiency: 58, npsh: 2.0, power: 5.0 },
+    { flow: 21, head: 45, efficiency: 70, npsh: 2.8, power: 7.1 },
+    { flow: 28, head: 40, efficiency: 75, npsh: 3.7, power: 9.0 },
+    { flow: 35, head: 33, efficiency: 74, npsh: 4.7, power: 10.6 },
+    { flow: 42, head: 25, efficiency: 68, npsh: 5.9, power: 11.8 },
+    { flow: 49, head: 16, efficiency: 56, npsh: 7.3, power: 12.7 },
+    { flow: 56, head: 6, efficiency: 35, npsh: 8.9, power: 13.2 },
+  ],
+  // FBE 1" CA - 1750 RPM (variação com Câmara de Aquecimento)
+  'FBE-1" CA': [
+    { flow: 0, head: 52, efficiency: 0, npsh: 1.1, power: 0 },
+    { flow: 7, head: 51, efficiency: 36, npsh: 1.5, power: 2.6 },
+    { flow: 14, head: 48, efficiency: 55, npsh: 2.1, power: 5.0 },
+    { flow: 21, head: 43, efficiency: 64, npsh: 2.9, power: 7.1 },
+    { flow: 28, head: 37, efficiency: 68, npsh: 3.8, power: 9.0 },
+    { flow: 35, head: 29, efficiency: 66, npsh: 4.8, power: 10.6 },
+    { flow: 42, head: 20, efficiency: 56, npsh: 6.0, power: 11.8 },
+    { flow: 49, head: 9, efficiency: 41, npsh: 7.4, power: 12.7 },
+  ],
+  // FBE 1-1/2" - 1750 RPM
+  'FBE-1-1/2"': [
+    { flow: 0, head: 55, efficiency: 0, npsh: 1.3, power: 0 },
+    { flow: 10, head: 54, efficiency: 40, npsh: 1.7, power: 3.8 },
+    { flow: 20, head: 51, efficiency: 60, npsh: 2.4, power: 7.4 },
+    { flow: 30, head: 46, efficiency: 70, npsh: 3.3, power: 10.6 },
+    { flow: 40, head: 39, efficiency: 74, npsh: 4.3, power: 13.5 },
+    { flow: 50, head: 31, efficiency: 72, npsh: 5.5, power: 15.9 },
+    { flow: 60, head: 21, efficiency: 62, npsh: 6.8, power: 17.8 },
+    { flow: 70, head: 10, efficiency: 45, npsh: 8.3, power: 19.2 },
+  ],
+  // FBE 1-1/2" CA - 1750 RPM (variação com Câmara de Aquecimento - da imagem 3)
+  'FBE-1-1/2" CA': [
+    { flow: 0, head: 55, efficiency: 0, npsh: 1.3, power: 0 },
+    { flow: 10, head: 54, efficiency: 38, npsh: 1.7, power: 3.8 },
+    { flow: 20, head: 51, efficiency: 56, npsh: 2.4, power: 7.4 },
+    { flow: 30, head: 46, efficiency: 66, npsh: 3.3, power: 10.6 },
+    { flow: 40, head: 39, efficiency: 70, npsh: 4.3, power: 13.5 },
+    { flow: 50, head: 31, efficiency: 68, npsh: 5.5, power: 15.9 },
+    { flow: 60, head: 21, efficiency: 58, npsh: 6.8, power: 17.8 },
+    { flow: 70, head: 10, efficiency: 42, npsh: 8.3, power: 19.2 },
+  ],
+  // FBE 2" - 1750 RPM
+  'FBE-2"': [
+    { flow: 0, head: 58, efficiency: 0, npsh: 1.5, power: 0 },
+    { flow: 15, head: 57, efficiency: 42, npsh: 2.0, power: 5.8 },
+    { flow: 30, head: 54, efficiency: 62, npsh: 2.8, power: 11.2 },
+    { flow: 45, head: 48, efficiency: 72, npsh: 3.8, power: 16.2 },
+    { flow: 60, head: 41, efficiency: 76, npsh: 5.0, power: 20.6 },
+    { flow: 75, head: 33, efficiency: 74, npsh: 6.3, power: 24.5 },
+    { flow: 90, head: 22, efficiency: 64, npsh: 7.8, power: 27.6 },
+    { flow: 105, head: 10, efficiency: 46, npsh: 9.5, power: 29.8 },
+  ],
+  // FBE 2" CA - 1750 RPM (variação com Câmara de Aquecimento)
+  'FBE-2" CA': [
+    { flow: 0, head: 58, efficiency: 0, npsh: 1.5, power: 0 },
+    { flow: 15, head: 57, efficiency: 39, npsh: 2.0, power: 5.8 },
+    { flow: 30, head: 54, efficiency: 58, npsh: 2.8, power: 11.2 },
+    { flow: 45, head: 48, efficiency: 68, npsh: 3.8, power: 16.2 },
+    { flow: 60, head: 41, efficiency: 72, npsh: 5.0, power: 20.6 },
+    { flow: 75, head: 33, efficiency: 70, npsh: 6.3, power: 24.5 },
+    { flow: 90, head: 22, efficiency: 60, npsh: 7.8, power: 27.6 },
+    { flow: 105, head: 10, efficiency: 43, npsh: 9.5, power: 29.8 },
+  ],
+  // FBE 3" - 1750 RPM
+  'FBE-3"': [
+    { flow: 0, head: 60, efficiency: 0, npsh: 1.8, power: 0 },
+    { flow: 20, head: 59, efficiency: 44, npsh: 2.3, power: 7.8 },
+    { flow: 40, head: 56, efficiency: 64, npsh: 3.2, power: 15.2 },
+    { flow: 60, head: 50, efficiency: 74, npsh: 4.3, power: 22.0 },
+    { flow: 80, head: 43, efficiency: 78, npsh: 5.6, power: 28.2 },
+    { flow: 100, head: 34, efficiency: 76, npsh: 7.0, power: 33.5 },
+    { flow: 120, head: 23, efficiency: 66, npsh: 8.7, power: 37.8 },
+    { flow: 140, head: 11, efficiency: 48, npsh: 10.6, power: 40.6 },
+  ],
+  // FBE 3" CA - 1750 RPM (variação com Câmara de Aquecimento)
+  'FBE-3" CA': [
+    { flow: 0, head: 60, efficiency: 0, npsh: 1.8, power: 0 },
+    { flow: 20, head: 59, efficiency: 41, npsh: 2.3, power: 7.8 },
+    { flow: 40, head: 56, efficiency: 60, npsh: 3.2, power: 15.2 },
+    { flow: 60, head: 50, efficiency: 70, npsh: 4.3, power: 22.0 },
+    { flow: 80, head: 43, efficiency: 74, npsh: 5.6, power: 28.2 },
+    { flow: 100, head: 34, efficiency: 72, npsh: 7.0, power: 33.5 },
+    { flow: 120, head: 23, efficiency: 62, npsh: 8.7, power: 37.8 },
+    { flow: 140, head: 11, efficiency: 45, npsh: 10.6, power: 40.6 },
+  ],
+  // FBE 3" M8 - 1750 RPM (variação com módulo 8)
+  'FBE-3" M8': [
+    { flow: 0, head: 60, efficiency: 0, npsh: 1.8, power: 0 },
+    { flow: 20, head: 59, efficiency: 44, npsh: 2.3, power: 7.8 },
+    { flow: 40, head: 56, efficiency: 64, npsh: 3.2, power: 15.2 },
+    { flow: 60, head: 51, efficiency: 74, npsh: 4.3, power: 22.0 },
+    { flow: 80, head: 44, efficiency: 79, npsh: 5.6, power: 28.2 },
+    { flow: 100, head: 35, efficiency: 78, npsh: 7.0, power: 33.5 },
+    { flow: 120, head: 25, efficiency: 70, npsh: 8.7, power: 37.8 },
+    { flow: 140, head: 13, efficiency: 55, npsh: 10.6, power: 40.6 },
+    { flow: 160, head: 0, efficiency: 0, npsh: 12.8, power: 42.0 },
+  ],
+  // FBE 3" M9 - 1750 RPM (variação com módulo 9)
+  'FBE-3" M9': [
+    { flow: 0, head: 60, efficiency: 0, npsh: 1.8, power: 0 },
+    { flow: 20, head: 59, efficiency: 44, npsh: 2.3, power: 7.8 },
+    { flow: 40, head: 56, efficiency: 64, npsh: 3.2, power: 15.2 },
+    { flow: 60, head: 51, efficiency: 75, npsh: 4.3, power: 22.0 },
+    { flow: 80, head: 45, efficiency: 80, npsh: 5.6, power: 28.2 },
+    { flow: 100, head: 37, efficiency: 80, npsh: 7.0, power: 33.5 },
+    { flow: 120, head: 28, efficiency: 75, npsh: 8.7, power: 37.8 },
+    { flow: 140, head: 17, efficiency: 65, npsh: 10.6, power: 40.6 },
+    { flow: 160, head: 5, efficiency: 42, npsh: 12.8, power: 42.0 },
+  ],
+  // FBE 4" - 1750 RPM (baseado na imagem 3)
+  'FBE-4"': [
+    { flow: 0, head: 62, efficiency: 0, npsh: 2.0, power: 0 },
+    { flow: 25, head: 61, efficiency: 45, npsh: 2.5, power: 9.5 },
+    { flow: 50, head: 58, efficiency: 65, npsh: 3.5, power: 18.5 },
+    { flow: 75, head: 53, efficiency: 75, npsh: 4.7, power: 26.5 },
+    { flow: 100, head: 47, efficiency: 79, npsh: 6.1, power: 34.0 },
+    { flow: 125, head: 39, efficiency: 80, npsh: 7.7, power: 40.0 },
+    { flow: 150, head: 30, efficiency: 75, npsh: 9.5, power: 45.5 },
+    { flow: 175, head: 19, efficiency: 63, npsh: 11.5, power: 49.5 },
+    { flow: 200, head: 7, efficiency: 42, npsh: 13.7, power: 52.0 },
+  ],
+  // FBE 4" M8 - 1750 RPM (variação com módulo 8)
+  'FBE-4" M8': [
+    { flow: 0, head: 62, efficiency: 0, npsh: 2.0, power: 0 },
+    { flow: 25, head: 61, efficiency: 45, npsh: 2.5, power: 9.5 },
+    { flow: 50, head: 58, efficiency: 65, npsh: 3.5, power: 18.5 },
+    { flow: 75, head: 54, efficiency: 75, npsh: 4.7, power: 26.5 },
+    { flow: 100, head: 48, efficiency: 80, npsh: 6.1, power: 34.0 },
+    { flow: 125, head: 41, efficiency: 82, npsh: 7.7, power: 40.0 },
+    { flow: 150, head: 33, efficiency: 78, npsh: 9.5, power: 45.5 },
+    { flow: 175, head: 23, efficiency: 70, npsh: 11.5, power: 49.5 },
+    { flow: 200, head: 12, efficiency: 55, npsh: 13.7, power: 52.0 },
+  ],
+  // FBE 4" M8 CA - 1750 RPM (variação com módulo 8 e Câmara de Aquecimento)
+  'FBE-4" M8 CA': [
+    { flow: 0, head: 62, efficiency: 0, npsh: 2.0, power: 0 },
+    { flow: 25, head: 61, efficiency: 42, npsh: 2.5, power: 9.5 },
+    { flow: 50, head: 58, efficiency: 61, npsh: 3.5, power: 18.5 },
+    { flow: 75, head: 54, efficiency: 71, npsh: 4.7, power: 26.5 },
+    { flow: 100, head: 48, efficiency: 75, npsh: 6.1, power: 34.0 },
+    { flow: 125, head: 41, efficiency: 77, npsh: 7.7, power: 40.0 },
+    { flow: 150, head: 33, efficiency: 73, npsh: 9.5, power: 45.5 },
+    { flow: 175, head: 23, efficiency: 66, npsh: 11.5, power: 49.5 },
+    { flow: 200, head: 12, efficiency: 52, npsh: 13.7, power: 52.0 },
+  ],
+  // FBE 4" M12 - 1750 RPM (variação com módulo 12)
+  'FBE-4" M12': [
+    { flow: 0, head: 62, efficiency: 0, npsh: 2.0, power: 0 },
+    { flow: 25, head: 61, efficiency: 45, npsh: 2.5, power: 9.5 },
+    { flow: 50, head: 59, efficiency: 65, npsh: 3.5, power: 18.5 },
+    { flow: 75, head: 55, efficiency: 77, npsh: 4.7, power: 26.5 },
+    { flow: 100, head: 50, efficiency: 83, npsh: 6.1, power: 34.0 },
+    { flow: 125, head: 44, efficiency: 85, npsh: 7.7, power: 40.0 },
+    { flow: 150, head: 37, efficiency: 83, npsh: 9.5, power: 45.5 },
+    { flow: 175, head: 29, efficiency: 76, npsh: 11.5, power: 49.5 },
+    { flow: 200, head: 19, efficiency: 65, npsh: 13.7, power: 52.0 },
+    { flow: 225, head: 8, efficiency: 45, npsh: 16.0, power: 53.5 },
+  ],
+  // FBE 4" M12 CA - 1750 RPM (variação com módulo 12 e Câmara de Aquecimento)
+  'FBE-4" M12 CA': [
+    { flow: 0, head: 62, efficiency: 0, npsh: 2.0, power: 0 },
+    { flow: 25, head: 61, efficiency: 42, npsh: 2.5, power: 9.5 },
+    { flow: 50, head: 59, efficiency: 61, npsh: 3.5, power: 18.5 },
+    { flow: 75, head: 55, efficiency: 72, npsh: 4.7, power: 26.5 },
+    { flow: 100, head: 50, efficiency: 78, npsh: 6.1, power: 34.0 },
+    { flow: 125, head: 44, efficiency: 80, npsh: 7.7, power: 40.0 },
+    { flow: 150, head: 37, efficiency: 78, npsh: 9.5, power: 45.5 },
+    { flow: 175, head: 29, efficiency: 71, npsh: 11.5, power: 49.5 },
+    { flow: 200, head: 19, efficiency: 61, npsh: 13.7, power: 52.0 },
+    { flow: 225, head: 8, efficiency: 42, npsh: 16.0, power: 53.5 },
+  ],
+  // FBE 5" - 1750 RPM (baseado na imagem 3)
+  'FBE-5"': [
+    { flow: 0, head: 65, efficiency: 0, npsh: 2.5, power: 0 },
+    { flow: 30, head: 64, efficiency: 47, npsh: 3.0, power: 12.0 },
+    { flow: 60, head: 61, efficiency: 67, npsh: 4.0, power: 23.0 },
+    { flow: 90, head: 56, efficiency: 78, npsh: 5.5, power: 33.0 },
+    { flow: 120, head: 50, efficiency: 84, npsh: 7.2, power: 42.0 },
+    { flow: 150, head: 43, efficiency: 85, npsh: 9.0, power: 50.0 },
+    { flow: 180, head: 34, efficiency: 82, npsh: 11.0, power: 56.5 },
+    { flow: 210, head: 24, efficiency: 74, npsh: 13.5, power: 61.5 },
+    { flow: 240, head: 13, efficiency: 60, npsh: 16.2, power: 65.0 },
+  ],
+  // FBE 5" CA - 1750 RPM (variação com Câmara de Aquecimento)
+  'FBE-5" CA': [
+    { flow: 0, head: 65, efficiency: 0, npsh: 2.5, power: 0 },
+    { flow: 30, head: 64, efficiency: 44, npsh: 3.0, power: 12.0 },
+    { flow: 60, head: 61, efficiency: 63, npsh: 4.0, power: 23.0 },
+    { flow: 90, head: 56, efficiency: 73, npsh: 5.5, power: 33.0 },
+    { flow: 120, head: 50, efficiency: 79, npsh: 7.2, power: 42.0 },
+    { flow: 150, head: 43, efficiency: 80, npsh: 9.0, power: 50.0 },
+    { flow: 180, head: 34, efficiency: 77, npsh: 11.0, power: 56.5 },
+    { flow: 210, head: 24, efficiency: 70, npsh: 13.5, power: 61.5 },
+    { flow: 240, head: 13, efficiency: 56, npsh: 16.2, power: 65.0 },
+  ],
+  // FBE 6" - 1750 RPM (baseado na imagem 3)
+  'FBE-6"': [
+    { flow: 0, head: 68, efficiency: 0, npsh: 3.0, power: 0 },
+    { flow: 40, head: 67, efficiency: 48, npsh: 3.5, power: 15.0 },
+    { flow: 80, head: 64, efficiency: 68, npsh: 4.8, power: 29.0 },
+    { flow: 120, head: 59, efficiency: 79, npsh: 6.5, power: 42.0 },
+    { flow: 160, head: 53, efficiency: 85, npsh: 8.5, power: 54.0 },
+    { flow: 200, head: 46, efficiency: 87, npsh: 10.8, power: 65.0 },
+    { flow: 240, head: 37, efficiency: 85, npsh: 13.5, power: 74.0 },
+    { flow: 280, head: 27, efficiency: 77, npsh: 16.5, power: 81.0 },
+    { flow: 320, head: 16, efficiency: 64, npsh: 20.0, power: 86.0 },
+  ],
+  // FBE 6" CA - 1750 RPM (variação com Câmara de Aquecimento)
+  'FBE-6" CA': [
+    { flow: 0, head: 68, efficiency: 0, npsh: 3.0, power: 0 },
+    { flow: 40, head: 67, efficiency: 45, npsh: 3.5, power: 15.0 },
+    { flow: 80, head: 64, efficiency: 64, npsh: 4.8, power: 29.0 },
+    { flow: 120, head: 59, efficiency: 74, npsh: 6.5, power: 42.0 },
+    { flow: 160, head: 53, efficiency: 80, npsh: 8.5, power: 54.0 },
+    { flow: 200, head: 46, efficiency: 82, npsh: 10.8, power: 65.0 },
+    { flow: 240, head: 37, efficiency: 80, npsh: 13.5, power: 74.0 },
+    { flow: 280, head: 27, efficiency: 72, npsh: 16.5, power: 81.0 },
+    { flow: 320, head: 16, efficiency: 60, npsh: 20.0, power: 86.0 },
+  ],
+  // FBE 30-20 (adicional do código original)
+  'FBE-30-20': [
+    { flow: 0, head: 35, efficiency: 0, npsh: 0.8, power: 0 },
+    { flow: 3, head: 34.5, efficiency: 15, npsh: 0.9, power: 0.9 },
+    { flow: 6, head: 33, efficiency: 30, npsh: 1.2, power: 1.8 },
+    { flow: 9, head: 31, efficiency: 45, npsh: 1.6, power: 2.5 },
+    { flow: 12, head: 29, efficiency: 55, npsh: 2.0, power: 3.2 },
+    { flow: 15, head: 26, efficiency: 60, npsh: 2.5, power: 3.8 },
+    { flow: 18, head: 22, efficiency: 58, npsh: 3.1, power: 4.3 },
+    { flow: 21, head: 17, efficiency: 50, npsh: 3.8, power: 4.7 },
+  ],
+};
+
+// FBE - Bomba de Engrenagens Externas - 1150 RPM
+const fbePumpCurves1150: Record<string, PumpCurvePoint[]> = {
+  // FBE 1/8" - 1150 RPM
+  'FBE-1/8"': [
+    { flow: 0, head: 17.0, efficiency: 0, npsh: 0.4, power: 0 },
+    { flow: 0.3, head: 16.5, efficiency: 16, npsh: 0.5, power: 0.1 },
+    { flow: 0.6, head: 15.5, efficiency: 30, npsh: 0.6, power: 0.2 },
+    { flow: 0.9, head: 14.0, efficiency: 40, npsh: 0.8, power: 0.3 },
+    { flow: 1.2, head: 12.0, efficiency: 48, npsh: 1.0, power: 0.35 },
+    { flow: 1.5, head: 9.5, efficiency: 45, npsh: 1.2, power: 0.4 },
+    { flow: 1.8, head: 6.5, efficiency: 36, npsh: 1.5, power: 0.45 },
+  ],
+  // FBE 1/4" - 1150 RPM
+  'FBE-1/4"': [
+    { flow: 0, head: 18.0, efficiency: 0, npsh: 0.5, power: 0 },
+    { flow: 0.6, head: 17.5, efficiency: 20, npsh: 0.6, power: 0.2 },
+    { flow: 1.2, head: 16.5, efficiency: 36, npsh: 0.7, power: 0.4 },
+    { flow: 1.8, head: 15.0, efficiency: 48, npsh: 1.0, power: 0.6 },
+    { flow: 2.4, head: 13.0, efficiency: 54, npsh: 1.3, power: 0.7 },
+    { flow: 3.0, head: 10.5, efficiency: 50, npsh: 1.6, power: 0.8 },
+    { flow: 3.6, head: 7.5, efficiency: 42, npsh: 2.0, power: 0.9 },
+    { flow: 4.2, head: 4.0, efficiency: 30, npsh: 2.4, power: 1.0 },
+  ],
+  // FBE 3/8" - 1150 RPM
+  'FBE-3/8"': [
+    { flow: 0, head: 19.5, efficiency: 0, npsh: 0.5, power: 0 },
+    { flow: 1.2, head: 19.0, efficiency: 25, npsh: 0.6, power: 0.4 },
+    { flow: 2.4, head: 18.0, efficiency: 44, npsh: 0.9, power: 0.7 },
+    { flow: 3.6, head: 16.5, efficiency: 54, npsh: 1.2, power: 1.0 },
+    { flow: 4.8, head: 14.5, efficiency: 60, npsh: 1.6, power: 1.3 },
+    { flow: 6.0, head: 12.0, efficiency: 57, npsh: 2.0, power: 1.5 },
+    { flow: 7.2, head: 8.5, efficiency: 48, npsh: 2.5, power: 1.7 },
+    { flow: 8.4, head: 4.5, efficiency: 34, npsh: 3.0, power: 1.8 },
+  ],
+  // Adicionar outros modelos FBE para 1150 RPM conforme necessário
+};
+
+// FBE - Bomba de Engrenagens Externas - 850 RPM
+const fbePumpCurves850: Record<string, PumpCurvePoint[]> = {
+  // FBE 1/2" - 850 RPM
+  'FBE-1/2"': [
+    { flow: 0, head: 10.0, efficiency: 0, npsh: 0.4, power: 0 },
+    { flow: 2.0, head: 9.8, efficiency: 28, npsh: 0.6, power: 0.25 },
+    { flow: 4.0, head: 9.5, efficiency: 46, npsh: 0.8, power: 0.5 },
+    { flow: 6.0, head: 8.9, efficiency: 58, npsh: 1.1, power: 0.7 },
+    { flow: 8.0, head: 8.0, efficiency: 65, npsh: 1.4, power: 0.9 },
+    { flow: 10.0, head: 6.8, efficiency: 62, npsh: 1.8, power: 1.1 },
+    { flow: 12.0, head: 5.2, efficiency: 54, npsh: 2.2, power: 1.25 },
+    { flow: 14.0, head: 3.2, efficiency: 38, npsh: 2.7, power: 1.35 },
+  ],
+  // FBE 3/4" - 850 RPM
+  'FBE-3/4"': [
+    { flow: 0, head: 11.0, efficiency: 0, npsh: 0.5, power: 0 },
+    { flow: 3.0, head: 10.8, efficiency: 32, npsh: 0.7, power: 0.4 },
+    { flow: 6.0, head: 10.3, efficiency: 52, npsh: 0.9, power: 0.8 },
+    { flow: 9.0, head: 9.5, efficiency: 63, npsh: 1.2, power: 1.2 },
+    { flow: 12.0, head: 8.5, efficiency: 68, npsh: 1.6, power: 1.5 },
+    { flow: 15.0, head: 7.2, efficiency: 65, npsh: 2.0, power: 1.8 },
+    { flow: 18.0, head: 5.5, efficiency: 56, npsh: 2.5, power: 2.0 },
+    { flow: 21.0, head: 3.5, efficiency: 40, npsh: 3.0, power: 2.2 },
+  ],
+  // Adicionar outros modelos FBE para 850 RPM conforme necessário
+};
+
+// Preparar os dados para o chart combinado de sistema e bomba
+const prepareChartData = (
+  pumpCurve: PumpCurvePoint[],
+  systemCurve: SystemCurvePoint[]
+): any[] => {
+  // Primeiro, vamos converter systemCurve para um formato que podemos buscar facilmente
+  const systemCurveMap = new Map<number, number>();
+  systemCurve.forEach(point => {
+    systemCurveMap.set(point.flow, point.systemHead);
+  });
+  
+  // Agora, para cada ponto da curva da bomba, adicionamos o ponto correspondente da curva do sistema
+  return pumpCurve.map(pumpPoint => {
+    // Encontrar o ponto mais próximo na curva do sistema
+    let nearestFlow = systemCurve[0].flow;
+    let minDiff = Math.abs(pumpPoint.flow - nearestFlow);
+    
+    for (const point of systemCurve) {
+      const diff = Math.abs(pumpPoint.flow - point.flow);
+      if (diff < minDiff) {
+        minDiff = diff;
+        nearestFlow = point.flow;
+      }
+    }
+    
+    // Obter a altura do sistema para este ponto
+    const systemHead = systemCurveMap.get(nearestFlow) || null;
+    
+    // Retornar um objeto combinado
+    return {
+      ...pumpPoint,
+      systemHead
+    };
+  });
+};
+
+// Componente principal da calculadora
+const PumpCalculatorSection = () => {
+  const { t } = useLanguage();
+  
+  // Estados para gerenciar a interface e os dados
+  const [activeTab, setActiveTab] = useState('simple');
+  const [flowRate, setFlowRate] = useState<number>(20);
+  const [head, setHead] = useState<number>(40);
+  const [fluidType, setFluidType] = useState<string>('water');
+  const [temperature, setTemperature] = useState<number>(25);
+  const [viscosity, setViscosity] = useState<number>(1.0);
+  const [density, setDensity] = useState<number>(1000);
+  const [pumpType, setPumpType] = useState<PumpType>(PumpType.FBCN);
+  const [rotationSpeed, setRotationSpeed] = useState<number>(3500);
+  const [selectedModel, setSelectedModel] = useState<string>('');
+  const [systemCurve, setSystemCurve] = useState<SystemCurvePoint[]>([]);
+  const [calculationResult, setCalculationResult] = useState<CalculationResult | null>(null);
+  const [isCalculating, setIsCalculating] = useState<boolean>(false);
+  const [showDetails, setShowDetails] = useState<boolean>(false);
+  const [combinedChartData, setCombinedChartData] = useState<any[]>([]);
+  const [autoSelectModel, setAutoSelectModel] = useState<boolean>(true);
+  const [errorMessage, setErrorMessage] = useState<string>('');
+
+  // Função para converter entre cP (centipoise) e SSU (Segundos Saybolt Universal)
+  // Baseado nas tabelas de conversão usadas pela indústria de bombas
+  const convertCpToSSU = (cp: number): number => {
+    if (cp < 1.5) {
+      return 31.0 + cp * 1.65;
+    } else if (cp < 5) {
+      return 32.1 + cp * 1.31;
+    } else if (cp < 10) {
+      return 35.5 + cp * 0.65;
+    } else if (cp < 50) {
+      return 38 + cp * 0.32;
+    } else if (cp < 500) {
+      return 45 + cp * 0.21;
+    } else if (cp < 1000) {
+      return 120 + cp * 0.06;
+    } else if (cp < 10000) {
+      return 170 + cp * 0.01;
+    } else {
+      return 270 + cp * 0.001;
+    }
+  };
+  
+  const convertSSUtoCp = (ssu: number): number => {
+    if (ssu < 100) {
+      return (ssu - 31.0) / 1.65;
+    } else if (ssu < 200) {
+      return (ssu - 32.1) / 1.31;
+    } else if (ssu < 300) {
+      return (ssu - 35.5) / 0.65;
+    } else if (ssu < 1000) {
+      return (ssu - 38) / 0.32;
+    } else if (ssu < 5000) {
+      return (ssu - 45) / 0.21;
+    } else if (ssu < 10000) {
+      return (ssu - 120) / 0.06;
+    } else if (ssu < 100000) {
+      return (ssu - 170) / 0.01;
+    } else {
+      return (ssu - 270) / 0.001;
+    }
+  };
+
+  // Opções de rotação disponíveis por tipo de bomba
+  const rotationOptions = useMemo(() => {
+    switch (pumpType) {
+      case PumpType.FBCN:
+        return [
+          { value: 3500, label: '3500 RPM - 60Hz' },
+          { value: 1750, label: '1750 RPM - 60Hz' }
+        ];
+      case PumpType.FBOT:
+        return [
+          { value: 3500, label: '3500 RPM - 60Hz' },
+          { value: 1750, label: '1750 RPM - 60Hz' }
+        ];
+      case PumpType.FBE:
+        return [
+          { value: 1750, label: '1750 RPM - 60Hz' },
+          { value: 1150, label: '1150 RPM - 60Hz' },
+          { value: 850, label: '850 RPM - 60Hz' },
+          { value: 500, label: '500 RPM (redutor)' },
+          { value: 300, label: '300 RPM (redutor)' }
+        ];
+      default:
+        return [{ value: 3500, label: '3500 RPM - 60Hz' }];
+    }
+  }, [pumpType]);
+
+  // Ajustar rotação quando o tipo de bomba mudar
+  useEffect(() => {
+    // Define a rotação padrão para cada tipo de bomba
+    if (pumpType === PumpType.FBCN || pumpType === PumpType.FBOT) {
+      setRotationSpeed(3500);
+    } else if (pumpType === PumpType.FBE) {
+      setRotationSpeed(1750);
+    }
+    
+    // Resetar o modelo selecionado quando mudar o tipo de bomba
+    setSelectedModel('');
+    setCalculationResult(null);
+    setShowDetails(false);
+  }, [pumpType]);
+
+  // Obter os modelos disponíveis para o tipo de bomba e rotação selecionados
+  const availableModels = useMemo(() => {
+    let models: { value: string, label: string }[] = [];
+    
+    if (pumpType === PumpType.FBCN) {
+      const pumpCurves = rotationSpeed === 3500 ? fbcnPumpCurves3500 : fbcnPumpCurves1750;
+      models = Object.keys(pumpCurves).map(model => ({
+        value: model,
+        label: model
+      }));
+    } else if (pumpType === PumpType.FBOT) {
+      const pumpCurves = rotationSpeed === 3500 ? fbotPumpCurves3500 : fbotPumpCurves1750;
+      models = Object.keys(pumpCurves).map(model => ({
+        value: model,
+        label: model
+      }));
+    } else if (pumpType === PumpType.FBE) {
+      let pumpCurves: Record<string, PumpCurvePoint[]>;
+      
+      if (rotationSpeed === 1750) {
+        pumpCurves = fbePumpCurves1750;
+      } else if (rotationSpeed === 1150) {
+        pumpCurves = fbePumpCurves1150;
+      } else {
+        pumpCurves = fbePumpCurves850;
+      }
+      
+      models = Object.keys(pumpCurves).map(model => ({
+        value: model,
+        label: model
+      }));
+    }
+    
+    return models.sort((a, b) => a.label.localeCompare(b.label));
+  }, [pumpType, rotationSpeed]);
+
+  // Geração da curva do sistema considerando viscosidade e densidade
+  useEffect(() => {
+    if (head > 0) {
+      // Modelo de curva de sistema: H = H_estático + K * Q²
+      // Incorporamos fatores de correção precisos baseados no Excel da FB Bombas
+      
+      // Parte estática da altura (geralmente uma porcentagem do head total)
+      const staticHeadPercentage = 0.2; // 20% da altura é considerada estática
+      const staticHead = head * staticHeadPercentage;
+      
+      // Fatores de correção para viscosidade usando equações mais precisas
+      let viscosityFactor: number;
+      
+      if (viscosity <= 1.0) {
+        // Para água e fluidos de baixa viscosidade (próximos da água)
+        viscosityFactor = 1.0;
+      } else if (viscosity <= 10.0) {
+        // Para viscosidades baixas a médias (1-10 cP)
+        viscosityFactor = 1.0 + 0.015 * (viscosity - 1.0) + 0.0003 * Math.pow(viscosity - 1.0, 2);
+      } else if (viscosity <= 100.0) {
+        // Para fluidos com viscosidade média a alta (10-100 cP)
+        viscosityFactor = 1.15 + 0.012 * (viscosity - 10.0);
+      } else if (viscosity <= 500.0) {
+        // Para fluidos altamente viscosos (100-500 cP)
+        viscosityFactor = 2.35 + 0.008 * (viscosity - 100.0);
+      } else {
+        // Para fluidos extremamente viscosos (>500 cP)
+        viscosityFactor = 5.55 + 0.005 * (viscosity - 500.0);
+      }
+      
+      // Fator de densidade - ajuste preciso baseado nas equações
+      let densityExponent = 0.5; // Expoente padrão para a maioria dos fluidos
+      
+      // Ajustamos o expoente baseado no tipo de fluido
+      if (fluidType === 'oil' || viscosity > 5.0) {
+        densityExponent = 0.45; // Ligeiramente menor para óleos
+      } else if (fluidType === 'slurry') {
+        densityExponent = 0.55; // Maior para suspensões com sólidos
+      }
+      
+      const densityFactor = Math.pow(1000 / density, densityExponent);
+      
+      // Cálculo do coeficiente K da curva do sistema
+      const k = (head - staticHead) / (flowRate * flowRate) * viscosityFactor / densityFactor;
+      
+      // Gerar pontos para a curva do sistema com mais precisão
+      const systemCurveData: SystemCurvePoint[] = [];
+      
+      // Número de pontos aumentado para melhor visualização e precisão
+      const numPoints = 30;
+      let maxFlow = flowRate * 2; // Mostra até 2x a vazão requerida
+      
+      // Ajusta o maxFlow com base no tipo de bomba para melhor visualização
+      if (pumpType === PumpType.FBE && flowRate < 10) {
+        maxFlow = Math.max(flowRate * 3, 15); // Para bombas pequenas, aumentamos o range
+      } else if (pumpType === PumpType.FBOT && temperature > 150) {
+        maxFlow = Math.max(flowRate * 2.5, 40); // Para óleo térmico em alta temperatura
+      }
+      
+      for (let i = 0; i <= numPoints; i++) {
+        const flow = (maxFlow * i) / numPoints;
+        
+        // Equação da curva do sistema: H = H_estático + K * Q²
+        const systemHead = staticHead + k * flow * flow;
+        
+        systemCurveData.push({ 
+          flow, 
+          systemHead,
+          head: null, // Para que não seja plotado na linha da bomba
+          efficiency: null // Para que não seja plotado na linha de eficiência
+        });
+      }
+      
+      setSystemCurve(systemCurveData);
+    }
+  }, [flowRate, head, viscosity, density, fluidType, pumpType]);
+
+  // Função para obter a curva de bomba baseada no tipo, rotação e modelo
+  const getPumpCurve = (
+    pumpType: PumpType, 
+    rotationSpeed: number, 
+    model: string
+  ): PumpCurvePoint[] => {
+    let pumpCurve: PumpCurvePoint[] = [];
+    
+    if (pumpType === PumpType.FBCN) {
+      if (rotationSpeed === 3500) {
+        pumpCurve = fbcnPumpCurves3500[model as keyof typeof fbcnPumpCurves3500] || [];
+      } else {
+        pumpCurve = fbcnPumpCurves1750[model as keyof typeof fbcnPumpCurves1750] || [];
+      }
+    } else if (pumpType === PumpType.FBOT) {
+      if (rotationSpeed === 3500) {
+        pumpCurve = fbotPumpCurves3500[model as keyof typeof fbotPumpCurves3500] || [];
+      } else {
+        pumpCurve = fbotPumpCurves1750[model as keyof typeof fbotPumpCurves1750] || [];
+      }
+    } else if (pumpType === PumpType.FBE) {
+      if (rotationSpeed === 1750) {
+        pumpCurve = fbePumpCurves1750[model as keyof typeof fbePumpCurves1750] || [];
+      } else if (rotationSpeed === 1150) {
+        pumpCurve = fbePumpCurves1150[model as keyof typeof fbePumpCurves1150] || [];
+      } else {
+        pumpCurve = fbePumpCurves850[model as keyof typeof fbePumpCurves850] || [];
+      }
+    }
+    
+    return pumpCurve;
+  };
+
+  // Função para encontrar o ponto de operação (interseção das curvas)
+  const findOperationPoint = (
+    pumpCurve: PumpCurvePoint[],
+    systemCurve: SystemCurvePoint[]
+  ) => {
+    // Verificar se as curvas são válidas
+    if (pumpCurve.length === 0 || systemCurve.length === 0) {
+      // Retornar um valor padrão se alguma curva estiver vazia
+      return {
+        flow: flowRate,
+        head: head
+      };
+    }
+    
+    // Funções de interpolação para as curvas
+    const interpolatePumpHead = (flow: number): number => {
+      // Verificar se o fluxo está fora dos limites da curva da bomba
+      if (flow <= pumpCurve[0].flow) return pumpCurve[0].head;
+      if (flow >= pumpCurve[pumpCurve.length - 1].flow) return pumpCurve[pumpCurve.length - 1].head;
+      
+      // Encontrar os pontos antes e depois do fluxo desejado
+      let lowerPoint = pumpCurve[0];
+      let upperPoint = pumpCurve[pumpCurve.length - 1];
+      
+      for (let i = 0; i < pumpCurve.length - 1; i++) {
+        if (pumpCurve[i].flow <= flow && pumpCurve[i + 1].flow >= flow) {
+          lowerPoint = pumpCurve[i];
+          upperPoint = pumpCurve[i + 1];
+          break;
+        }
+      }
+      
+      // Interpolação linear para encontrar a altura
+      const ratio = (flow - lowerPoint.flow) / (upperPoint.flow - lowerPoint.flow);
+      return lowerPoint.head + ratio * (upperPoint.head - lowerPoint.head);
+    };
+    
+    // Função para interpolar um ponto na curva do sistema
+    const interpolateSystemHead = (flow: number): number => {
+      // Verificar limites da curva do sistema
+      if (flow <= systemCurve[0].flow) return systemCurve[0].systemHead;
+      if (flow >= systemCurve[systemCurve.length - 1].flow) return systemCurve[systemCurve.length - 1].systemHead;
+      
+      // Encontrar os pontos antes e depois do fluxo desejado
+      let lowerPoint = systemCurve[0];
+      let upperPoint = systemCurve[systemCurve.length - 1];
+      
+      for (let i = 0; i < systemCurve.length - 1; i++) {
+        if (systemCurve[i].flow <= flow && systemCurve[i + 1].flow >= flow) {
+          lowerPoint = systemCurve[i];
+          upperPoint = systemCurve[i + 1];
+          break;
+        }
+      }
+      
+      // Interpolação linear para encontrar a altura
+      const ratio = (flow - lowerPoint.flow) / (upperPoint.flow - lowerPoint.flow);
+      return lowerPoint.systemHead + ratio * (upperPoint.systemHead - lowerPoint.systemHead);
+    };
+    
+    // Algoritmo de bissecção para encontrar o ponto de interseção
+    let minFlow = pumpCurve[0].flow;
+    let maxFlow = pumpCurve[pumpCurve.length - 1].flow;
+    
+    // Verificar se curvas se cruzam neste intervalo
+    let minDiff = interpolatePumpHead(minFlow) - interpolateSystemHead(minFlow);
+    let maxDiff = interpolatePumpHead(maxFlow) - interpolateSystemHead(maxFlow);
+    
+    // Se curvas não se cruzam, use o ponto mais próximo
+    if (minDiff * maxDiff > 0) {
+      let bestFlow = minFlow;
+      let minAbsDiff = Math.abs(minDiff);
+      
+      // Usar mais pontos para busca detalhada
+      const numPoints = 30;
+      const flowStep = (maxFlow - minFlow) / numPoints;
+      
+      for (let i = 0; i <= numPoints; i++) {
+        const flow = minFlow + i * flowStep;
+        const pumpHead = interpolatePumpHead(flow);
+        const systemHead = interpolateSystemHead(flow);
+        const absDiff = Math.abs(pumpHead - systemHead);
+        
+        if (absDiff < minAbsDiff) {
+          minAbsDiff = absDiff;
+          bestFlow = flow;
+        }
+      }
+      
+      return {
+        flow: bestFlow,
+        head: interpolatePumpHead(bestFlow)
+      };
+    }
+    
+    // Método de bissecção - encontrar onde as curvas se cruzam
+    const TOLERANCE = 0.01; // Tolerância para convergência
+    const MAX_ITERATIONS = 20; // Número máximo de iterações
+    
+    let midFlow = (minFlow + maxFlow) / 2;
+    let midDiff = 0;
+    
+    for (let i = 0; i < MAX_ITERATIONS; i++) {
+      midFlow = (minFlow + maxFlow) / 2;
+      midDiff = interpolatePumpHead(midFlow) - interpolateSystemHead(midFlow);
+      
+      // Verificar convergência
+      if (Math.abs(midDiff) < TOLERANCE) {
+        break;
+      }
+      
+      // Ajustar limites para próxima iteração
+      if (midDiff * minDiff < 0) {
+        maxFlow = midFlow;
+        maxDiff = midDiff;
+      } else {
+        minFlow = midFlow;
+        minDiff = midDiff;
+      }
+    }
+    
+    // Retornar o ponto de operação encontrado
+    return {
+      flow: midFlow,
+      head: interpolatePumpHead(midFlow)
+    };
+  };
+  
+  // Função para encontrar os pontos mais próximos para interpolação
+  const findClosestPoints = (
+    curveData: PumpCurvePoint[],
+    targetFlow: number
+  ) => {
+    // Encontre o ponto exato ou os dois pontos mais próximos para interpolação
+    const exactPoint = curveData.find(p => p.flow === targetFlow);
+    if (exactPoint) return [exactPoint, exactPoint];
+    
+    let lower = curveData[0];
+    let upper = curveData[curveData.length - 1];
+    
+    for (const point of curveData) {
+      if (point.flow <= targetFlow && point.flow > lower.flow) {
+        lower = point;
+      }
+      if (point.flow >= targetFlow && point.flow < upper.flow) {
+        upper = point;
+      }
+    }
+    
+    return [lower, upper];
+  };
+  
+  // Função para interpolar valores
+  const interpolateValue = (
+    points: PumpCurvePoint[],
+    targetFlow: number,
+    property: 'efficiency' | 'power' | 'npsh'
+  ): number => {
+    // Verificar se os pontos existem
+    if (!points || points.length < 2) {
+      // Valores padrão caso não seja possível interpolar
+      const defaults = {
+        efficiency: 50,
+        power: 5.0,
+        npsh: 3.0
+      };
+      return defaults[property];
+    }
+    
+    const [p1, p2] = points;
+    
+    // Se forem o mesmo ponto, não precisa interpolar
+    if (p1.flow === p2.flow) return p1[property];
+    
+    // Interpolação linear
+    const ratio = (targetFlow - p1.flow) / (p2.flow - p1.flow);
+    return p1[property] + ratio * (p2[property] - p1[property]);
+  };
+
+  // Função para verificar se os parâmetros estão dentro dos limites operacionais
+  const checkOperationalLimits = (): string => {
+    setErrorMessage('');
+    
+    // Verificações específicas para cada tipo de bomba com base na documentação
+    if (pumpType === PumpType.FBCN) {
+      if (temperature > 260) {
+        return 'Temperatura máxima para bombas FBCN é 260°C. Para temperaturas superiores, utilize bombas FBOT.';
+      }
+      
+      if (viscosity > 10000) {
+        return 'Viscosidade muito alta para bombas centrífugas. Para viscosidades acima de 10000 cP, recomenda-se bombas FBE.';
+      }
+    } 
+    else if (pumpType === PumpType.FBOT) {
+      if (temperature > 350) {
+        return 'Temperatura máxima para bombas FBOT é 350°C.';
+      }
+      
+      if (viscosity > 5000) {
+        return 'Viscosidade muito alta para bombas FBOT. Para viscosidades acima de 5000 cP, recomenda-se bombas FBE.';
+      }
+    }
+    else if (pumpType === PumpType.FBE) {
+      // Verificações baseadas nas tabelas das imagens 3 e 4
+      const ssuViscosity = convertCpToSSU(viscosity);
+      
+      if (rotationSpeed > 1150 && ssuViscosity > 10000) {
+        return 'Para viscosidades acima de 10000 SSU, recomenda-se usar rotações menores que 1150 RPM.';
+      }
+      
+      if (rotationSpeed > 850 && ssuViscosity > 50000) {
+        return 'Para viscosidades acima de 50000 SSU, recomenda-se usar rotações menores que 850 RPM.';
+      }
+      
+      if (rotationSpeed > 500 && ssuViscosity > 100000) {
+        return 'Para viscosidades extremamente altas, utilize rotações de 300-500 RPM com redutor.';
+      }
+      
+      if (temperature > 350) {
+        return 'Temperatura máxima para bombas FBE é 350°C.';
+      }
+    }
+    
+    return '';
+  };
+
+  // Função para calcular a bomba ideal
+  const calculateIdealPump = () => {
+    const errorMsg = checkOperationalLimits();
+    if (errorMsg) {
+      setErrorMessage(errorMsg);
+      return;
+    }
+    
+    setIsCalculating(true);
+    
+    setTimeout(() => {
+      let pumpData: PumpCurvePoint[] = [];
+      let pumpModel = '';
+      
+      // Se o usuário escolheu um modelo específico, usamos ele
+      if (!autoSelectModel && selectedModel) {
+        pumpModel = selectedModel;
+        pumpData = getPumpCurve(pumpType, rotationSpeed, pumpModel);
+      } else {
+        // Lógica para encontrar a melhor bomba automaticamente
+        let bestPump = '';
+        let bestScore = Number.MAX_VALUE;
+        
+        // Seleção diferente para cada tipo de bomba
+        if (pumpType === PumpType.FBCN) {
+          // Para bombas centrífugas, buscamos a maior eficiência no ponto de operação
+          const pumpCurves = rotationSpeed === 3500 ? fbcnPumpCurves3500 : fbcnPumpCurves1750;
+          
+          Object.entries(pumpCurves).forEach(([model, curveData]) => {
+            // Verificamos se a bomba pode fornecer a vazão e altura desejadas
+            const maxFlow = curveData[curveData.length - 1].flow;
+            const maxHead = curveData[0].head;
+            
+            if (flowRate <= maxFlow * 0.9 && head <= maxHead * 0.9) {
+              // Encontre o ponto de operação desta bomba mais próximo do ponto desejado
+              for (let i = 0; i < curveData.length - 1; i++) {
+                if (curveData[i].flow <= flowRate && curveData[i + 1].flow >= flowRate) {
+                  // Interpolação linear para estimar a altura e eficiência neste ponto
+                  const p1 = curveData[i];
+                  const p2 = curveData[i + 1];
+                  const ratio = (flowRate - p1.flow) / (p2.flow - p1.flow);
+                  
+                  const estimatedHead = p1.head + ratio * (p2.head - p1.head);
+                  const estimatedEfficiency = p1.efficiency + ratio * (p2.efficiency - p1.efficiency);
+                  
+                  // Calcular um score que prioriza a eficiência e proximidade da altura desejada
+                  const headDiff = Math.abs(estimatedHead - head) / head;
+                  
+                  // Score menor é melhor
+                  // Priorizamos bombas que fornecem uma altura próxima e com alta eficiência
+                  const score = headDiff * 3 - (estimatedEfficiency / 100);
+                  
+                  if (score < bestScore && estimatedHead >= head * 0.9) {
+                    bestScore = score;
+                    bestPump = model;
+                  }
+                  break;
+                }
+              }
+            }
+          });
+        } else if (pumpType === PumpType.FBOT) {
+          // Para bombas de óleo térmico, consideramos temperatura e viscosidade
+          const pumpCurves = rotationSpeed === 3500 ? fbotPumpCurves3500 : fbotPumpCurves1750;
+          
+          Object.entries(pumpCurves).forEach(([model, curveData]) => {
+            const maxFlow = curveData[curveData.length - 1].flow;
+            const maxHead = curveData[0].head;
+            
+            // Para óleo térmico, consideramos um fator de segurança maior
+            if (flowRate <= maxFlow * 0.85 && head <= maxHead * 0.85) {
+              // Score baseado na temperatura também
+              let tempFactor = 1.0;
+              if (temperature > 150) {
+                // Modelos maiores são melhores para alta temperatura
+                tempFactor = model.includes("200") ? 0.8 : 1.0;
+              }
+              
+              for (let i = 0; i < curveData.length - 1; i++) {
+                if (curveData[i].flow <= flowRate && curveData[i + 1].flow >= flowRate) {
+                  const p1 = curveData[i];
+                  const p2 = curveData[i + 1];
+                  const ratio = (flowRate - p1.flow) / (p2.flow - p1.flow);
+                  
+                  const estimatedHead = p1.head + ratio * (p2.head - p1.head);
+                  const estimatedEfficiency = p1.efficiency + ratio * (p2.efficiency - p1.efficiency);
+                  
+                  const headDiff = Math.abs(estimatedHead - head) / head;
+                  const efficiencyBonus = estimatedEfficiency / 200; // Menor peso à eficiência
+                  
+                  const score = (headDiff * 2 - efficiencyBonus) * tempFactor;
+                  
+                  if (score < bestScore && estimatedHead >= head) {
+                    bestScore = score;
+                    bestPump = model;
+                  }
+                  break;
+                }
+              }
+            }
+          });
+        } else if (pumpType === PumpType.FBE) {
+          // Para bombas de engrenagens, priorizamos viscosidade e pressão
+          let pumpCurves: Record<string, PumpCurvePoint[]>;
+          
+          if (rotationSpeed === 1750) {
+            pumpCurves = fbePumpCurves1750;
+          } else if (rotationSpeed === 1150) {
+            pumpCurves = fbePumpCurves1150;
+          } else {
+            pumpCurves = fbePumpCurves850;
+          }
+          
+          // Fator de viscosidade - bombas de engrenagens são otimizadas para fluidos viscosos
+          // Baseado na tabela 1, 2 e 3 da documentação FBE (imagens 3 e 4)
+          let viscFactor: number;
+          
+          if (viscosity <= 10) {
+            viscFactor = 1.2; // Menos ideal para fluidos de baixa viscosidade
+          } else if (viscosity <= 100) {
+            viscFactor = 1.0;
+          } else if (viscosity <= 1000) {
+            viscFactor = 0.8; // Bombas FBE começam a mostrar vantagens
+          } else if (viscosity <= 10000) {
+            viscFactor = 0.7; // Significativamente melhores para alta viscosidade
+          } else if (viscosity <= 50000) {
+            viscFactor = 0.6; // Ideais para viscosidades muito altas
+          } else {
+            viscFactor = 0.5; // Extremamente vantajosas para fluidos ultra viscosos
+          }
+          
+          // Ajuste baseado na rotação - rotações mais baixas são melhores para viscosidades altas
+          if (viscosity > 1000) {
+            viscFactor *= (rotationSpeed === 850 ? 0.85 : rotationSpeed === 1150 ? 0.9 : 1.0);
+          }
+          
+          Object.entries(pumpCurves).forEach(([model, curveData]) => {
+            const maxFlow = curveData[curveData.length - 1].flow;
+            const maxHead = curveData[0].head;
+            
+            if (flowRate <= maxFlow * 0.8 && head <= maxHead * 0.9) {
+              // Para bombas de engrenagens, operamos preferencialmente em 40-70% da capacidade
+              const flowRatio = flowRate / maxFlow;
+              const optimalFlowBonus = flowRatio >= 0.4 && flowRatio <= 0.7 ? 0.2 : 0;
+              
+              for (let i = 0; i < curveData.length - 1; i++) {
+                if (curveData[i].flow <= flowRate && curveData[i + 1].flow >= flowRate) {
+                  const p1 = curveData[i];
+                  const p2 = curveData[i + 1];
+                  const ratio = (flowRate - p1.flow) / (p2.flow - p1.flow);
+                  
+                  const estimatedHead = p1.head + ratio * (p2.head - p1.head);
+                  const headDiff = Math.abs(estimatedHead - head) / head;
+                  
+                  // Para bombas de engrenagem, o mais importante é a vazão e capacidade de pressão
+                  const score = (headDiff * 1.5 - optimalFlowBonus) * viscFactor;
+                  
+                  if (score < bestScore && estimatedHead >= head) {
+                    bestScore = score;
+                    bestPump = model;
+                  }
+                  break;
+                }
+              }
+            }
+          });
+        }
+        
+        // Se não encontrou uma bomba adequada, usar a primeira disponível como fallback
+        if (!bestPump && availableModels.length > 0) {
+          bestPump = availableModels[0].value;
+        }
+        
+        pumpModel = bestPump;
+        pumpData = getPumpCurve(pumpType, rotationSpeed, pumpModel);
+      }
+      
+      // Se não houver dados de bomba, exibir mensagem de erro
+      if (pumpData.length === 0) {
+        setIsCalculating(false);
+        return;
+      }
+      
+      // Encontrar o ponto de operação (interseção da curva da bomba com a curva do sistema)
+      const operationPoint = findOperationPoint(pumpData, systemCurve);
+      
+      // Calcular eficiência no ponto de operação (interpolação linear simples)
+      const closestPoints = findClosestPoints(pumpData, operationPoint.flow);
+      
+      // Verificar se temos pontos válidos para interpolação
+      if (!closestPoints || closestPoints.length < 2) {
+        setCalculationResult({
+          pumpModel,
+          pumpType: pumpType,
+          efficiency: 50,
+          power: 5.0,
+          npsh: 3.0,
+          flowRate: operationPoint.flow,
+          head: operationPoint.head,
+          points: pumpData.map(p => ({ x: p.flow, y: p.head })),
+          curvePoints: pumpData,
+          rotationSpeed
+        });
+        
+        setIsCalculating(false);
+        setShowDetails(true);
+        return;
+      }
+      
+      // Cálculos de eficiência, potência e NPSH com correções
+      const flowForCalc = operationPoint.flow || flowRate;
+      let efficiency = interpolateValue(closestPoints, flowForCalc, 'efficiency');
+      
+      // Ajustes de eficiência baseados na viscosidade
+      if (viscosity <= 1.0) {
+        // Para água e fluidos com viscosidade próxima à água, não há redução
+      } else if (viscosity <= 10.0) {
+        // Para fluidos pouco viscosos (1-10 cP)
+        const vf = Math.log10(viscosity) * 3.5;
+        const reductionFactor = 1.0 - (vf / 100) * (efficiency / 100) * 1.25;
+        efficiency = Math.max(efficiency * reductionFactor, efficiency * 0.7);
+      } else if (viscosity <= 100.0) {
+        // Para fluidos com viscosidade média a alta (10-100 cP)
+        const vf = 10 + Math.log10(viscosity / 10) * 15;
+        const reductionFactor = 1.0 - (vf / 100) * (efficiency / 75) * 1.4;
+        efficiency = Math.max(efficiency * reductionFactor, efficiency * 0.5);
+      } else if (viscosity <= 1000.0) {
+        // Para fluidos altamente viscosos (100-1000 cP)
+        const vf = 25 + Math.log10(viscosity / 100) * 20;
+        const reductionFactor = 1.0 - (vf / 100) * 1.6;
+        efficiency = Math.max(efficiency * reductionFactor, efficiency * 0.35);
+      } else if (viscosity <= 10000.0) {
+        // Para fluidos muito viscosos (1000-10000 cP)
+        const vf = 45 + Math.log10(viscosity / 1000) * 15;
+        const reductionFactor = 1.0 - (vf / 100) * 1.8;
+        efficiency = Math.max(efficiency * reductionFactor, efficiency * 0.25);
+      } else {
+        // Para fluidos ultra viscosos (>10000 cP)
+        const vf = 60 + Math.log10(viscosity / 10000) * 10;
+        const reductionFactor = 1.0 - (vf / 100) * 2.0;
+        efficiency = Math.max(efficiency * reductionFactor, efficiency * 0.20);
+        
+        // Para bombas de engrenagens, a eficiência cai menos drasticamente com viscosidade extrema
+        if (pumpType === PumpType.FBE) {
+          efficiency *= 1.25; // Ajuste para bombas de engrenagens com fluidos ultra viscosos
+          efficiency = Math.min(efficiency, 45); // Limite máximo de eficiência para viscosidades extremas
+        }
+      }
+      
+      // Fator de temperatura para fluidos térmicos
+      if (fluidType === 'thermal_oil' && temperature > 80) {
+        const tempFactor = 1.0 + (temperature - 80) * 0.002;
+        efficiency = Math.min(efficiency * tempFactor, efficiency * 1.15);
+      }
+      
+      // Ajustes específicos por tipo de bomba
+      if (pumpType === PumpType.FBE && viscosity > 50) {
+        // Bombas de engrenagens funcionam melhor com fluidos viscosos
+        efficiency = Math.min(efficiency * 1.1, efficiency * 1.2);
+      }
+      
+      // Calcular potência com as correções
+      const powerBase = interpolateValue(closestPoints, flowForCalc, 'power');
+      const powerDensityFactor = density / 1000;
+      
+      // Fator de viscosidade para potência - baseado nas tabelas 1-4 da documentação FBE
+      let powerViscosityFactor: number;
+      
+      if (viscosity <= 1.0) {
+        powerViscosityFactor = 1.0;
+      } else if (viscosity <= 10.0) {
+        powerViscosityFactor = 1.0 + (viscosity - 1.0) * 0.01 + Math.pow(viscosity - 1.0, 1.5) * 0.0005;
+      } else if (viscosity <= 100.0) {
+        powerViscosityFactor = 1.09 + (viscosity - 10.0) * 0.008;
+      } else if (viscosity <= 1000.0) {
+        powerViscosityFactor = 1.81 + (viscosity - 100.0) * 0.005;
+      } else if (viscosity <= 10000.0) {
+        powerViscosityFactor = 6.31 + (viscosity - 1000.0) * 0.001;
+      } else if (viscosity <= 50000.0) {
+        powerViscosityFactor = 16.31 + (viscosity - 10000.0) * 0.0005;
+      } else {
+        powerViscosityFactor = 36.31 + (viscosity - 50000.0) * 0.0002;
+      }
+      
+      // Ajustes específicos por tipo de bomba
+      if (pumpType === PumpType.FBE) {
+        // As bombas de engrenagens FBE são otimizadas para fluidos viscosos
+        // De acordo com a tabela de seleção no documento, esses ajustes são necessários
+        if (viscosity > 1000) {
+          // Redução do fator de viscosidade para bombas de engrenagens em alta viscosidade
+          powerViscosityFactor = powerViscosityFactor * 0.85;
+        }
+        if (viscosity > 10000) {
+          // Redução adicional para viscosidades extremas - conforme tabela 3
+          powerViscosityFactor = powerViscosityFactor * 0.8;
+        }
+      } else if (pumpType === PumpType.FBCN && viscosity > 1000) {
+        // Bombas centrífugas não são ideais para fluidos muito viscosos
+        powerViscosityFactor = powerViscosityFactor * 1.3;
+      }
+      
+      // Ajuste para temperatura da potência em fluidos térmicos
+      let powerTempFactor = 1.0;
+      if (fluidType === 'thermal_oil' && temperature > 80) {
+        powerTempFactor = 1.0 - (temperature - 80) * 0.001;
+        powerTempFactor = Math.max(powerTempFactor, 0.85);
+      }
+      
+      // Ajustes específicos por tipo de bomba para potência
+      if (pumpType === PumpType.FBE) {
+        // Bombas de engrenagens consomem mais potência com viscosidade
+        powerViscosityFactor *= (1.0 + viscosity / 1000);
+      } else if (pumpType === PumpType.FBOT && temperature > 200) {
+        // Bombas de óleo térmico em alta temperatura
+        powerTempFactor *= 0.9;
+      }
+      
+      // Cálculo final da potência com todos os fatores
+      const power = powerBase * powerDensityFactor * powerViscosityFactor * powerTempFactor;
+      
+      // NPSH requerido - ajuste mais detalhado
+      let npsh = interpolateValue(closestPoints, flowForCalc, 'npsh');
+      
+      // Correções de NPSH para viscosidade
+      if (viscosity > 1.0) {
+        if (viscosity <= 10.0) {
+          npsh *= (1.0 + (viscosity - 1.0) * 0.003);
+        } else if (viscosity <= 100.0) {
+          npsh *= (1.027 + (viscosity - 10.0) * 0.004);
+        } else if (viscosity <= 500.0) {
+          npsh *= (1.387 + (viscosity - 100.0) * 0.002);
+        } else {
+          npsh *= (2.187 + (viscosity - 500.0) * 0.001);
+        }
+      }
+      
+      // Correções de NPSH para temperatura
+      if (temperature > 60) {
+        const npshTempFactor = 1.0 + (temperature - 60) * 0.003;
+        npsh *= npshTempFactor;
+      }
+      
+      // Ajustes específicos por tipo de bomba para NPSH
+      if (pumpType === PumpType.FBOT && temperature > 150) {
+        // Óleo térmico quente tem menor NPSH requerido
+        npsh *= 0.9;
+      } else if (pumpType === PumpType.FBE && viscosity > 100) {
+        // Fluidos viscosos em bombas de engrenagens
+        npsh *= 1.2;
+      }
+      
+      // Preparar dados combinados para o gráfico
+      const chartData = prepareChartData(pumpData, systemCurve);
+      setCombinedChartData(chartData);
+      
+      // Gerar recomendações específicas
+      const specificRecommendations: string[] = [];
+      
+      // Recomendações baseadas no tipo de bomba e nos parâmetros do sistema
+      if (pumpType === PumpType.FBCN) {
+        // Recomendações para bombas centrífugas normalizadas
+        if (efficiency < 50) {
+          specificRecommendations.push('Operando fora do ponto ótimo de eficiência. Considere ajustar o sistema para melhor eficiência energética.');
+        }
+        if (temperature > 100) {
+          specificRecommendations.push('Para temperaturas elevadas, recomenda-se usar selos mecânicos especiais e materiais adequados.');
+        }
+        if (flowRate < pumpData[1].flow * 1.2) {
+          specificRecommendations.push('Operando próximo ao fluxo mínimo recomendado. Considere uma válvula de recirculação.');
+        }
+      } else       if (pumpType === PumpType.FBOT) {
+        // Recomendações para bombas de óleo térmico baseadas na documentação técnica (imagem 2)
+        if (temperature < 150) {
+          specificRecommendations.push('Para temperaturas abaixo de 150°C, considere o pré-aquecimento do sistema antes da operação.');
+        }
+        if (temperature > 250) {
+          specificRecommendations.push('Para temperaturas acima de 250°C, recomenda-se resfriamento adicional para os rolamentos 6306 C4/ZZ C4 WT conforme especificação.');
+        }
+        if (temperature > 300) {
+          specificRecommendations.push('Para operação em temperatura acima de 300°C, verificar pressão de recalque conforme Figura 1 da documentação técnica.');
+        }
+        if (rotationSpeed === 3500 && temperature > 300) {
+          specificRecommendations.push('Para temperaturas extremas, considere operar em rotação mais baixa para prolongar a vida útil do equipamento.');
+        }
+        
+        // Recomendações adicionais baseadas nas características construtivas
+        specificRecommendations.push('Utilizar gaxeta de fibra de grafite de 5,5mm conforme especificação do fabricante para alta temperatura.');
+        
+        // Informações sobre a pressão de teste hidrostático
+        specificRecommendations.push('A pressão de teste hidrostático deve ser 1,5x a pressão de operação, conforme especificação técnica.');
+      } else       if (pumpType === PumpType.FBE) {
+        // Recomendações para bombas de engrenagens baseadas na tabela de seleção (imagem 3 e 4)
+        if (viscosity < 20 && rotationSpeed > 1150) {
+          specificRecommendations.push('Para fluidos de baixa viscosidade, considere reduzir a rotação para evitar cavitação.');
+        }
+        
+        // Recomendações baseadas nas faixas de viscosidade da tabela 1 (imagem 3)
+        if (viscosity > 500 && viscosity <= 2500) {
+          specificRecommendations.push('Para fluidos altamente viscosos, utilizar transmissão direta (conforme tabela 2) e monitorar a temperatura do fluido.');
+        } else if (viscosity > 2500 && viscosity <= 7500) {
+          specificRecommendations.push('Para viscosidade entre 2500-7500 SSU, considerar rotação 850 RPM com transmissão direta conforme tabela 2.');
+        } else if (viscosity > 7500 && viscosity <= 50000) {
+          specificRecommendations.push('Para viscosidade entre 7500-50000 SSU, utilizar redução de velocidade por polia ou redutor conforme tabela 2.');
+        } else if (viscosity > 50000) {
+          specificRecommendations.push('Para viscosidade extrema (>50000 SSU), usar rotação máxima de 300-150 RPM com redutor conforme especificação.');
+        }
+        
+        // Recomendações baseadas na tabela 4 - reserva de potência
+        if (head > 20) {
+          specificRecommendations.push('Considerar reserva de potência de 30% para potências até 3cv, 25% para 3-5cv, ou 15% para 6-25cv (conforme tabela 4).');
+        }
+        
+        if (flowRate > pumpData[Math.floor(pumpData.length / 2)].flow) {
+          specificRecommendations.push('Operando em alto fluxo. Verificar requisitos de NPSH disponível no sistema.');
+        }
+        
+        // Adicionar informação sobre nomenclatura, conforme imagem 4
+        const modelNumber = selectedModel.replace('FBE-', '');
+        if (modelNumber.includes('CA')) {
+          specificRecommendations.push('Modelo com Câmara de Aquecimento (CA) para fluidos de alta viscosidade que necessitam pré-aquecimento.');
+        }
+      }
+      
+      // Recomendações gerais baseadas em parâmetros do sistema
+      if (fluidType === 'chemical') {
+        specificRecommendations.push('Para produtos químicos, verifique a compatibilidade dos materiais de vedação e componentes internos.');
+      }
+      if (fluidType === 'slurry') {
+        specificRecommendations.push('Para fluidos com sólidos em suspensão, considere componentes com tratamento superficial anti-abrasivo.');
+      }
+      
+      // Definir o resultado final do cálculo
+      setCalculationResult({
+        pumpModel,
+        pumpType: pumpType,
+        efficiency,
+        power,
+        npsh,
+        flowRate: operationPoint.flow,
+        head: operationPoint.head,
+        points: pumpData.map(p => ({ x: p.flow, y: p.head })),
+        curvePoints: pumpData,
+        rotationSpeed,
+        specificRecommendations
+      });
+      
+      setIsCalculating(false);
+      setShowDetails(true);
+    }, 800);
